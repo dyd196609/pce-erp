@@ -1,0 +1,273 @@
+[
+    {
+        "model": "system.company",
+        "pk": 1,
+        "fields": {
+            "name": "示例制造有限公司",
+            "code": "COMP001",
+            "address": "某某工业园",
+            "contact": "张三",
+            "phone": "13800000000",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 1,
+        "fields": {
+            "name": "总经办",
+            "code": "ZJB",
+            "parent": null,
+            "company": 1,
+            "manager": "总经理",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 2,
+        "fields": {
+            "name": "生产部",
+            "code": "SCB",
+            "parent": null,
+            "company": 1,
+            "manager": "生产总监",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 3,
+        "fields": {
+            "name": "机加工车间",
+            "code": "JJC",
+            "parent": 2,
+            "company": 1,
+            "manager": "车间主任",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 4,
+        "fields": {
+            "name": "装配车间",
+            "code": "ZPC",
+            "parent": 2,
+            "company": 1,
+            "manager": "车间主任",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 5,
+        "fields": {
+            "name": "采购部",
+            "code": "CGB",
+            "parent": null,
+            "company": 1,
+            "manager": "采购经理",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 6,
+        "fields": {
+            "name": "营销部",
+            "code": "YXB",
+            "parent": null,
+            "company": 1,
+            "manager": "营销总监",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 7,
+        "fields": {
+            "name": "工艺部",
+            "code": "GYB",
+            "parent": null,
+            "company": 1,
+            "manager": "工艺经理",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 8,
+        "fields": {
+            "name": "品保部",
+            "code": "PBB",
+            "parent": null,
+            "company": 1,
+            "manager": "品保经理",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 9,
+        "fields": {
+            "name": "仓储部",
+            "code": "CCB",
+            "parent": null,
+            "company": 1,
+            "manager": "仓库主管",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 10,
+        "fields": {
+            "name": "财务部",
+            "code": "CWB",
+            "parent": null,
+            "company": 1,
+            "manager": "财务经理",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 11,
+        "fields": {
+            "name": "人力行政部",
+            "code": "RLXZB",
+            "parent": null,
+            "company": 1,
+            "manager": "人事经理",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 12,
+        "fields": {
+            "name": "计划物控部",
+            "code": "JHWKB",
+            "parent": null,
+            "company": 1,
+            "manager": "计划物控经理",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.department",
+        "pk": 13,
+        "fields": {
+            "name": "设计部",
+            "code": "SJB",
+            "parent": null,
+            "company": 1,
+            "manager": "设计经理",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.workshop",
+        "pk": 1,
+        "fields": {
+            "name": "原料车间",
+            "code": "YLC",
+            "department": 2,
+            "company": 1,
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.workshop",
+        "pk": 2,
+        "fields": {
+            "name": "初加工车间",
+            "code": "CJG",
+            "department": 2,
+            "company": 1,
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.workshop",
+        "pk": 3,
+        "fields": {
+            "name": "包装车间",
+            "code": "BZC",
+            "department": 2,
+            "company": 1,
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.workshop",
+        "pk": 4,
+        "fields": {
+            "name": "机加工车间",
+            "code": "JJCWS",
+            "department": 3,
+            "company": 1,
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.workshop",
+        "pk": 5,
+        "fields": {
+            "name": "装配车间",
+            "code": "ZPCWS",
+            "department": 4,
+            "company": 1,
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.team",
+        "pk": 1,
+        "fields": {
+            "name": "机加工一班",
+            "code": "JJC01",
+            "workshop": 4,
+            "department": 3,
+            "company": 1,
+            "leader": "班组长",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.team",
+        "pk": 2,
+        "fields": {
+            "name": "装配一班",
+            "code": "ZPC01",
+            "workshop": 5,
+            "department": 4,
+            "company": 1,
+            "leader": "班组长",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.process",
+        "pk": 1,
+        "fields": {
+            "name": "切割工序",
+            "code": "QG01",
+            "team": 1,
+            "description": "材料切割",
+            "is_active": true
+        }
+    },
+    {
+        "model": "system.process",
+        "pk": 2,
+        "fields": {
+            "name": "装配工序",
+            "code": "ZP01",
+            "team": 2,
+            "description": "产品装配",
+            "is_active": true
+        }
+    }
+]

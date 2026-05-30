@@ -1,0 +1,54 @@
+{% extends "admin/index.html" %}
+
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+    {% if app_list %}
+    {% for app in app_list %}
+    <div class="app-{{ app.app_label }} module">
+        <table>
+            <caption>
+                <a href="{{ app.app_url }}" class="section">{{ app.name }}</a>
+            </caption>
+            {% for model in app.models %}
+            <tr class="model-{{ model.object_name|lower }}">
+                {% if model.admin_url %}
+                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                {% else %}
+                <th scope="row">{{ model.name }}</th>
+                {% endif %}
+
+                {% if model.add_url %}
+                <td><a href="{{ model.add_url }}" class="addlink">增加</a></td>
+                {% else %}
+                <td>&nbsp;</td>
+                {% endif %}
+
+                {% if model.admin_url %}
+                {% if model.view_only %}
+                <td><a href="{{ model.admin_url }}" class="viewlink">查看</a></td>
+                {% else %}
+                <td><a href="{{ model.admin_url }}" class="changelink">修改</a></td>
+                {% endif %}
+                {% else %}
+                <td>&nbsp;</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            {# 自定义添加：在 SYSTEM 应用下增加导入链接 #}
+            {% if app.app_label == 'system' %}
+            <tr class="model-import-org">
+                <th scope="row"><a href="{% url 'import_org' %}">导入组织架构</a></th>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p>您没有权限查看或编辑任何内容。</p>
+    {% endif %}
+</div>
+{% endblock %}
