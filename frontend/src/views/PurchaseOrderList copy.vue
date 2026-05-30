@@ -42,32 +42,6 @@
         流程：草稿 → 提交 → 审核 → 复核 → 审批 → 收货 → 检验 → 入库 → 结案
       </span>
 
-      <!-- ========== 新增三列筛选器 ========== -->
-      <!-- 紧急程度筛选 -->
-      <el-select v-model="filters.urgency_level" placeholder="紧急程度" clearable size="small" style="width: 100px"
-        @change="loadOrders">
-        <el-option label="特急" value="urgent" />
-        <el-option label="紧急" value="emergency" />
-        <el-option label="一般" value="normal" />
-        <el-option label="宽松" value="relaxed" />
-        <el-option label="已完成" value="completed" />
-        <el-option label="未计划" value="unscheduled" />
-      </el-select>
-
-      <!-- 是否达成筛选 -->
-      <el-select v-model="filters.is_fulfilled" placeholder="是否达成" clearable size="small" style="width: 100px"
-        @change="loadOrders">
-        <el-option label="是" :value="true" />
-        <el-option label="否" :value="false" />
-      </el-select>
-
-      <!-- 到期天数范围筛选 -->
-      <el-input v-model="filters.days_to_expiry_min" placeholder="到期天数≥" size="small" style="width: 100px"
-        @input="loadOrders" />
-      <span style="margin: 0 4px">~</span>
-      <el-input v-model="filters.days_to_expiry_max" placeholder="到期天数≤" size="small" style="width: 100px"
-        @input="loadOrders" />
-
       <!-- 搜索框 -->
       <el-input v-model="searchKeyword" placeholder="全局搜索订单号/供应商" clearable style="width: 250px; margin-left: auto"
         @clear="loadOrders" @keyup.enter="loadOrders" />
@@ -137,35 +111,7 @@
           </template>
         </el-table-column>
 
-        <!-- 采购订单-到期天数 -->
-        <el-table-column prop="days_to_expiry" label="到期天数" width="120">
-          <template #default="{ row }">
-            <span v-if="row.days_to_expiry !== null && row.days_to_expiry !== undefined">
-              {{ row.days_to_expiry }}
-            </span>
-            <span v-else>-</span>
-          </template>
-        </el-table-column>
-
-        <!-- 采购订单-紧急程度 -->
-        <el-table-column prop="urgency_level" label="紧急程度" width="120">
-          <template #default="{ row }">
-            <el-tag :type="getUrgencyTagType(row.urgency_level)" size="small">
-              {{ getUrgencyText(row.urgency_level) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-
-        <!-- 采购订单-是否达成 -->
-        <el-table-column prop="is_fulfilled" label="是否达成" width="120">
-          <template #default="{ row }">
-            <el-tag :type="row.is_fulfilled ? 'success' : 'info'" size="small">
-              {{ row.is_fulfilled ? '是' : '否' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="buyer" label="采购员" min-width="100">
+        <el-table-column prop="buyer" label="采购员" min-width="100" sortable="custom">
           <template #header>
             <div>
               <div>采购员</div>
@@ -291,32 +237,6 @@
                   <el-option label="已结案" value="closed" />
                   <el-option label="已取消" value="cancelled" />
                 </el-select>
-
-                <!-- 紧急程度筛选 -->
-                <el-select v-model="filters.urgency_level" placeholder="紧急程度" clearable size="small"
-                  style="width: 100px" @change="loadOrders">
-                  <el-option label="特急" value="urgent" />
-                  <el-option label="紧急" value="emergency" />
-                  <el-option label="一般" value="normal" />
-                  <el-option label="宽松" value="relaxed" />
-                  <el-option label="已完成" value="completed" />
-                  <el-option label="未计划" value="unscheduled" />
-                </el-select>
-
-                <!-- 是否达成筛选 -->
-                <el-select v-model="filters.is_fulfilled" placeholder="是否达成" clearable size="small" style="width: 100px"
-                  @change="loadOrders">
-                  <el-option label="是" :value="true" />
-                  <el-option label="否" :value="false" />
-                </el-select>
-
-                <!-- 到期天数范围筛选 -->
-                <el-input v-model="filters.days_to_expiry_min" placeholder="到期天数≥" size="small" style="width: 100px"
-                  @input="loadOrders" />
-                <span style="margin: 0 4px">~</span>
-                <el-input v-model="filters.days_to_expiry_max" placeholder="到期天数≤" size="small" style="width: 100px"
-                  @input="loadOrders" />
-
                 <el-button type="text" size="small" @click="resetStatus">重置</el-button>
               </div>
             </div>
@@ -553,31 +473,6 @@ const statusMap = {
   cancelled: '已取消'
 }
 
-// 采购订单-紧急程度映射
-const getUrgencyText = (level) => {
-  const map = {
-    'urgent': '特急',
-    'emergency': '紧急',
-    'normal': '一般',
-    'relaxed': '宽松',
-    'completed': '已完成',
-    'unscheduled': '未计划'
-  }
-  return map[level] || '未知'
-}
-
-const getUrgencyTagType = (level) => {
-  const map = {
-    'urgent': 'danger',
-    'emergency': 'warning',
-    'normal': 'primary',
-    'relaxed': 'success',
-    'completed': 'info',
-    'unscheduled': 'info'
-  }
-  return map[level] || 'info'
-}
-
 // 检查权限（示例，实际应从后端获取用户权限列表）
 const userPermissions = ref([]) // 存储当前用户的权限列表
 const hasPerm = (perm) => userPermissions.value.includes(perm)
@@ -716,16 +611,7 @@ const searchKeyword = ref('')
 const selectedRows = ref([])
 
 // ---------- 筛选条件 ----------
-const filters = reactive({
-  po_no: '',
-  supplier_name: '',
-  buyer: '',
-  status: '',
-  urgency_level: '',      // 新增：紧急程度筛选
-  is_fulfilled: '',       // 新增：是否达成筛选
-  days_to_expiry_min: '', // 新增：到期天数最小值
-  days_to_expiry_max: ''  // 新增：到期天数最大值
-})
+const filters = reactive({ po_no: '', supplier_name: '', buyer: '', status: '' })
 const amountMin = ref('')
 const amountMax = ref('')
 const dateRange = reactive({ order_date: [], expected_date: [], actual_receive_date: [] })
@@ -830,11 +716,7 @@ const loadOrders = async () => {
       po_no__in: batch.po_nos.join(','),
       supplier_name__in: batch.suppliers.join(','),
       buyer__in: batch.buyers.join(','),
-      ordering: sortOrder.value ? `${sortOrder.value === 'asc' ? '' : '-'}${sortField.value}` : '',
-      urgency_level: filters.urgency_level,
-      is_fulfilled: filters.is_fulfilled,
-      days_to_expiry_min: filters.days_to_expiry_min,
-      days_to_expiry_max: filters.days_to_expiry_max
+      ordering: sortOrder.value ? `${sortOrder.value === 'asc' ? '' : '-'}${sortField.value}` : ''
     }
     Object.keys(params).forEach(k => {
       if (params[k] === undefined || params[k] === '') delete params[k]
