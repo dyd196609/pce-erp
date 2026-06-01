@@ -75,6 +75,17 @@ class PurchaseOrder(models.Model):
     )
     # =================================
 
+    # ========== 在这里添加新字段 ==========
+    require_department = models.ForeignKey(
+        "system.Department",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="require_orders",
+        verbose_name="物料需求部门",
+    )
+    # ===================================
+
     created_by = models.BigIntegerField(blank=True, null=True)
 
     created_by = models.BigIntegerField(blank=True, null=True)
