@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div style="padding: 20px">
     <h2>采购订单管理</h2>
 
@@ -41,6 +41,32 @@
       <span style="font-size: 12px; color: #909399; margin-left: 16px;">
         流程：草稿 → 提交 → 审核 → 复核 → 审批 → 收货 → 检验 → 入库 → 结案
       </span>
+
+      <!-- ========== 新增三列筛选器 ========== -->
+      <!-- 紧急程度筛选 -->
+      <el-select v-model="filters.urgency_level" placeholder="紧急程度" clearable size="small" style="width: 100px"
+        @change="loadOrders">
+        <el-option label="特急" value="urgent" />
+        <el-option label="紧急" value="emergency" />
+        <el-option label="一般" value="normal" />
+        <el-option label="宽松" value="relaxed" />
+        <el-option label="已完成" value="completed" />
+        <el-option label="未计划" value="unscheduled" />
+      </el-select>
+
+      <!-- 是否达成筛选 -->
+      <el-select v-model="filters.is_fulfilled" placeholder="是否达成" clearable size="small" style="width: 100px"
+        @change="loadOrders">
+        <el-option label="是" :value="true" />
+        <el-option label="否" :value="false" />
+      </el-select>
+
+      <!-- 到期天数范围筛选 -->
+      <el-input v-model="filters.days_to_expiry_min" placeholder="到期天数≥" size="small" style="width: 100px"
+        @input="loadOrders" />
+      <span style="margin: 0 4px">~</span>
+      <el-input v-model="filters.days_to_expiry_max" placeholder="到期天数≤" size="small" style="width: 100px"
+        @input="loadOrders" />
 
       <!-- 搜索框 -->
       <el-input v-model="searchKeyword" placeholder="全局搜索订单号/供应商" clearable style="width: 250px; margin-left: auto"
@@ -111,7 +137,75 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="buyer" label="采购员" min-width="100" sortable="custom">
+        <!-- 采购订单-到期天数 -->
+        <el-table-column prop="days_to_expiry" label="到期天数" width="160">
+          <template #header>
+            <div>
+              <div>到期天数</div>
+              <div style="margin-top: 4px; display: flex; gap: 4px">
+                <el-input v-model="filters.days_to_expiry_min" placeholder="最小值" size="small" style="width: 70px"
+                  @input="loadOrders" />
+                <span>~</span>
+                <el-input v-model="filters.days_to_expiry_max" placeholder="最大值" size="small" style="width: 70px"
+                  @input="loadOrders" />
+              </div>
+            </div>
+          </template>
+          <template #default="{ row }">
+            <span v-if="row.days_to_expiry !== null && row.days_to_expiry !== undefined">
+              {{ row.days_to_expiry }}
+            </span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
+
+        <!-- 采购订单-紧急程度 -->
+        <el-table-column prop="urgency_level" label="紧急程度" width="120">
+          <template #header>
+            <div>
+              <div>紧急程度</div>
+              <div style="margin-top: 4px">
+                <el-select v-model="filters.urgency_level" placeholder="请选择" size="small" clearable @change="loadOrders"
+                  style="width: 100%">
+                  <el-option label="特急" value="urgent" />
+                  <el-option label="紧急" value="emergency" />
+                  <el-option label="一般" value="normal" />
+                  <el-option label="宽松" value="relaxed" />
+                  <el-option label="已完成" value="completed" />
+                  <el-option label="未计划" value="unscheduled" />
+                </el-select>
+              </div>
+            </div>
+          </template>
+          <template #default="{ row }">
+            <el-tag :type="getUrgencyTagType(row.urgency_level)" size="small">
+              {{ getUrgencyText(row.urgency_level) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <!-- 采购订单-是否达成 -->
+        <el-table-column prop="is_fulfilled" label="是否达成" width="100">
+          <template #header>
+            <div>
+              <div>是否达成</div>
+              <div style="margin-top: 4px">
+                <el-select v-model="filters.is_fulfilled" placeholder="请选择" size="small" clearable @change="loadOrders"
+                  style="width: 100%">
+                  <el-option label="是" :value="true" />
+                  <el-option label="否" :value="false" />
+                </el-select>
+              </div>
+            </div>
+          </template>
+          <template #default="{ row }">
+            <el-tag :type="row.is_fulfilled ? 'success' : 'info'" size="small">
+              {{ row.is_fulfilled ? '是' : '否' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="buyer" label="采购员" min-width="100">
           <template #header>
             <div>
               <div>采购员</div>
@@ -237,6 +331,7 @@
                   <el-option label="已结案" value="closed" />
                   <el-option label="已取消" value="cancelled" />
                 </el-select>
+
                 <el-button type="text" size="small" @click="resetStatus">重置</el-button>
               </div>
             </div>
@@ -414,7 +509,7 @@
         </div>
 
         <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" rows="2" />
+          <el-input v-model="form.remark" type="textarea" :rows="2" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -473,6 +568,31 @@ const statusMap = {
   cancelled: '已取消'
 }
 
+// 采购订单-紧急程度映射
+const getUrgencyText = (level) => {
+  const map = {
+    'urgent': '特急',
+    'emergency': '紧急',
+    'normal': '一般',
+    'relaxed': '宽松',
+    'completed': '已完成',
+    'unscheduled': '未计划'
+  }
+  return map[level] || '未知'
+}
+
+const getUrgencyTagType = (level) => {
+  const map = {
+    'urgent': 'danger',
+    'emergency': 'warning',
+    'normal': 'primary',
+    'relaxed': 'success',
+    'completed': 'info',
+    'unscheduled': 'info'
+  }
+  return map[level] || 'info'
+}
+
 // 检查权限（示例，实际应从后端获取用户权限列表）
 const userPermissions = ref([]) // 存储当前用户的权限列表
 const hasPerm = (perm) => userPermissions.value.includes(perm)
@@ -485,7 +605,7 @@ const cancelOrder = async (row) => {
   }
   await ElMessageBox.confirm(`确定取消订单 ${row.po_no} 吗？`, '提示', { type: 'warning' })
   try {
-    const response = await request.post(`/procurement/purchase_orders/${row.id}/cancel/`)
+    const response = await request.post(`/api/procurement/purchase_orders/${row.id}/cancel/`)
     if (response.status === 'cancelled') {
       ElMessage.success('订单已取消')
       loadOrders()                // 刷新列表
@@ -498,7 +618,7 @@ const cancelOrder = async (row) => {
 const restartOrder = async (row) => {
   await ElMessageBox.confirm(`确定重启订单 ${row.po_no} 吗？订单将回到草稿状态。`, '提示', { type: 'info' })
   try {
-    await request.post(`/procurement/purchase_orders/${row.id}/restart/`)
+    await request.post(`/api/procurement/purchase_orders/${row.id}/restart/`)
     ElMessage.success('订单已重启，状态变为草稿')
     loadOrders()
   } catch (e) {
@@ -510,7 +630,7 @@ const restartOrder = async (row) => {
 const submitOrder = async (row) => {
   await ElMessageBox.confirm(`确定提交订单 ${row.po_no} 吗？`, '提示', { type: 'info' })
   try {
-    await request.post(`/procurement/purchase_orders/${row.id}/submit/`)
+    await request.post(`/api/procurement/purchase_orders/${row.id}/submit/`)
     ElMessage.success('提交成功')
     loadOrders()
   } catch (e) {
@@ -522,7 +642,7 @@ const submitOrder = async (row) => {
 const approveOrder = async (row) => {
   await ElMessageBox.confirm(`确定审核订单 ${row.po_no} 吗？`, '提示', { type: 'info' })
   try {
-    await request.post(`/procurement/purchase_orders/${row.id}/approve/`)
+    await request.post(`/api/procurement/purchase_orders/${row.id}/approve/`)
     ElMessage.success('审核成功')
     loadOrders()
   } catch (e) {
@@ -534,7 +654,7 @@ const approveOrder = async (row) => {
 const reviewOrder = async (row) => {
   await ElMessageBox.confirm(`确定复核订单 ${row.po_no} 吗？`, '提示', { type: 'info' })
   try {
-    await request.post(`/procurement/purchase_orders/${row.id}/review/`)
+    await request.post(`/api/procurement/purchase_orders/${row.id}/review/`)
     ElMessage.success('复核成功')
     loadOrders()
   } catch (e) {
@@ -546,7 +666,7 @@ const reviewOrder = async (row) => {
 const finalApproveOrder = async (row) => {
   await ElMessageBox.confirm(`确定审批订单 ${row.po_no} 吗？`, '提示', { type: 'info' })
   try {
-    await request.post(`/procurement/purchase_orders/${row.id}/final_approve/`)
+    await request.post(`/api/procurement/purchase_orders/${row.id}/final_approve/`)
     ElMessage.success('审批成功')
     loadOrders()
   } catch (e) {
@@ -558,7 +678,7 @@ const finalApproveOrder = async (row) => {
 const receiveOrder = async (row) => {
   await ElMessageBox.confirm(`确定收货订单 ${row.po_no} 吗？`, '提示', { type: 'info' })
   try {
-    await request.post(`/procurement/purchase_orders/${row.id}/receive/`)
+    await request.post(`/api/procurement/purchase_orders/${row.id}/receive/`)
     ElMessage.success('收货成功')
     loadOrders()
   } catch (e) {
@@ -570,7 +690,7 @@ const receiveOrder = async (row) => {
 const inspectOrder = async (row) => {
   await ElMessageBox.confirm(`确定检验订单 ${row.po_no} 吗？`, '提示', { type: 'info' })
   try {
-    await request.post(`/procurement/purchase_orders/${row.id}/inspect/`)
+    await request.post(`/api/procurement/purchase_orders/${row.id}/inspect/`)
     ElMessage.success('检验成功')
     loadOrders()
   } catch (e) {
@@ -582,7 +702,7 @@ const inspectOrder = async (row) => {
 const storeOrder = async (row) => {
   await ElMessageBox.confirm(`确定入库订单 ${row.po_no} 吗？`, '提示', { type: 'info' })
   try {
-    await request.post(`/procurement/purchase_orders/${row.id}/store/`)
+    await request.post(`/api/procurement/purchase_orders/${row.id}/store/`)
     ElMessage.success('入库成功')
     loadOrders()
   } catch (e) {
@@ -594,7 +714,7 @@ const storeOrder = async (row) => {
 const closeOrder = async (row) => {
   await ElMessageBox.confirm(`确定结案订单 ${row.po_no} 吗？`, '提示', { type: 'info' })
   try {
-    await request.post(`/procurement/purchase_orders/${row.id}/close/`)
+    await request.post(`/api/procurement/purchase_orders/${row.id}/close/`)
     ElMessage.success('结案成功')
     loadOrders()
   } catch (e) {
@@ -611,7 +731,21 @@ const searchKeyword = ref('')
 const selectedRows = ref([])
 
 // ---------- 筛选条件 ----------
-const filters = reactive({ po_no: '', supplier_name: '', buyer: '', status: '' })
+const filters = reactive({
+  po_no: '',
+  supplier_name: '',
+  buyer: '',
+  status: '',
+  urgency_level: '',
+  is_fulfilled: '',
+  days_to_expiry_min: '',
+  days_to_expiry_max: '',
+  // 批量筛选字段
+  po_no__in: '',
+  supplier_name__in: '',
+  buyer__in: '',
+})
+
 const amountMin = ref('')
 const amountMax = ref('')
 const dateRange = reactive({ order_date: [], expected_date: [], actual_receive_date: [] })
@@ -713,16 +847,21 @@ const loadOrders = async () => {
       expected_date_end: dateRange.expected_date?.[1],
       actual_receive_date_start: dateRange.actual_receive_date?.[0],
       actual_receive_date_end: dateRange.actual_receive_date?.[1],
-      po_no__in: batch.po_nos.join(','),
-      supplier_name__in: batch.suppliers.join(','),
-      buyer__in: batch.buyers.join(','),
-      ordering: sortOrder.value ? `${sortOrder.value === 'asc' ? '' : '-'}${sortField.value}` : ''
+      ordering: sortOrder.value ? `${sortOrder.value === 'asc' ? '' : '-'}${sortField.value}` : '',
+      urgency_level: filters.urgency_level,
+      is_fulfilled: filters.is_fulfilled,
+      days_to_expiry_min: filters.days_to_expiry_min,
+      days_to_expiry_max: filters.days_to_expiry_max,  // ← 这里必须有逗号
+      po_no__in: filters.po_no__in,                    // ← 注意：这一行会重复，需要处理
+      supplier_name__in: filters.supplier_name__in,
+      buyer__in: filters.buyer__in,
     }
+
     Object.keys(params).forEach(k => {
       if (params[k] === undefined || params[k] === '') delete params[k]
       if (k.endsWith('__in') && !params[k]) delete params[k]
     })
-    const res = await request.get('/procurement/purchase_orders/', { params })
+    const res = await request.get('/api/procurement/purchase_orders/', { params })
     orderList.value = res.results || []
     total.value = res.count || 0
   } catch (e) {
@@ -732,19 +871,19 @@ const loadOrders = async () => {
 
 const loadSuppliers = async () => {
   try {
-    const res = await request.get('/procurement/suppliers/?page_size=1000')
+    const res = await request.get('/api/procurement/suppliers/?page_size=1000')
     supplierAll.value = res.results || []
   } catch (e) { console.error(e) }
 }
 const loadEmployees = async () => {
   try {
-    const res = await request.get('/pfm/employees/?page_size=1000')
+    const res = await request.get('/api/pfm/employees/?page_size=1000')
     employeeList.value = res.results || []
   } catch (e) { console.error(e) }
 }
 const loadMaterials = async () => {
   try {
-    const res = await request.get('/masterdata/materials/?page_size=1000')
+    const res = await request.get('/api/masterdata/materials/?page_size=1000')
     materialList.value = res.results || []
   } catch (e) { console.error(e) }
 }
@@ -764,7 +903,31 @@ const handleTextFilter = () => { currentPage.value = 1; loadOrders() }
 const handleSelectFilter = () => { currentPage.value = 1; loadOrders() }
 const handleAmountFilter = () => { currentPage.value = 1; loadOrders() }
 const handleDateRangeFilter = () => { currentPage.value = 1; loadOrders() }
-const applyBatchFilter = () => { currentPage.value = 1; loadOrders() }
+const applyBatchFilter = () => {
+  // 构建批量筛选参数
+  const batchParams = {}
+
+  if (batch.po_nos && batch.po_nos.length > 0) {
+    filters.po_no__in = batch.po_nos.join(',')
+  } else {
+    filters.po_no__in = ''
+  }
+
+  if (batch.suppliers && batch.suppliers.length > 0) {
+    filters.supplier_name__in = batch.suppliers.join(',')
+  } else {
+    filters.supplier_name__in = ''
+  }
+
+  if (batch.buyers && batch.buyers.length > 0) {
+    filters.buyer__in = batch.buyers.join(',')
+  } else {
+    filters.buyer__in = ''
+  }
+
+  currentPage.value = 1
+  loadOrders()
+}
 
 // 重置总金额
 const resetAmount = () => {
@@ -838,7 +1001,7 @@ const batchDelete = async () => {
   if (!selectedRows.value.length) return ElMessage.warning('请选择订单')
   await ElMessageBox.confirm(`删除 ${selectedRows.value.length} 条订单？`, '提示', { type: 'warning' })
   const ids = selectedRows.value.map(r => r.id)
-  await request.post('/procurement/purchase_orders/batch_delete/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_delete/', { ids })
   ElMessage.success('删除成功')
   loadOrders()
 }
@@ -847,7 +1010,7 @@ const batchSubmit = async () => {
   if (!draftRows.length) return ElMessage.warning('请选择草稿订单')
   await ElMessageBox.confirm(`提交 ${draftRows.length} 条订单？`, '提示', { type: 'info' })
   const ids = draftRows.map(r => r.id)
-  await request.post('/procurement/purchase_orders/batch_submit/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_submit/', { ids })
   ElMessage.success('提交成功')
   loadOrders()
 }
@@ -857,7 +1020,7 @@ const batchApprove = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'submitted').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已提交状态的订单')
   await ElMessageBox.confirm(`确定审核 ${ids.length} 个订单吗？`, '提示', { type: 'info' })
-  await request.post('/procurement/purchase_orders/batch_approve/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_approve/', { ids })
   ElMessage.success('批量审核成功')
   loadOrders()
 }
@@ -866,7 +1029,7 @@ const batchApprove = async () => {
 const batchReview = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'approved').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已审核状态的订单')
-  await request.post('/procurement/purchase_orders/batch_review/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_review/', { ids })
   ElMessage.success('批量复核成功')
   loadOrders()
 }
@@ -875,7 +1038,7 @@ const batchReview = async () => {
 const batchFinalApprove = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'reviewed').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已复核状态的订单')
-  await request.post('/procurement/purchase_orders/batch_final_approve/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_final_approve/', { ids })
   ElMessage.success('批量审批成功')
   loadOrders()
 }
@@ -884,7 +1047,7 @@ const batchFinalApprove = async () => {
 const batchReceive = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'final_approved').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已审批状态的订单')
-  await request.post('/procurement/purchase_orders/batch_receive/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_receive/', { ids })
   ElMessage.success('批量收货成功')
   loadOrders()
 }
@@ -893,7 +1056,7 @@ const batchReceive = async () => {
 const batchInspect = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'received').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已收货状态的订单')
-  await request.post('/procurement/purchase_orders/batch_inspect/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_inspect/', { ids })
   ElMessage.success('批量检验成功')
   loadOrders()
 }
@@ -902,7 +1065,7 @@ const batchInspect = async () => {
 const batchStore = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'inspected').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已检验状态的订单')
-  await request.post('/procurement/purchase_orders/batch_store/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_store/', { ids })
   ElMessage.success('批量入库成功')
   loadOrders()
 }
@@ -911,7 +1074,7 @@ const batchStore = async () => {
 const batchClose = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'stored').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已入库状态的订单')
-  await request.post('/procurement/purchase_orders/batch_close/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_close/', { ids })
   ElMessage.success('批量结案成功')
   loadOrders()
 }
@@ -919,13 +1082,13 @@ const batchClose = async () => {
 // ---------- 单个订单操作 ----------
 const handleDelete = async (row) => {
   await ElMessageBox.confirm(`确定删除订单 ${row.po_no} 吗？`, '提示', { type: 'warning' })
-  await request.delete(`/procurement/purchase_orders/${row.id}/`)
+  await request.delete(`/api/procurement/purchase_orders/${row.id}/`)
   ElMessage.success('删除成功')
   loadOrders()
 }
 
 const viewDetail = async (row) => {
-  const res = await request.get(`/procurement/purchase_orders/${row.id}/`)
+  const res = await request.get(`/api/procurement/purchase_orders/${row.id}/`)
   viewData.value = res
   viewDialogVisible.value = true
 }
@@ -954,51 +1117,52 @@ const handleAdd = () => {
 }
 
 const handleEdit = async (row) => {
+  console.log('开始编辑, row:', row)
   dialogTitle.value = '编辑订单'
-  const res = await request.get(`/procurement/purchase_orders/${row.id}/`)
-  console.log('编辑获取的订单详情:', res)
 
-  let supplierId = null
-  if (typeof res.supplier === 'number') {
-    supplierId = res.supplier
-  } else if (res.supplier?.id) {
-    supplierId = Number(res.supplier.id)
-  } else if (res.supplier_id) {
-    supplierId = Number(res.supplier_id)
+  try {
+    const res = await request.get(`/api/procurement/purchase_orders/${row.id}/`)
+    console.log('获取到的数据:', res)
+
+    // 简化版赋值 - 确保数据结构正确
+    form.value = {
+      id: res.id,
+      po_no: res.po_no || '',
+      supplier_id: res.supplier?.id || res.supplier_id || null,
+      buyer_id: res.buyer_id || null,
+      order_date: res.order_date || '',
+      expected_date: res.expected_date || '',
+      actual_receive_date: res.actual_receive_date || '',
+      total_amount: Number(res.total_amount) || 0,
+      status: res.status || 'draft',
+      remark: res.remark || '',
+      items: []
+    }
+
+    // 处理商品明细
+    if (res.items && Array.isArray(res.items)) {
+      form.value.items = res.items.map(item => ({
+        material_id: item.material,
+        material_name: item.material_name || '',
+        specification: item.specification || '',
+        quantity: Number(item.quantity) || 0,
+        unit_price: Number(item.unit_price) || 0,
+        amount: Number(item.amount) || 0,
+        actual_quantity: item.actual_quantity || null,
+        actual_unit_price: item.actual_unit_price || null,
+        actual_amount: item.actual_amount || null,
+        actual_arrival_date: item.actual_arrival_date || null
+      }))
+    }
+
+    console.log('form.value 已设置:', form.value)
+    console.log('弹窗应该打开了')
+    dialogVisible.value = true
+
+  } catch (error) {
+    console.error('编辑失败:', error)
+    ElMessage.error('加载订单详情失败')
   }
-
-  let buyerId = null
-  if (res.buyer_id) {
-    buyerId = Number(res.buyer_id)
-  } else if (res.buyer) {
-    const matched = employeeList.value.find(emp => emp.full_name === res.buyer)
-    buyerId = matched ? Number(matched.id) : null
-  }
-
-  const items = (res.items || []).map(item => ({
-    material_id: item.material,
-    specification: item.specification || '',
-    quantity: Number(item.quantity) || 1,
-    unit_price: Number(item.unit_price) || 0,
-    amount: Number(item.amount) || 0,
-    actual_quantity: item.actual_quantity || null,
-    actual_unit_price: item.actual_unit_price || null,
-    actual_amount: item.actual_amount || null,
-    actual_arrival_date: item.actual_arrival_date || null,
-    material_name: item.material_name || ''
-  }))
-
-  form.value = {
-    ...res,
-    total_amount: Number(res.total_amount) || 0,
-    supplier_id: supplierId,
-    buyer_id: buyerId,
-    items: items
-  }
-
-  await nextTick()
-  console.log('编辑表单最终值:', form.value)
-  dialogVisible.value = true
 }
 
 // 商品明细操作
@@ -1038,43 +1202,80 @@ const submitForm = async () => {
   await formRef.value.validate()
   submitting.value = true
   try {
+    // ========== 第一步：重新计算总金额（基于商品明细）==========
+    let calculatedTotal = 0
+    for (const item of form.value.items) {
+      const qty = Number(item.quantity) || 0
+      const price = Number(item.unit_price) || 0
+      const amount = qty * price
+      calculatedTotal += amount
+    }
+
+    // ========== 第二步：确保金额不超过 12 位数字 ==========
+    const maxAmount = 9999999999.99
+    if (calculatedTotal > maxAmount) {
+      ElMessage.error(`订单总金额 ${calculatedTotal.toFixed(2)} 超过限制，请拆分订单`)
+      submitting.value = false
+      return
+    }
+
+    console.log('=== 调试信息 ===')
+    console.log('原始 total_amount:', form.value.total_amount)
+    console.log('重新计算后的 total_amount:', calculatedTotal)
+    // ========================================================
+
+    // 格式化日期函数
+    const formatDate = (date) => {
+      if (!date) return null
+      if (typeof date === 'string') return date
+      if (date instanceof Date) return date.toISOString().slice(0, 10)
+      return null
+    }
+
+    // 准备提交数据
     const submitData = {
-      ...form.value,
-      supplier_id: Number(form.value.supplier_id),
+      supplier: Number(form.value.supplier_id),
+      po_no: form.value.po_no || null,
+      order_date: formatDate(form.value.order_date),
+      expected_date: formatDate(form.value.expected_date),
+      actual_receive_date: formatDate(form.value.actual_receive_date),
+      total_amount: calculatedTotal,  // 使用重新计算的值
+      status: form.value.status || 'draft',
+      remark: form.value.remark || '',
       company_id: 1,
-      order_date: form.value.order_date ? form.value.order_date : new Date().toISOString().slice(0, 10),
-      expected_date: form.value.expected_date || null,
-      actual_receive_date: form.value.actual_receive_date || null,
-      buyer: form.value.buyer_id
-        ? employeeList.value.find(e => e.id === form.value.buyer_id)?.full_name
-        : form.value.buyer,
-      items: form.value.items.map(i => ({
-        material: i.material_id,
-        quantity: i.quantity,
-        unit_price: i.unit_price,
-        amount: i.amount,
-        specification: i.specification,
-        actual_quantity: i.actual_quantity || null,
-        actual_unit_price: i.actual_unit_price || null,
-        actual_amount: i.actual_amount || null,
-        actual_arrival_date: i.actual_arrival_date || null
+      items: form.value.items.map(item => ({
+        material: Number(item.material_id),
+        quantity: Number(item.quantity) || 0,
+        unit_price: Number(item.unit_price) || 0,
+        amount: Number(item.amount) || 0,
+        specification: item.specification || '',
+        actual_quantity: item.actual_quantity ? Number(item.actual_quantity) : null,
+        actual_unit_price: item.actual_unit_price ? Number(item.actual_unit_price) : null,
+        actual_amount: item.actual_amount ? Number(item.actual_amount) : null,
+        actual_arrival_date: formatDate(item.actual_arrival_date)
       }))
     }
-    if (submitData.supplier_id) {
-      submitData.supplier = submitData.supplier_id
+
+    // 处理 buyer（传 buyer_id 而不是 buyer 字符串）
+    if (form.value.buyer_id) {
+      submitData.buyer_id = Number(form.value.buyer_id)
     }
+
+    console.log('提交数据:', JSON.stringify(submitData, null, 2))
+
     if (form.value.id) {
-      await request.put(`/procurement/purchase_orders/${form.value.id}/`, submitData)
+      await request.put(`/api/procurement/purchase_orders/${form.value.id}/`, submitData)
       ElMessage.success('编辑成功')
     } else {
-      await request.post('/procurement/purchase_orders/', submitData)
+      await request.post('/api/procurement/purchase_orders/', submitData)
       ElMessage.success('新增成功')
     }
     dialogVisible.value = false
     loadOrders()
   } catch (error) {
-    console.error(error)
-    ElMessage.error(form.value.id ? '编辑失败' : '新增失败')
+    console.error('提交错误:', error)
+    const errorMsg = error.response?.data?.error || error.response?.data?.message || '操作失败'
+    ElMessage.error(errorMsg)
   } finally {
     submitting.value = false
   }
@@ -1122,6 +1323,9 @@ const onTableMouseLeave = () => {
 }
 
 onMounted(async () => {
+  console.log('=== 采购订单组件已挂载 ===')
+  console.log('request对象:', request)
+  console.log('loadOrders函数:', typeof loadOrders)
   // await loadUserPermissions()   // 暂时注释，因为后端没有此接口
   loadOrders()
   loadSuppliers()
