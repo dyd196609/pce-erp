@@ -31,15 +31,6 @@ class SupplierViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = SupplierPagination
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        search = self.request.query_params.get("search")
-        if search:
-            queryset = queryset.filter(
-                models.Q(code__icontains=search) | models.Q(name__icontains=search)
-            )
-        return queryset
-
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def export_template(self, request):
         df = pd.DataFrame(
@@ -195,42 +186,59 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
         search = self.request.query_params.get("search")
         if search:
             queryset = queryset.filter(
                 models.Q(po_no__icontains=search)
                 | models.Q(supplier__name__icontains=search)
             )
+
         po_no = self.request.query_params.get("po_no")
         if po_no:
             queryset = queryset.filter(po_no__icontains=po_no)
+
         supplier_name = self.request.query_params.get("supplier_name")
         if supplier_name:
             queryset = queryset.filter(supplier__name__icontains=supplier_name)
+
         buyer = self.request.query_params.get("buyer")
         if buyer:
             queryset = queryset.filter(buyer__icontains=buyer)
+
         status = self.request.query_params.get("status")
         if status:
             queryset = queryset.filter(status=status)
+
         total_amount_min = self.request.query_params.get("total_amount_min")
         if total_amount_min:
             queryset = queryset.filter(total_amount__gte=float(total_amount_min))
         total_amount_max = self.request.query_params.get("total_amount_max")
         if total_amount_max:
             queryset = queryset.filter(total_amount__lte=float(total_amount_max))
+
         order_date_start = self.request.query_params.get("order_date_start")
         order_date_end = self.request.query_params.get("order_date_end")
         if order_date_start and order_date_end:
             queryset = queryset.filter(
                 order_date__range=[order_date_start, order_date_end]
             )
+        elif order_date_start:
+            queryset = queryset.filter(order_date__gte=order_date_start)
+        elif order_date_end:
+            queryset = queryset.filter(order_date__lte=order_date_end)
+
         expected_date_start = self.request.query_params.get("expected_date_start")
         expected_date_end = self.request.query_params.get("expected_date_end")
         if expected_date_start and expected_date_end:
             queryset = queryset.filter(
                 expected_date__range=[expected_date_start, expected_date_end]
             )
+        elif expected_date_start:
+            queryset = queryset.filter(expected_date__gte=expected_date_start)
+        elif expected_date_end:
+            queryset = queryset.filter(expected_date__lte=expected_date_end)
+
         actual_receive_date_start = self.request.query_params.get(
             "actual_receive_date_start"
         )
@@ -244,11 +252,25 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
                     actual_receive_date_end,
                 ]
             )
+        elif actual_receive_date_start:
+            queryset = queryset.filter(
+                actual_receive_date__gte=actual_receive_date_start
+            )
+        elif actual_receive_date_end:
+            queryset = queryset.filter(actual_receive_date__lte=actual_receive_date_end)
+
+        # 排序
         ordering = self.request.query_params.get("ordering")
         if ordering:
+            # 转换前端排序字段名为数据库字段名
+            if ordering == "supplier_name":
+                ordering = "supplier__name"
+            elif ordering == "-supplier_name":
+                ordering = "-supplier__name"
             queryset = queryset.order_by(ordering)
         else:
             queryset = queryset.order_by("-id")
+
         return queryset
 
     @action(detail=True, methods=["post"])
@@ -734,7 +756,7 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         )
 
 
-# ========== 报表视图 ==========
+# ========== 采购报表视图 ==========
 class ReportViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -742,39 +764,72 @@ class ReportViewSet(viewsets.GenericViewSet):
     def department_purchase_report(self, request):
         start_date = request.query_params.get("start_date")
         end_date = request.query_params.get("end_date")
+        group_by = request.query_params.get("group_by", "department")
+
         queryset = PurchaseOrder.objects.filter(status__in=["received", "closed"])
         if start_date:
             queryset = queryset.filter(order_date__gte=start_date)
         if end_date:
             queryset = queryset.filter(order_date__lte=end_date)
 
+        # 筛选条件
+        buyer = request.query_params.get("buyer")
+        if buyer:
+            queryset = queryset.filter(buyer=buyer)
+
+        supplier_id = request.query_params.get("supplier_id")
+        if supplier_id:
+            queryset = queryset.filter(supplier_id=supplier_id)
+
+        department_id = request.query_params.get("department_id")
+        if department_id:
+            queryset = queryset.filter(department_id=department_id)
+
         from system.models import Department
 
-        departments = Department.objects.filter(
-            id__in=queryset.values("department_id").distinct()
-        )
+        if group_by == "require_department":
+            dept_ids = queryset.values("require_department_id").distinct()
+            filter_field = "require_department"
+        else:
+            dept_ids = queryset.values("department_id").distinct()
+            filter_field = "department"
+
+        departments = Department.objects.filter(id__in=dept_ids)
         total_amount_all = queryset.aggregate(
             total=Coalesce(Sum("total_amount"), Decimal("0"))
         )["total"]
 
         report_data = []
         for dept in departments:
-            dept_orders = queryset.filter(department=dept)
+            dept_orders = queryset.filter(**{filter_field: dept})
             total_amount = dept_orders.aggregate(
                 total=Coalesce(Sum("total_amount"), Decimal("0"))
             )["total"]
             order_count = dept_orders.count()
+
+            planned_total = Decimal("0")
+            for order in dept_orders:
+                planned_total += order.items.aggregate(
+                    total=Coalesce(Sum("amount"), Decimal("0"))
+                )["total"]
+
             amount_diff_rate = Decimal("0")
+            if planned_total and planned_total > 0:
+                amount_diff_rate = (
+                    (total_amount - planned_total) / planned_total
+                ) * Decimal("100")
+
             percentage = Decimal("0")
             if total_amount_all and total_amount_all > 0:
                 percentage = (total_amount / total_amount_all) * Decimal("100")
+
             report_data.append(
                 {
                     "department_id": dept.id,
                     "department_name": dept.name,
                     "total_amount": total_amount,
                     "order_count": order_count,
-                    "amount_diff_rate": amount_diff_rate,
+                    "amount_diff_rate": round(amount_diff_rate, 2),
                     "percentage": round(percentage, 2),
                 }
             )
@@ -784,20 +839,36 @@ class ReportViewSet(viewsets.GenericViewSet):
             "total_amount_all": total_amount_all,
             "total_order_count": queryset.count(),
             "department_count": len(report_data),
+            "group_by": group_by,
         }
         return Response({"data": report_data, "summary": summary})
 
     @action(detail=False, methods=["get"], url_path="buyer-performance")
     def buyer_performance_report(self, request):
+        from django.db.models import F
+
         start_date = request.query_params.get("start_date")
         end_date = request.query_params.get("end_date")
+
         queryset = PurchaseOrder.objects.filter(status__in=["received", "closed"])
         if start_date:
             queryset = queryset.filter(order_date__gte=start_date)
         if end_date:
             queryset = queryset.filter(order_date__lte=end_date)
 
-        # 按采购员分组统计（不使用 Avg 聚合，用 Sum 和 Count 计算平均值）
+        # 筛选条件
+        buyer = request.query_params.get("buyer")
+        if buyer:
+            queryset = queryset.filter(buyer=buyer)
+
+        supplier_id = request.query_params.get("supplier_id")
+        if supplier_id:
+            queryset = queryset.filter(supplier_id=supplier_id)
+
+        department_id = request.query_params.get("department_id")
+        if department_id:
+            queryset = queryset.filter(department_id=department_id)
+
         buyer_stats = (
             queryset.values("buyer")
             .annotate(
@@ -807,7 +878,6 @@ class ReportViewSet(viewsets.GenericViewSet):
             .order_by("-total_amount")
         )
 
-        # 计算总金额（用于占比）
         total_amount_all = queryset.aggregate(
             total=Coalesce(Sum("total_amount"), Decimal("0"))
         )["total"]
@@ -815,19 +885,73 @@ class ReportViewSet(viewsets.GenericViewSet):
         report_data = []
         for stat in buyer_stats:
             buyer_name = stat["buyer"] or "未分配"
-            # 计算平均金额
+            buyer_orders = queryset.filter(
+                buyer=buyer_name if buyer_name != "未分配" else None
+            )
+
+            total_orders = buyer_orders.count()
+            on_time_orders = buyer_orders.filter(
+                actual_receive_date__isnull=False,
+                expected_date__isnull=False,
+                actual_receive_date__lte=F("expected_date"),
+            ).count()
+            on_time_rate = Decimal("0")
+            if total_orders > 0:
+                on_time_rate = (
+                    Decimal(on_time_orders) / Decimal(total_orders) * Decimal("100")
+                )
+
+            from procurement.models import PurchaseOrderItem
+
+            items = PurchaseOrderItem.objects.filter(po__in=buyer_orders)
+            price_diff_sum = Decimal("0")
+            amount_diff_sum = Decimal("0")
+            item_count = 0
+            for item in items:
+                if item.unit_price and item.unit_price > 0:
+                    planned_price = item.unit_price
+                    actual_price = item.actual_unit_price or planned_price
+                    price_diff_rate = (
+                        (actual_price - planned_price) / planned_price * Decimal("100")
+                    )
+                    price_diff_sum += price_diff_rate
+
+                    planned_amount = item.amount
+                    actual_amount = item.actual_amount or planned_amount
+                    amount_diff_rate = (
+                        (actual_amount - planned_amount)
+                        / planned_amount
+                        * Decimal("100")
+                        if planned_amount
+                        else 0
+                    )
+                    amount_diff_sum += amount_diff_rate
+                    item_count += 1
+
+            avg_price_diff_rate = (
+                price_diff_sum / item_count if item_count > 0 else Decimal("0")
+            )
+            avg_amount_diff_rate = (
+                amount_diff_sum / item_count if item_count > 0 else Decimal("0")
+            )
+
             avg_amount = Decimal("0")
             if stat["order_count"] > 0:
                 avg_amount = stat["total_amount"] / stat["order_count"]
+
             percentage = Decimal("0")
             if total_amount_all > 0:
                 percentage = (stat["total_amount"] / total_amount_all) * Decimal("100")
+
             report_data.append(
                 {
                     "buyer_name": buyer_name,
                     "total_amount": stat["total_amount"],
                     "order_count": stat["order_count"],
-                    "avg_amount": avg_amount,
+                    "avg_amount": round(avg_amount, 2),
+                    "on_time_rate": round(on_time_rate, 2),
+                    "price_diff_rate": round(avg_price_diff_rate, 2),
+                    "amount_diff_rate": round(avg_amount_diff_rate, 2),
                     "percentage": round(percentage, 2),
                 }
             )
@@ -845,15 +969,30 @@ class ReportViewSet(viewsets.GenericViewSet):
 
     @action(detail=False, methods=["get"], url_path="supplier-performance")
     def supplier_performance_report(self, request):
+        from django.db.models import F, Avg
+
         start_date = request.query_params.get("start_date")
         end_date = request.query_params.get("end_date")
+
         queryset = PurchaseOrder.objects.filter(status__in=["received", "closed"])
         if start_date:
             queryset = queryset.filter(order_date__gte=start_date)
         if end_date:
             queryset = queryset.filter(order_date__lte=end_date)
 
-        # 按供应商分组统计
+        # 筛选条件
+        buyer = request.query_params.get("buyer")
+        if buyer:
+            queryset = queryset.filter(buyer=buyer)
+
+        supplier_id = request.query_params.get("supplier_id")
+        if supplier_id:
+            queryset = queryset.filter(supplier_id=supplier_id)
+
+        department_id = request.query_params.get("department_id")
+        if department_id:
+            queryset = queryset.filter(department_id=department_id)
+
         supplier_stats = (
             queryset.values("supplier__id", "supplier__name")
             .annotate(
@@ -863,22 +1002,18 @@ class ReportViewSet(viewsets.GenericViewSet):
             .order_by("-total_amount")
         )
 
-        # 计算准时交货率
         total_orders = queryset.count()
         on_time_orders = queryset.filter(
             actual_receive_date__isnull=False,
             expected_date__isnull=False,
             actual_receive_date__lte=F("expected_date"),
         ).count()
-
-        # 修复类型错误
-        on_time_rate = Decimal("0")
+        overall_on_time_rate = Decimal("0")
         if total_orders > 0:
-            on_time_rate = (
+            overall_on_time_rate = (
                 Decimal(on_time_orders) / Decimal(total_orders) * Decimal("100")
             )
 
-        # 计算总金额
         total_amount_all = queryset.aggregate(
             total=Coalesce(Sum("total_amount"), Decimal("0"))
         )["total"]
@@ -886,19 +1021,68 @@ class ReportViewSet(viewsets.GenericViewSet):
         report_data = []
         for stat in supplier_stats:
             supplier_name = stat["supplier__name"] or "未知供应商"
+            supplier_orders = queryset.filter(supplier_id=stat["supplier__id"])
+
+            delivery_days = (
+                supplier_orders.aggregate(
+                    avg_days=Avg(
+                        F("actual_receive_date") - F("order_date"),
+                        output_field=models.FloatField(),
+                    )
+                )["avg_days"]
+                or 0
+            )
+
+            sup_total_orders = supplier_orders.count()
+            sup_on_time_orders = supplier_orders.filter(
+                actual_receive_date__isnull=False,
+                expected_date__isnull=False,
+                actual_receive_date__lte=F("expected_date"),
+            ).count()
+            sup_on_time_rate = Decimal("0")
+            if sup_total_orders > 0:
+                sup_on_time_rate = (
+                    Decimal(sup_on_time_orders)
+                    / Decimal(sup_total_orders)
+                    * Decimal("100")
+                )
+
+            from procurement.models import PurchaseOrderItem
+
+            items = PurchaseOrderItem.objects.filter(po__in=supplier_orders)
+            price_diff_sum = Decimal("0")
+            item_count = 0
+            for item in items:
+                if item.unit_price and item.unit_price > 0:
+                    planned = item.unit_price
+                    actual = item.actual_unit_price or planned
+                    diff_rate = (actual - planned) / planned * Decimal("100")
+                    price_diff_sum += diff_rate
+                    item_count += 1
+            price_diff_rate = (
+                price_diff_sum / item_count if item_count > 0 else Decimal("0")
+            )
+
             avg_amount = Decimal("0")
             if stat["order_count"] > 0:
                 avg_amount = stat["total_amount"] / stat["order_count"]
+
             percentage = Decimal("0")
             if total_amount_all > 0:
                 percentage = (stat["total_amount"] / total_amount_all) * Decimal("100")
+
             report_data.append(
                 {
                     "supplier_id": stat["supplier__id"],
                     "supplier_name": supplier_name,
                     "total_amount": stat["total_amount"],
                     "order_count": stat["order_count"],
-                    "avg_amount": avg_amount,
+                    "avg_amount": round(avg_amount, 2),
+                    "on_time_rate": round(sup_on_time_rate, 2),
+                    "avg_delivery_days": (
+                        round(delivery_days, 1) if delivery_days else 0
+                    ),
+                    "price_diff_rate": round(price_diff_rate, 2),
                     "percentage": round(percentage, 2),
                 }
             )
@@ -910,7 +1094,7 @@ class ReportViewSet(viewsets.GenericViewSet):
                     "total_amount_all": total_amount_all,
                     "total_order_count": total_orders,
                     "supplier_count": len(report_data),
-                    "on_time_rate": round(on_time_rate, 2),
+                    "on_time_rate": round(overall_on_time_rate, 2),
                 },
             }
         )
