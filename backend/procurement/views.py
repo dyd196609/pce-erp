@@ -187,6 +187,7 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
+        # ========== 1. 全局搜索 ==========
         search = self.request.query_params.get("search")
         if search:
             queryset = queryset.filter(
@@ -194,22 +195,48 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
                 | models.Q(supplier__name__icontains=search)
             )
 
+        # ========== 2. 订单号筛选（单个） ==========
         po_no = self.request.query_params.get("po_no")
         if po_no:
             queryset = queryset.filter(po_no__icontains=po_no)
 
+        # ========== 3. 订单号筛选（批量） ==========
+        po_no_in = self.request.query_params.get("po_no__in")
+        if po_no_in:
+            values = [v.strip() for v in po_no_in.split(",") if v.strip()]
+            if values:
+                queryset = queryset.filter(po_no__in=values)
+
+        # ========== 4. 供应商名称筛选（单个） ==========
         supplier_name = self.request.query_params.get("supplier_name")
         if supplier_name:
             queryset = queryset.filter(supplier__name__icontains=supplier_name)
 
+        # ========== 5. 供应商名称筛选（批量） ==========
+        supplier_name_in = self.request.query_params.get("supplier_name__in")
+        if supplier_name_in:
+            values = [v.strip() for v in supplier_name_in.split(",") if v.strip()]
+            if values:
+                queryset = queryset.filter(supplier__name__in=values)
+
+        # ========== 6. 采购员筛选（单个） ==========
         buyer = self.request.query_params.get("buyer")
         if buyer:
             queryset = queryset.filter(buyer__icontains=buyer)
 
+        # ========== 7. 采购员筛选（批量） ==========
+        buyer_in = self.request.query_params.get("buyer__in")
+        if buyer_in:
+            values = [v.strip() for v in buyer_in.split(",") if v.strip()]
+            if values:
+                queryset = queryset.filter(buyer__in=values)
+
+        # ========== 8. 状态筛选（单个） ==========
         status = self.request.query_params.get("status")
         if status:
             queryset = queryset.filter(status=status)
 
+        # ========== 9. 总金额范围筛选 ==========
         total_amount_min = self.request.query_params.get("total_amount_min")
         if total_amount_min:
             queryset = queryset.filter(total_amount__gte=float(total_amount_min))
@@ -217,6 +244,7 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         if total_amount_max:
             queryset = queryset.filter(total_amount__lte=float(total_amount_max))
 
+        # ========== 10. 下单日期范围筛选 ==========
         order_date_start = self.request.query_params.get("order_date_start")
         order_date_end = self.request.query_params.get("order_date_end")
         if order_date_start and order_date_end:
@@ -228,6 +256,7 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         elif order_date_end:
             queryset = queryset.filter(order_date__lte=order_date_end)
 
+        # ========== 11. 预计到货日期范围筛选 ==========
         expected_date_start = self.request.query_params.get("expected_date_start")
         expected_date_end = self.request.query_params.get("expected_date_end")
         if expected_date_start and expected_date_end:
@@ -239,6 +268,7 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         elif expected_date_end:
             queryset = queryset.filter(expected_date__lte=expected_date_end)
 
+        # ========== 12. 实际到货日期范围筛选 ==========
         actual_receive_date_start = self.request.query_params.get(
             "actual_receive_date_start"
         )
@@ -259,7 +289,42 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         elif actual_receive_date_end:
             queryset = queryset.filter(actual_receive_date__lte=actual_receive_date_end)
 
-        # 排序
+        # ========== 13. 紧急程度、是否达成、到期天数筛选（property字段） ==========
+        # 先将 queryset 转为列表（因为 property 无法在数据库层筛选）
+        result_list = list(queryset)
+
+        # 13.1 紧急程度筛选
+        urgency_level = self.request.query_params.get("urgency_level")
+        if urgency_level:
+            result_list = [p for p in result_list if p.urgency_level == urgency_level]
+
+        # 13.2 是否达成筛选
+        is_fulfilled = self.request.query_params.get("is_fulfilled")
+        if is_fulfilled is not None:
+            target = is_fulfilled.lower() == "true"
+            result_list = [p for p in result_list if p.is_fulfilled == target]
+
+        # 13.3 到期天数范围筛选
+        days_min = self.request.query_params.get("days_to_expiry_min")
+        days_max = self.request.query_params.get("days_to_expiry_max")
+        if days_min or days_max:
+            filtered = []
+            for p in result_list:
+                days = p.days_to_expiry
+                if days is None:
+                    continue
+                if days_min and days < int(days_min):
+                    continue
+                if days_max and days > int(days_max):
+                    continue
+                filtered.append(p)
+            result_list = filtered
+
+        # 返回 ID 列表，保持分页功能
+        ids = [p.id for p in result_list]
+        queryset = queryset.filter(id__in=ids)
+
+        # ========== 14. 排序 ==========
         ordering = self.request.query_params.get("ordering")
         if ordering:
             # 转换前端排序字段名为数据库字段名
