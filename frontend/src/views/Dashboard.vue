@@ -2,7 +2,12 @@
     <div class="dashboard">
         <!-- 顶部导航栏 -->
         <div class="navbar">
-            <div class="logo">掌云智造管理系统</div>
+            <div class="logo">
+                <span class="menu-toggle" @click="sidebarCollapsed = !sidebarCollapsed">
+                    {{ sidebarCollapsed ? '☰' : '◀' }}
+                </span>
+                掌云智造管理系统
+            </div>
             <div class="user-info">
                 <span>{{ userInfo?.real_name || userInfo?.username || '管理员' }}</span>
                 <el-button type="text" @click="handleLogout">退出</el-button>
@@ -12,8 +17,9 @@
         <!-- 主体布局 -->
         <div class="layout">
             <!-- 侧边栏菜单 -->
-            <div class="sidebar">
-                <el-menu :default-active="activeMenu" @select="handleMenuSelect">
+            <div class="sidebar" :class="{ collapsed: sidebarCollapsed }">
+                <el-menu :default-active="activeMenu" @select="handleMenuSelect" :collapse="sidebarCollapsed"
+                    :collapse-transition="false">
                     <el-menu-item index="employees">
                         <el-icon>
                             <User />
@@ -77,7 +83,7 @@ import {
 
 const router = useRouter()
 const route = useRoute()
-
+const sidebarCollapsed = ref(false)
 const userInfo = ref(JSON.parse(localStorage.getItem('user') || '{}'))
 
 const activeMenu = computed(() => {
@@ -126,6 +132,22 @@ const handleLogout = () => {
 .logo {
     font-size: 20px;
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.menu-toggle {
+    cursor: pointer;
+    font-size: 20px;
+    color: white;
+    display: inline-block;
+    width: 32px;
+    text-align: center;
+}
+
+.menu-toggle:hover {
+    opacity: 0.8;
 }
 
 .user-info {
@@ -150,6 +172,11 @@ const handleLogout = () => {
     border-right: 1px solid #e4e7ed;
     overflow-y: auto;
     flex-shrink: 0;
+    transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+    width: 64px;
 }
 
 .content {
@@ -171,5 +198,18 @@ const handleLogout = () => {
 
 .el-menu-item:hover {
     background: #ecf5ff;
+}
+
+/* 强制折叠效果 */
+.sidebar {
+    width: 220px !important;
+}
+
+.sidebar.collapsed {
+    width: 64px !important;
+}
+
+.sidebar.collapsed .el-menu-item span {
+    display: none !important;
 }
 </style>
