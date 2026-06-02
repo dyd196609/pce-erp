@@ -138,16 +138,17 @@
         </el-table-column>
 
         <!-- 采购订单-到期天数 -->
-        <el-table-column prop="days_to_expiry" label="到期天数" width="160">
+        <el-table-column prop="days_to_expiry" label="到期天数" width="180">
           <template #header>
             <div>
               <div>到期天数</div>
-              <div style="margin-top: 4px; display: flex; gap: 4px">
-                <el-input v-model="filters.days_to_expiry_min" placeholder="最小值" size="small" style="width: 70px"
+              <div style="margin-top: 4px; display: flex; gap: 4px; align-items: center;">
+                <el-input v-model="filters.days_to_expiry_min" placeholder="最小值" size="small" style="width: 65px"
                   @input="loadOrders" />
                 <span>~</span>
-                <el-input v-model="filters.days_to_expiry_max" placeholder="最大值" size="small" style="width: 70px"
+                <el-input v-model="filters.days_to_expiry_max" placeholder="最大值" size="small" style="width: 65px"
                   @input="loadOrders" />
+                <el-button size="small" type="text" @click="resetDaysFilter">重置</el-button>
               </div>
             </div>
           </template>
@@ -160,13 +161,13 @@
         </el-table-column>
 
         <!-- 采购订单-紧急程度 -->
-        <el-table-column prop="urgency_level" label="紧急程度" width="120">
+        <el-table-column prop="urgency_level" label="紧急程度" width="140">
           <template #header>
             <div>
               <div>紧急程度</div>
-              <div style="margin-top: 4px">
+              <div style="margin-top: 4px; display: flex; gap: 4px; align-items: center;">
                 <el-select v-model="filters.urgency_level" placeholder="请选择" size="small" clearable @change="loadOrders"
-                  style="width: 100%">
+                  style="width: 100px">
                   <el-option label="特急" value="urgent" />
                   <el-option label="紧急" value="emergency" />
                   <el-option label="一般" value="normal" />
@@ -174,6 +175,7 @@
                   <el-option label="已完成" value="completed" />
                   <el-option label="未计划" value="unscheduled" />
                 </el-select>
+                <el-button size="small" type="text" @click="resetUrgencyFilter">重置</el-button>
               </div>
             </div>
           </template>
@@ -185,16 +187,17 @@
         </el-table-column>
 
         <!-- 采购订单-是否达成 -->
-        <el-table-column prop="is_fulfilled" label="是否达成" width="100">
+        <el-table-column prop="is_fulfilled" label="是否达成" width="140">
           <template #header>
             <div>
               <div>是否达成</div>
-              <div style="margin-top: 4px">
+              <div style="margin-top: 4px; display: flex; gap: 4px; align-items: center;">
                 <el-select v-model="filters.is_fulfilled" placeholder="请选择" size="small" clearable @change="loadOrders"
-                  style="width: 100%">
+                  style="width: 100px">
                   <el-option label="是" :value="true" />
                   <el-option label="否" :value="false" />
                 </el-select>
+                <el-button size="small" type="text" @click="resetFulfilledFilter">重置</el-button>
               </div>
             </div>
           </template>
@@ -339,12 +342,6 @@
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)">{{ statusMap[row.status] || row.status_display || row.status
             }}</el-tag>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="is_fulfilled" label="是否达成" width="100">
-          <template #default="{ row }">
-            <span>{{ row.is_fulfilled !== undefined ? row.is_fulfilled : '0' }}</span>
           </template>
         </el-table-column>
 
@@ -553,6 +550,25 @@
 import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import request from '../api/request'
+
+// 重置到期天数筛选
+const resetDaysFilter = () => {
+  filters.days_to_expiry_min = ''
+  filters.days_to_expiry_max = ''
+  loadOrders()
+}
+
+// 重置紧急程度筛选
+const resetUrgencyFilter = () => {
+  filters.urgency_level = ''
+  loadOrders()
+}
+
+// 重置是否达成筛选
+const resetFulfilledFilter = () => {
+  filters.is_fulfilled = ''
+  loadOrders()
+}
 
 // ---------- 状态映射 ----------
 const statusMap = {
@@ -904,27 +920,24 @@ const handleSelectFilter = () => { currentPage.value = 1; loadOrders() }
 const handleAmountFilter = () => { currentPage.value = 1; loadOrders() }
 const handleDateRangeFilter = () => { currentPage.value = 1; loadOrders() }
 const applyBatchFilter = () => {
-  // 构建批量筛选参数
-  const batchParams = {}
-
+  // 订单批量筛选参数
   if (batch.po_nos && batch.po_nos.length > 0) {
     filters.po_no__in = batch.po_nos.join(',')
   } else {
     filters.po_no__in = ''
   }
-
+  // 供应商批量筛选
   if (batch.suppliers && batch.suppliers.length > 0) {
     filters.supplier_name__in = batch.suppliers.join(',')
   } else {
     filters.supplier_name__in = ''
   }
-
+  // 采购员批量筛选
   if (batch.buyers && batch.buyers.length > 0) {
     filters.buyer__in = batch.buyers.join(',')
   } else {
     filters.buyer__in = ''
   }
-
   currentPage.value = 1
   loadOrders()
 }
