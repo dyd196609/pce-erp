@@ -74,7 +74,7 @@ const rules = {
 
 const loadCategories = async () => {
   try {
-    const res = await request.get('/masterdata/categories/');
+    const res = await request.get('/api/masterdata/categories/');
     categoryList.value = res.results || [];
   } catch (error) {
     ElMessage.error('加载分类列表失败');
@@ -106,7 +106,7 @@ const handleDelete = (row) => {
     } catch (error) {
       ElMessage.error('删除失败');
     }
-  }).catch(() => {});
+  }).catch(() => { });
 };
 
 const submitForm = async () => {
@@ -122,7 +122,7 @@ const submitForm = async () => {
       await request.put(`/masterdata/categories/${form.value.id}/`, data);
       ElMessage.success('编辑成功');
     } else {
-      await request.post('/masterdata/categories/', data);
+      await request.post('/api/masterdata/categories/', data);
       ElMessage.success('新增成功');
     }
     dialogVisible.value = false;
