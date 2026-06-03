@@ -40,7 +40,7 @@ const handleLogin = async () => {
   await formRef.value.validate();
   loading.value = true;
   try {
-    const res = await request.post('/auth/login/', {
+    const res = await request.post('/api/auth/login/', {
       username: form.username,
       password: form.password
     });
@@ -49,7 +49,17 @@ const handleLogin = async () => {
       userStore.setToken(res.token);
       userStore.setUserInfo(res.user);
       ElMessage.success('登录成功');
-      router.push('/employees');
+      router.push('/');
+    } else if (res.success) {
+      // 如果没有 token 但有 success，用假的 token
+      localStorage.setItem('token', 'fake_token');
+      userStore.setToken('fake_token');
+      userStore.setUserInfo({
+        username: res.username,
+        real_name: res.real_name
+      });
+      ElMessage.success('登录成功');
+      router.push('/');
     } else {
       ElMessage.error(res.error || '登录失败');
     }
