@@ -3,7 +3,8 @@
     <h2>证书管理</h2>
     <div style="margin-bottom: 20px">
       <el-button type="primary" @click="handleAdd">新增证书</el-button>
-      <el-select v-model="filterEmployeeId" placeholder="筛选员工" clearable @change="loadCertificates" style="width: 200px; margin-left: 10px">
+      <el-select v-model="filterEmployeeId" placeholder="筛选员工" clearable @change="loadCertificates"
+        style="width: 200px; margin-left: 10px">
         <el-option v-for="emp in employeeList" :key="emp.id" :label="emp.full_name" :value="emp.id" />
       </el-select>
     </div>
@@ -14,15 +15,18 @@
         <el-table-column prop="certificate_name" label="证书名称" width="150" />
         <el-table-column prop="certificate_no" label="证书编号" width="150" />
         <el-table-column prop="issue_date" label="发证日期" width="120">
-          <template #default="{ row }">{{ row.issue_date ? new Date(row.issue_date).toLocaleDateString('zh-CN') : '' }}</template>
+          <template #default="{ row }">{{ row.issue_date ? new Date(row.issue_date).toLocaleDateString('zh-CN') : ''
+            }}</template>
         </el-table-column>
         <el-table-column prop="expiry_date" label="有效期至" width="120">
-          <template #default="{ row }">{{ row.expiry_date ? new Date(row.expiry_date).toLocaleDateString('zh-CN') : '' }}</template>
+          <template #default="{ row }">{{ row.expiry_date ? new Date(row.expiry_date).toLocaleDateString('zh-CN') : ''
+            }}</template>
         </el-table-column>
         <el-table-column prop="issuing_authority" label="发证机构" width="150" />
         <el-table-column label="提醒" width="100">
           <template #default="{ row }">
-            <el-tag v-if="row.expiry_date && getDaysBeforeExpiry(row.expiry_date) <= row.remind_before_days" type="danger">即将到期</el-tag>
+            <el-tag v-if="row.expiry_date && getDaysBeforeExpiry(row.expiry_date) <= row.remind_before_days"
+              type="danger">即将到期</el-tag>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -106,13 +110,13 @@ const getDaysBeforeExpiry = (expiryDate) => {
 };
 
 const loadEmployees = async () => {
-  const res = await request.get('/pfm/employees/');
+  const res = await request.get('/api/pfm/employees/');
   employeeList.value = res.results || [];
 };
 
 const loadCertificates = async () => {
   const params = filterEmployeeId.value ? { employee_id: filterEmployeeId.value } : {};
-  const res = await request.get('/pfm/certificates/', { params });
+  const res = await request.get('/api/pfm/certificates/', { params });
   certificateList.value = res.results || [];
 };
 
@@ -137,7 +141,7 @@ const handleDelete = (row) => {
     await request.delete(`/pfm/certificates/${row.id}/`);
     ElMessage.success('删除成功');
     loadCertificates();
-  }).catch(() => {});
+  }).catch(() => { });
 };
 
 // 修改后的 submitForm 函数
@@ -149,12 +153,12 @@ const submitForm = async () => {
     // 将 employee_id 转换为后端期望的 employee 字段
     const data = { ...form.value, employee: form.value.employee_id };
     delete data.employee_id;
-    
+
     if (form.value.id) {
       await request.put(`/pfm/certificates/${form.value.id}/`, data);
       ElMessage.success('编辑成功');
     } else {
-      await request.post('/pfm/certificates/', data);
+      await request.post('/api/pfm/certificates/', data);
       ElMessage.success('新增成功');
     }
     dialogVisible.value = false;
