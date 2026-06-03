@@ -79,17 +79,22 @@ const supplierData = ref([])
 // 加载筛选选项
 const loadOptions = async () => {
     try {
-        const [suppliersRes, buyersRes] = await Promise.all([
+        const [suppliersRes, buyersRes, deptRes] = await Promise.all([
             request.get('/api/procurement/suppliers/?page_size=1000'),
-            request.get('/api/procurement/reports/buyer-performance/')
+            request.get('/api/procurement/reports/buyer-performance/'),
+            request.get('/api/procurement/reports/department-purchase/')
         ])
         supplierList.value = suppliersRes.results || []
         if (buyersRes.data) {
-            buyerList.value = [...new Set(buyersRes.data.map(b => b.buyer_name))] // 去重
+            buyerList.value = [...new Set(buyersRes.data.map(b => b.buyer_name))]
         }
-        // 部门列表 - 修复路径
-        const deptRes = await request.get('/api/pfm/departments/')  // 修改为正确路径
-        departmentList.value = deptRes.results || []
+        // 从部门采购表中提取部门列表
+        if (deptRes.data) {
+            departmentList.value = deptRes.data.map(d => ({
+                id: d.department_id,
+                name: d.department_name
+            }))
+        }
     } catch (error) {
         console.error('加载选项失败:', error)
     }
