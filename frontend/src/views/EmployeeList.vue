@@ -1,65 +1,43 @@
 <template>
   <div style="padding: 20px">
     <h2>员工管理</h2>
-    
+
     <!-- 工具栏 -->
     <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
       <el-button type="primary" @click="handleAdd">新增员工</el-button>
       <el-button type="success" @click="downloadTemplate">下载导入模板</el-button>
-      <el-upload
-        ref="uploadRef"
-        :action="uploadUrl"
-        :headers="uploadHeaders"
-        :on-success="handleUploadSuccess"
-        :on-error="handleUploadError"
-        :before-upload="beforeUpload"
-        :show-file-list="false"
-      >
+      <el-upload ref="uploadRef" :action="uploadUrl" :headers="uploadHeaders" :on-success="handleUploadSuccess"
+        :on-error="handleUploadError" :before-upload="beforeUpload" :show-file-list="false">
         <el-button type="warning">导入Excel</el-button>
       </el-upload>
       <el-button type="info" @click="exportData">导出Excel</el-button>
-      
-      <el-input
-        v-model="searchKeyword"
-        placeholder="全局搜索"
-        clearable
-        style="width: 200px; margin-left: auto"
-        @clear="loadEmployees"
-        @keyup.enter="loadEmployees"
-      />
+
+      <el-input v-model="searchKeyword" placeholder="全局搜索" clearable style="width: 200px; margin-left: auto"
+        @clear="loadEmployees" @keyup.enter="loadEmployees" />
       <el-button @click="loadEmployees">搜索</el-button>
     </div>
 
-     <!-- 员工表格 -->
-     <div style="overflow-x: auto; width: 100%">
-       <el-table :data="employeeList" border stripe style="min-width: 100%">
+    <!-- 员工表格 -->
+    <div style="overflow-x: auto; width: 100%">
+      <el-table :data="employeeList" border stripe style="min-width: 100%">
         <!-- 序号列 -->
         <el-table-column type="index" label="序号" width="60" fixed="left" :index="indexMethod" />
-        
+
         <!-- 工号 - 输入框 + 弹出多选 -->
         <el-table-column prop="employee_no" label="工号" width="180" column-key="employee_no">
           <template #header>
             <div>
               <div>工号</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-input 
-                  v-model="filters.employee_no" 
-                  placeholder="输入筛选" 
-                  size="small"
-                  clearable
-                  @input="handleTextFilter"
-                />
+                <el-input v-model="filters.employee_no" placeholder="输入筛选" size="small" clearable
+                  @input="handleTextFilter" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedEmployeeNos">
-                      <el-checkbox
-                        v-for="item in employeeNoOptions"
-                        :key="item.value"
-                        :value="item.value"
-                      >
+                      <el-checkbox v-for="item in employeeNoOptions" :key="item.value" :value="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -73,31 +51,22 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 姓名 - 输入框 + 弹出多选 -->
         <el-table-column prop="full_name" label="姓名" width="160" column-key="full_name">
           <template #header>
             <div>
               <div>姓名</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-input 
-                  v-model="filters.full_name" 
-                  placeholder="输入筛选" 
-                  size="small"
-                  clearable
-                  @input="handleTextFilter"
-                />
+                <el-input v-model="filters.full_name" placeholder="输入筛选" size="small" clearable
+                  @input="handleTextFilter" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedNames">
-                      <el-checkbox
-                        v-for="item in nameOptions"
-                        :key="item.value"
-                        :value="item.value"
-                      >
+                      <el-checkbox v-for="item in nameOptions" :key="item.value" :value="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -111,31 +80,21 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 手机号 - 输入框 + 弹出多选 -->
         <el-table-column prop="phone" label="手机号" width="180" column-key="phone">
           <template #header>
             <div>
               <div>手机号</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-input 
-                  v-model="filters.phone" 
-                  placeholder="输入筛选" 
-                  size="small"
-                  clearable
-                  @input="handleTextFilter"
-                />
+                <el-input v-model="filters.phone" placeholder="输入筛选" size="small" clearable @input="handleTextFilter" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedPhones">
-                      <el-checkbox
-                        v-for="item in phoneOptions"
-                        :key="item.value"
-                        :value="item.value"
-                      >
+                      <el-checkbox v-for="item in phoneOptions" :key="item.value" :value="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -149,20 +108,15 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 状态 - 下拉 + 弹出多选 -->
         <el-table-column prop="status" label="状态" width="140" column-key="status">
           <template #header>
             <div>
               <div>状态</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-select 
-                  v-model="filters.status" 
-                  placeholder="选择筛选" 
-                  size="small"
-                  clearable
-                  @change="handleSelectFilter"
-                >
+                <el-select v-model="filters.status" placeholder="选择筛选" size="small" clearable
+                  @change="handleSelectFilter">
                   <el-option label="在职" value="active" />
                   <el-option label="离职" value="inactive" />
                 </el-select>
@@ -190,31 +144,22 @@
             </el-tag>
           </template>
         </el-table-column>
-        
+
         <!-- 部门 - 输入框 + 弹出多选 -->
         <el-table-column prop="department_name" label="部门" width="160" column-key="department_name">
           <template #header>
             <div>
               <div>部门</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-input 
-                  v-model="filters.department_name" 
-                  placeholder="输入筛选" 
-                  size="small"
-                  clearable
-                  @input="handleTextFilter"
-                />
+                <el-input v-model="filters.department_name" placeholder="输入筛选" size="small" clearable
+                  @input="handleTextFilter" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedDepartments">
-                      <el-checkbox
-                        v-for="item in departmentOptions"
-                        :key="item.value"
-                        :value="item.value"
-                      >
+                      <el-checkbox v-for="item in departmentOptions" :key="item.value" :value="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -228,31 +173,22 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 职位 - 输入框 + 弹出多选 -->
         <el-table-column prop="position" label="职位" width="180" column-key="position">
           <template #header>
             <div>
               <div>职位</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-input 
-                  v-model="filters.position" 
-                  placeholder="输入筛选" 
-                  size="small"
-                  clearable
-                  @input="handleTextFilter"
-                />
+                <el-input v-model="filters.position" placeholder="输入筛选" size="small" clearable
+                  @input="handleTextFilter" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedPositions">
-                      <el-checkbox
-                        v-for="item in positionOptions"
-                        :key="item.value"
-                        :value="item.value"
-                      >
+                      <el-checkbox v-for="item in positionOptions" :key="item.value" :value="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -266,20 +202,15 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 性别 - 下拉 + 弹出多选 -->
         <el-table-column prop="gender" label="性别" width="120" column-key="gender">
           <template #header>
             <div>
               <div>性别</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-select 
-                  v-model="filters.gender" 
-                  placeholder="选择筛选" 
-                  size="small"
-                  clearable
-                  @change="handleSelectFilter"
-                >
+                <el-select v-model="filters.gender" placeholder="选择筛选" size="small" clearable
+                  @change="handleSelectFilter">
                   <el-option label="男" value="M" />
                   <el-option label="女" value="F" />
                 </el-select>
@@ -305,62 +236,38 @@
             {{ row.gender === 'M' ? '男' : row.gender === 'F' ? '女' : '' }}
           </template>
         </el-table-column>
-        
+
         <!-- 生日 - 日期范围 + 清除按钮 -->
         <el-table-column prop="birth_date" label="生日" width="300" column-key="birth_date">
-        <template #header>
+          <template #header>
             <div>
-            <div>生日</div>
-            <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-date-picker
-                v-model="dateRange.birth_date"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                size="small"
-                value-format="YYYY-MM-DD"
-                :unlink-panels="true"
-                :default-value="new Date()"   
-                @change="handleDateRangeFilter"
-                style="flex: 1"
-                />
+              <div>生日</div>
+              <div style="display: flex; gap: 4px; margin-top: 4px">
+                <el-date-picker v-model="dateRange.birth_date" type="daterange" range-separator="至"
+                  start-placeholder="开始日期" end-placeholder="结束日期" size="small" value-format="YYYY-MM-DD"
+                  :unlink-panels="true" :default-value="new Date()" @change="handleDateRangeFilter" style="flex: 1" />
                 <el-button size="small" @click="clearDateRange('birth_date')">清除</el-button>
+              </div>
             </div>
-            </div>
-        </template>
+          </template>
         </el-table-column>
-        
+
         <!-- 入职日期 - 日期范围 + 弹出多选 -->
         <el-table-column prop="hire_date" label="入职日期" width="260" column-key="hire_date">
           <template #header>
             <div>
               <div>入职日期</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-date-picker
-                  v-model="dateRange.hire_date"
-                  type="daterange"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  size="small"
-                  value-format="YYYY-MM-DD"
-                  :unlink-panels="true"
-                  :default-value="new Date()"   
-                  @change="handleDateRangeFilter"
-                  style="flex: 1"
-                />
+                <el-date-picker v-model="dateRange.hire_date" type="daterange" range-separator="至"
+                  start-placeholder="开始日期" end-placeholder="结束日期" size="small" value-format="YYYY-MM-DD"
+                  :unlink-panels="true" :default-value="new Date()" @change="handleDateRangeFilter" style="flex: 1" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedHireDates">
-                      <el-checkbox
-                        v-for="item in hireDateOptions"
-                        :key="item.value"
-                        :value="item.value"
-                      >
+                      <el-checkbox v-for="item in hireDateOptions" :key="item.value" :value="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -374,37 +281,23 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 离职日期 - 日期范围 + 弹出多选 -->
         <el-table-column prop="resignation_date" label="离职日期" width="260" column-key="resignation_date">
           <template #header>
             <div>
               <div>离职日期</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-date-picker
-                  v-model="dateRange.resignation_date"
-                  type="daterange"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  size="small"
-                  value-format="YYYY-MM-DD"
-                  :unlink-panels="true"
-                  :default-value="new Date()"   
-                  @change="handleDateRangeFilter"
-                  style="flex: 1"
-                />
+                <el-date-picker v-model="dateRange.resignation_date" type="daterange" range-separator="至"
+                  start-placeholder="开始日期" end-placeholder="结束日期" size="small" value-format="YYYY-MM-DD"
+                  :unlink-panels="true" :default-value="new Date()" @change="handleDateRangeFilter" style="flex: 1" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedResignationDates">
-                      <el-checkbox
-                        v-for="item in resignationDateOptions"
-                        :key="item.value"
-                        :value="item.value"
-                      >
+                      <el-checkbox v-for="item in resignationDateOptions" :key="item.value" :value="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -418,10 +311,10 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 工龄 - 只显示，不筛选 -->
         <el-table-column prop="seniority" label="工龄" width="80" />
-        
+
         <!-- 操作列 -->
         <el-table-column label="操作" fixed="right" width="150">
           <template #default="{ row }">
@@ -433,16 +326,9 @@
     </div>
 
     <!-- 分页 -->
-    <el-pagination
-      :current-page="currentPage"
-      :page-size="pageSize"
-      :total="total"
-      :page-sizes="[10, 20, 50, 100]"
-      layout="total, sizes, prev, pager, next, jumper"
-      @current-change="handleCurrentChange"
-      @size-change="handleSizeChange"
-      style="margin-top: 20px; justify-content: flex-end"
-    />
+    <el-pagination :current-page="currentPage" :page-size="pageSize" :total="total" :page-sizes="[10, 20, 50, 100]"
+      layout="total, sizes, prev, pager, next, jumper" @current-change="handleCurrentChange"
+      @size-change="handleSizeChange" style="margin-top: 20px; justify-content: flex-end" />
 
     <!-- 弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
@@ -621,68 +507,68 @@ const buildParams = () => {
     page_size: pageSize.value,
     search: searchKeyword.value
   };
-  
+
   // 批量筛选优先（如果有选中的批量值）
   if (selectedEmployeeNos.value.length > 0) {
     params.employee_no__in = selectedEmployeeNos.value.join(',');
   } else if (filters.value.employee_no) {
     params.employee_no = filters.value.employee_no;
   }
-  
+
   if (selectedNames.value.length > 0) {
     params.full_name__in = selectedNames.value.join(',');
   } else if (filters.value.full_name) {
     params.full_name = filters.value.full_name;
   }
-  
+
   if (selectedPhones.value.length > 0) {
     params.phone__in = selectedPhones.value.join(',');
   } else if (filters.value.phone) {
     params.phone = filters.value.phone;
   }
-  
+
   if (selectedStatuses.value.length > 0) {
     params.status__in = selectedStatuses.value.join(',');
   } else if (filters.value.status) {
     params.status = filters.value.status;
   }
-  
+
   if (selectedDepartments.value.length > 0) {
     params.department_name__in = selectedDepartments.value.join(',');
   } else if (filters.value.department_name) {
     params.department_name = filters.value.department_name;
   }
-  
+
   if (selectedPositions.value.length > 0) {
     params.position__in = selectedPositions.value.join(',');
   } else if (filters.value.position) {
     params.position = filters.value.position;
   }
-  
+
   if (selectedGenders.value.length > 0) {
     params.gender__in = selectedGenders.value.join(',');
   } else if (filters.value.gender) {
     params.gender = filters.value.gender;
   }
-  
+
   if (selectedBirthDates.value.length > 0) {
     params.birth_date__in = selectedBirthDates.value.join(',');
   } else if (filters.value.birth_date) {
     params.birth_date = filters.value.birth_date;
   }
-  
+
   if (selectedHireDates.value.length > 0) {
     params.hire_date__in = selectedHireDates.value.join(',');
   } else if (filters.value.hire_date) {
     params.hire_date = filters.value.hire_date;
   }
-  
+
   if (selectedResignationDates.value.length > 0) {
     params.resignation_date__in = selectedResignationDates.value.join(',');
   } else if (filters.value.resignation_date) {
     params.resignation_date = filters.value.resignation_date;
   }
-  
+
   // 日期范围筛选
   if (dateRange.value.birth_date && dateRange.value.birth_date.length === 2) {
     params.birth_date_start = dateRange.value.birth_date[0];
@@ -696,7 +582,7 @@ const buildParams = () => {
     params.resignation_date_start = dateRange.value.resignation_date[0];
     params.resignation_date_end = dateRange.value.resignation_date[1];
   }
-  
+
   return params;
 };
 
@@ -704,7 +590,7 @@ const buildParams = () => {
 const loadEmployees = async () => {
   try {
     const params = buildParams();
-    const res = await request.get('/pfm/employees/', { params });
+    const res = await request.get('/api/pfm/employees/', { params });
     employeeList.value = res.results || [];
     total.value = res.count || 0;
   } catch (error) {
@@ -815,16 +701,16 @@ const downloadTemplate = () => {
     method: 'GET',
     headers: { 'Authorization': `Bearer ${token}` }
   })
-  .then(response => response.blob())
-  .then(blob => {
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'employee_template.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
-  })
-  .catch(() => ElMessage.error('下载模板失败'));
+    .then(response => response.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'employee_template.xlsx';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(() => ElMessage.error('下载模板失败'));
 };
 
 // ========== 导出数据 ==========
@@ -834,24 +720,24 @@ const exportData = () => {
     method: 'GET',
     headers: { 'Authorization': `Bearer ${token}` }
   })
-  .then(response => response.blob())
-  .then(blob => {
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `employees_${new Date().toISOString().slice(0,19)}.xlsx`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-    ElMessage.success('导出成功');
-  })
-  .catch(() => ElMessage.error('导出失败'));
+    .then(response => response.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `employees_${new Date().toISOString().slice(0, 19)}.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      ElMessage.success('导出成功');
+    })
+    .catch(() => ElMessage.error('导出失败'));
 };
 
 // ========== 导入文件校验 ==========
 const beforeUpload = (file) => {
-  const isAllowed = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
-                    file.type === 'application/vnd.ms-excel' || 
-                    file.name.endsWith('.csv');
+  const isAllowed = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+    file.type === 'application/vnd.ms-excel' ||
+    file.name.endsWith('.csv');
   if (!isAllowed) {
     ElMessage.error('只能上传 Excel 或 CSV 文件');
     return false;
@@ -910,7 +796,7 @@ const handleDelete = (row) => {
     } catch (error) {
       ElMessage.error('删除失败');
     }
-  }).catch(() => {});
+  }).catch(() => { });
 };
 
 const submitForm = async () => {
@@ -922,7 +808,7 @@ const submitForm = async () => {
       await request.put(`/pfm/employees/${form.value.id}/`, form.value);
       ElMessage.success('编辑成功');
     } else {
-      await request.post('/pfm/employees/', form.value);
+      await request.post('/api/pfm/employees/', form.value);
       ElMessage.success('新增成功');
     }
     dialogVisible.value = false;
