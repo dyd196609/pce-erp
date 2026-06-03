@@ -1,7 +1,7 @@
 <template>
   <div style="padding: 20px">
     <h2>供应商管理</h2>
-    
+
     <!-- 工具栏 -->
     <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
       <el-button type="primary" @click="handleAdd">新增供应商</el-button>
@@ -13,70 +13,38 @@
       <el-button type="primary" plain @click="batchInspect">批量检验</el-button>
       <el-button type="primary" plain @click="batchStore">批量入库</el-button>
       <el-button type="primary" plain @click="batchClose">批量结案</el-button>
-      <el-upload
-        ref="uploadRef"
-        :action="uploadUrl"
-        :headers="uploadHeaders"
-        :on-success="handleUploadSuccess"
-        :on-error="handleUploadError"
-        :before-upload="beforeUpload"
-        :show-file-list="false"
-      >
+      <el-upload ref="uploadRef" :action="uploadUrl" :headers="uploadHeaders" :on-success="handleUploadSuccess"
+        :on-error="handleUploadError" :before-upload="beforeUpload" :show-file-list="false">
         <el-button type="warning">导入Excel</el-button>
       </el-upload>
       <el-button type="info" @click="exportData">导出Excel</el-button>
-      
-      <el-input
-        v-model="searchKeyword"
-        placeholder="搜索供应商编码/名称"
-        clearable
-        style="width: 220px; margin-left: auto"
-        @clear="loadSuppliers"
-        @keyup.enter="loadSuppliers"
-      />
+
+      <el-input v-model="searchKeyword" placeholder="搜索供应商编码/名称" clearable style="width: 220px; margin-left: auto"
+        @clear="loadSuppliers" @keyup.enter="loadSuppliers" />
       <el-button @click="loadSuppliers">搜索</el-button>
     </div>
 
     <!-- 供应商表格（横向滚动） -->
-    <div 
-      class="table-scroll-container" 
-      ref="tableScrollContainer"
-      @mousemove="handleTableMouseMove"
-      @mouseleave="handleTableMouseLeave"
-      style="overflow-x: auto; width: 100%; max-width: 100%"
-    >
-      <el-table 
-        :data="supplierList" 
-        border stripe 
-        style="min-width: 1200px; width: 100%"
-      >
+    <div class="table-scroll-container" ref="tableScrollContainer" @mousemove="handleTableMouseMove"
+      @mouseleave="handleTableMouseLeave" style="overflow-x: auto; width: 100%; max-width: 100%">
+      <el-table :data="supplierList" border stripe style="min-width: 1200px; width: 100%">
         <!-- 序号列 -->
         <el-table-column type="index" label="序号" width="60" fixed="left" :index="indexMethod" />
-        
+
         <!-- 供应商编码 - 录入筛选 + 批量筛选 -->
         <el-table-column prop="code" label="供应商编码" width="150" column-key="code">
           <template #header>
             <div>
               <div>供应商编码</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-input 
-                  v-model="filters.code" 
-                  placeholder="输入筛选" 
-                  size="small"
-                  clearable
-                  @input="handleTextFilter"
-                />
+                <el-input v-model="filters.code" placeholder="输入筛选" size="small" clearable @input="handleTextFilter" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedCodes">
-                      <el-checkbox
-                        v-for="item in codeOptions"
-                        :key="item.value"
-                        :label="item.value"
-                      >
+                      <el-checkbox v-for="item in codeOptions" :key="item.value" :label="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -90,31 +58,21 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 供应商名称 - 录入筛选 + 批量筛选 -->
         <el-table-column prop="name" label="供应商名称" width="180" column-key="name">
           <template #header>
             <div>
               <div>供应商名称</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-input 
-                  v-model="filters.name" 
-                  placeholder="输入筛选" 
-                  size="small"
-                  clearable
-                  @input="handleTextFilter"
-                />
+                <el-input v-model="filters.name" placeholder="输入筛选" size="small" clearable @input="handleTextFilter" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedNames">
-                      <el-checkbox
-                        v-for="item in nameOptions"
-                        :key="item.value"
-                        :label="item.value"
-                      >
+                      <el-checkbox v-for="item in nameOptions" :key="item.value" :label="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -128,31 +86,22 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 联系人 - 录入筛选 + 批量筛选 -->
         <el-table-column prop="contact_person" label="联系人" width="100" column-key="contact_person">
           <template #header>
             <div>
               <div>联系人</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-input 
-                  v-model="filters.contact_person" 
-                  placeholder="输入筛选" 
-                  size="small"
-                  clearable
-                  @input="handleTextFilter"
-                />
+                <el-input v-model="filters.contact_person" placeholder="输入筛选" size="small" clearable
+                  @input="handleTextFilter" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedContactPersons">
-                      <el-checkbox
-                        v-for="item in contactPersonOptions"
-                        :key="item.value"
-                        :label="item.value"
-                      >
+                      <el-checkbox v-for="item in contactPersonOptions" :key="item.value" :label="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -166,31 +115,22 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 联系电话 - 录入筛选 + 批量筛选 -->
         <el-table-column prop="contact_phone" label="联系电话" width="130" column-key="contact_phone">
           <template #header>
             <div>
               <div>联系电话</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-input 
-                  v-model="filters.contact_phone" 
-                  placeholder="输入筛选" 
-                  size="small"
-                  clearable
-                  @input="handleTextFilter"
-                />
+                <el-input v-model="filters.contact_phone" placeholder="输入筛选" size="small" clearable
+                  @input="handleTextFilter" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedPhones">
-                      <el-checkbox
-                        v-for="item in phoneOptions"
-                        :key="item.value"
-                        :label="item.value"
-                      >
+                      <el-checkbox v-for="item in phoneOptions" :key="item.value" :label="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -204,31 +144,22 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 邮箱 - 录入筛选 + 批量筛选 -->
         <el-table-column prop="contact_email" label="邮箱" width="180" column-key="contact_email">
           <template #header>
             <div>
               <div>邮箱</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-input 
-                  v-model="filters.contact_email" 
-                  placeholder="输入筛选" 
-                  size="small"
-                  clearable
-                  @input="handleTextFilter"
-                />
+                <el-input v-model="filters.contact_email" placeholder="输入筛选" size="small" clearable
+                  @input="handleTextFilter" />
                 <el-popover placement="bottom-end" width="220" trigger="click">
                   <template #reference>
                     <el-button size="small">批量</el-button>
                   </template>
                   <div>
                     <el-checkbox-group v-model="selectedEmails">
-                      <el-checkbox
-                        v-for="item in emailOptions"
-                        :key="item.value"
-                        :label="item.value"
-                      >
+                      <el-checkbox v-for="item in emailOptions" :key="item.value" :label="item.value">
                         {{ item.text }}
                       </el-checkbox>
                     </el-checkbox-group>
@@ -242,20 +173,15 @@
             </div>
           </template>
         </el-table-column>
-        
+
         <!-- 信用等级 - 下拉筛选 + 批量筛选 -->
         <el-table-column prop="credit_rating_display" label="信用等级" width="100" column-key="credit_rating">
           <template #header>
             <div>
               <div>信用等级</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-select 
-                  v-model="filters.credit_rating" 
-                  placeholder="选择筛选" 
-                  size="small"
-                  clearable
-                  @change="handleSelectFilter"
-                >
+                <el-select v-model="filters.credit_rating" placeholder="选择筛选" size="small" clearable
+                  @change="handleSelectFilter">
                   <el-option label="A级" value="A" />
                   <el-option label="B级" value="B" />
                   <el-option label="C级" value="C" />
@@ -285,20 +211,15 @@
             {{ row.credit_rating_display || row.credit_rating }}
           </template>
         </el-table-column>
-        
+
         <!-- 状态 - 下拉筛选 + 批量筛选 -->
         <el-table-column prop="status_display" label="状态" width="80" column-key="is_active">
           <template #header>
             <div>
               <div>状态</div>
               <div style="display: flex; gap: 4px; margin-top: 4px">
-                <el-select 
-                  v-model="filters.is_active" 
-                  placeholder="选择筛选" 
-                  size="small"
-                  clearable
-                  @change="handleSelectFilter"
-                >
+                <el-select v-model="filters.is_active" placeholder="选择筛选" size="small" clearable
+                  @change="handleSelectFilter">
                   <el-option label="启用" value="true" />
                   <el-option label="禁用" value="false" />
                 </el-select>
@@ -326,7 +247,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        
+
         <!-- 操作列 -->
         <el-table-column label="操作" width="150">
           <template #default="{ row }">
@@ -338,16 +259,9 @@
     </div>
 
     <!-- 分页 -->
-    <el-pagination
-      :current-page="currentPage"
-      :page-size="pageSize"
-      :total="total"
-      :page-sizes="[10, 20, 50, 100]"
-      layout="total, sizes, prev, pager, next, jumper"
-      @current-change="handleCurrentChange"
-      @size-change="handleSizeChange"
-      style="margin-top: 20px; justify-content: flex-end"
-    />
+    <el-pagination :current-page="currentPage" :page-size="pageSize" :total="total" :page-sizes="[10, 20, 50, 100]"
+      layout="total, sizes, prev, pager, next, jumper" @current-change="handleCurrentChange"
+      @size-change="handleSizeChange" style="margin-top: 20px; justify-content: flex-end" />
 
     <!-- 新增/编辑弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
@@ -405,7 +319,7 @@ const batchApprove = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'submitted').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已提交状态的订单')
   await ElMessageBox.confirm(`确定审核 ${ids.length} 个订单吗？`, '提示', { type: 'info' })
-  await request.post('/procurement/purchase_orders/batch_approve/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_approve/', { ids })
   ElMessage.success('批量审核成功')
   loadOrders()
 }
@@ -413,7 +327,7 @@ const batchApprove = async () => {
 const batchReview = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'approved').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已审核状态的订单')
-  await request.post('/procurement/purchase_orders/batch_review/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_review/', { ids })
   ElMessage.success('批量复核成功')
   loadOrders()
 }
@@ -421,7 +335,7 @@ const batchReview = async () => {
 const batchFinalApprove = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'reviewed').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已复核状态的订单')
-  await request.post('/procurement/purchase_orders/batch_final_approve/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_final_approve/', { ids })
   ElMessage.success('批量审批成功')
   loadOrders()
 }
@@ -429,7 +343,7 @@ const batchFinalApprove = async () => {
 const batchReceive = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'final_approved').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已审批状态的订单')
-  await request.post('/procurement/purchase_orders/batch_receive/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_receive/', { ids })
   ElMessage.success('批量收货成功')
   loadOrders()
 }
@@ -437,7 +351,7 @@ const batchReceive = async () => {
 const batchInspect = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'received').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已收货状态的订单')
-  await request.post('/procurement/purchase_orders/batch_inspect/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_inspect/', { ids })
   ElMessage.success('批量检验成功')
   loadOrders()
 }
@@ -445,7 +359,7 @@ const batchInspect = async () => {
 const batchStore = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'inspected').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已检验状态的订单')
-  await request.post('/procurement/purchase_orders/batch_store/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_store/', { ids })
   ElMessage.success('批量入库成功')
   loadOrders()
 }
@@ -453,7 +367,7 @@ const batchStore = async () => {
 const batchClose = async () => {
   const ids = selectedRows.value.filter(r => r.status === 'stored').map(r => r.id)
   if (!ids.length) return ElMessage.warning('请选择已入库状态的订单')
-  await request.post('/procurement/purchase_orders/batch_close/', { ids })
+  await request.post('/api/procurement/purchase_orders/batch_close/', { ids })
   ElMessage.success('批量结案成功')
   loadOrders()
 }
@@ -539,50 +453,50 @@ const buildParams = () => {
     page_size: pageSize.value,
     search: searchKeyword.value
   };
-  
+
   // 批量筛选优先（如果有选中的批量值）
   if (selectedCodes.value.length > 0) {
     params.code__in = selectedCodes.value.join(',');
   } else if (filters.value.code) {
     params.code = filters.value.code;
   }
-  
+
   if (selectedNames.value.length > 0) {
     params.name__in = selectedNames.value.join(',');
   } else if (filters.value.name) {
     params.name = filters.value.name;
   }
-  
+
   if (selectedContactPersons.value.length > 0) {
     params.contact_person__in = selectedContactPersons.value.join(',');
   } else if (filters.value.contact_person) {
     params.contact_person = filters.value.contact_person;
   }
-  
+
   if (selectedPhones.value.length > 0) {
     params.contact_phone__in = selectedPhones.value.join(',');
   } else if (filters.value.contact_phone) {
     params.contact_phone = filters.value.contact_phone;
   }
-  
+
   if (selectedEmails.value.length > 0) {
     params.contact_email__in = selectedEmails.value.join(',');
   } else if (filters.value.contact_email) {
     params.contact_email = filters.value.contact_email;
   }
-  
+
   if (selectedCreditRatings.value.length > 0) {
     params.credit_rating__in = selectedCreditRatings.value.join(',');
   } else if (filters.value.credit_rating) {
     params.credit_rating = filters.value.credit_rating;
   }
-  
+
   if (selectedStatuses.value.length > 0) {
     params.is_active__in = selectedStatuses.value.join(',');
   } else if (filters.value.is_active) {
     params.is_active = filters.value.is_active === 'true';
   }
-  
+
   return params;
 };
 
@@ -590,7 +504,7 @@ const buildParams = () => {
 const loadSuppliers = async () => {
   try {
     const params = buildParams();
-    const res = await request.get('/procurement/suppliers/', { params });
+    const res = await request.get('/api/procurement/suppliers/', { params });
     supplierList.value = res.results || [];
     total.value = res.count || 0;
   } catch (error) {
@@ -683,7 +597,7 @@ const exportData = () => {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `purchase_orders_${new Date().toISOString().slice(0,19)}.xlsx`
+      a.download = `purchase_orders_${new Date().toISOString().slice(0, 19)}.xlsx`
       a.click()
       URL.revokeObjectURL(url)
       ElMessage.success('导出成功')
@@ -698,23 +612,23 @@ const downloadTemplate = () => {
     method: 'GET',
     headers: { 'Authorization': `Bearer ${token}` }
   })
-  .then(response => response.blob())
-  .then(blob => {
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'supplier_template.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
-  })
-  .catch(() => ElMessage.error('下载模板失败'));
+    .then(response => response.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'supplier_template.xlsx';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(() => ElMessage.error('下载模板失败'));
 };
 
 // ========== 导入文件校验 ==========
 const beforeUpload = (file) => {
-  const isAllowed = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
-                    file.type === 'application/vnd.ms-excel' || 
-                    file.name.endsWith('.csv');
+  const isAllowed = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+    file.type === 'application/vnd.ms-excel' ||
+    file.name.endsWith('.csv');
   if (!isAllowed) {
     ElMessage.error('只能上传 Excel 或 CSV 文件');
     return false;
@@ -770,7 +684,7 @@ const handleDelete = (row) => {
     } catch (error) {
       ElMessage.error('删除失败');
     }
-  }).catch(() => {});
+  }).catch(() => { });
 };
 
 const submitForm = async () => {
@@ -787,7 +701,7 @@ const submitForm = async () => {
       await request.put(`/procurement/suppliers/${form.value.id}/`, submitData);
       ElMessage.success('编辑成功');
     } else {
-      await request.post('/procurement/suppliers/', submitData);
+      await request.post('/api/procurement/suppliers/', submitData);
       ElMessage.success('新增成功');
     }
     dialogVisible.value = false;
@@ -808,15 +722,15 @@ let scrollInterval = null
 const handleTableMouseMove = (event) => {
   const container = tableScrollContainer.value
   if (!container) return
-  
+
   const rect = container.getBoundingClientRect()
   const mouseX = event.clientX
   const threshold = 80  // 距离右侧多少像素时触发滚动
-  
+
   // 清除之前的定时器
   if (scrollTimer) clearTimeout(scrollTimer)
   if (scrollInterval) clearInterval(scrollInterval)
-  
+
   if (mouseX > rect.right - threshold) {
     // 鼠标在右侧边缘，开始向左滚动
     scrollTimer = setTimeout(() => {
@@ -870,14 +784,17 @@ onMounted(() => {
 .table-scroll-container::-webkit-scrollbar {
   height: 8px;
 }
+
 .table-scroll-container::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 4px;
 }
+
 .table-scroll-container::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 4px;
 }
+
 .table-scroll-container::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
