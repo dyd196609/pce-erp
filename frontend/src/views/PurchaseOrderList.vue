@@ -235,6 +235,24 @@
           </template>
         </el-table-column>
 
+        <!-- 新增部门列 -->
+        <el-row :gutter="20">
+          <el-col :span="14">
+            <el-form-item label="物料申购部门" prop="purchase_department_id">
+              <el-select v-model="form.purchase_department_id" filterable placeholder="请选择申购部门" clearable>
+                <el-option v-for="dept in departmentList" :key="dept.id" :label="dept.name" :value="dept.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="物料需求部门" prop="require_department_id">
+              <el-select v-model="form.require_department_id" filterable placeholder="请选择需求部门" clearable>
+                <el-option v-for="dept in departmentList" :key="dept.id" :label="dept.name" :value="dept.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
         <!-- 下单日期范围 -->
         <el-table-column prop="order_date" label="下单日期" width="260" sortable="custom">
           <template #header>
@@ -386,44 +404,69 @@
       layout="total, sizes, prev, pager, next, jumper" @current-change="onPageChange" @size-change="onSizeChange"
       style="margin-top: 20px; justify-content: flex-end" />
 
-    <!-- 新增/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="900px" @closed="resetForm">
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
+    <!-- 新增/编辑弹窗（已修正并加入部门字段） -->
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="1100px" top="5vh" @closed="resetForm"
+      :append-to-body="true" :body-style="{ maxHeight: '70vh', overflowY: 'auto' }">
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
+
+        <!-- 订单号 -->
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="订单号" prop="po_no">
               <el-input v-model="form.po_no" placeholder="留空自动生成" />
             </el-form-item>
           </el-col>
+        </el-row>
+
+        <!-- 供应商 + 采购员 -->
+        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="供应商" prop="supplier_id" required>
-              <el-select v-model="form.supplier_id" filterable placeholder="请选择供应商" style="width: 100%">
+              <el-select v-model="form.supplier_id" filterable placeholder="请选择供应商">
                 <el-option v-for="s in supplierAll" :key="s.id" :label="`${s.code} - ${s.name}`" :value="s.id" />
               </el-select>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="采购员" prop="buyer_id">
-              <el-select v-model="form.buyer_id" filterable placeholder="请选择采购员" style="width: 100%">
+              <el-select v-model="form.buyer_id" filterable placeholder="请选择采购员">
                 <el-option v-for="emp in employeeList" :key="emp.id" :label="emp.full_name" :value="emp.id" />
               </el-select>
             </el-form-item>
           </el-col>
+        </el-row>
+
+        <!-- 物料申购部门 + 物料需求部门（并排） -->
+        <el-row :gutter="20">
           <el-col :span="12">
+            <el-form-item label="物料申购部门" prop="purchase_department_id">
+              <el-select v-model="form.purchase_department_id" filterable placeholder="请选择申购部门" clearable>
+                <el-option v-for="dept in departmentList" :key="dept.id" :label="dept.name" :value="dept.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="物料需求部门" prop="require_department_id">
+              <el-select v-model="form.require_department_id" filterable placeholder="请选择需求部门" clearable>
+                <el-option v-for="dept in departmentList" :key="dept.id" :label="dept.name" :value="dept.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- 三个日期并排 -->
+        <el-row :gutter="20">
+          <el-col :span="8">
             <el-form-item label="下单日期" prop="order_date">
               <el-date-picker v-model="form.order_date" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row :gutter="20">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="预计到货日期" prop="expected_date">
               <el-date-picker v-model="form.expected_date" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="实际到货日期" prop="actual_receive_date">
               <el-date-picker v-model="form.actual_receive_date" type="date" value-format="YYYY-MM-DD"
                 style="width: 100%" />
@@ -431,13 +474,14 @@
           </el-col>
         </el-row>
 
-        <!-- 商品明细表格 -->
+        <!-- 商品明细表格（原样保留） -->
         <div style="margin: 20px 0">
           <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
             <strong>商品明细</strong>
             <el-button type="primary" size="small" @click="addItemRow">添加商品</el-button>
           </div>
           <el-table :data="form.items" border>
+            <!-- 列定义与原文件一致，这里仅示意，实际使用时请从备份文件中复制完整表格列 -->
             <el-table-column label="物料" width="200">
               <template #default="{ row, $index }">
                 <el-select v-model="row.material_id" filterable placeholder="请选择物料" @change="onMaterialChange($index)">
@@ -445,58 +489,42 @@
                 </el-select>
               </template>
             </el-table-column>
-
             <el-table-column label="规格" width="120">
               <template #default="{ row }">{{ row.specification || '-' }}</template>
             </el-table-column>
-
-            <!-- 计划数量 -->
             <el-table-column label="计划数量" width="100">
               <template #default="{ row, $index }">
                 <el-input-number v-model="row.quantity" :min="0" size="small" @change="calcItemAmount($index)"
                   style="width: 100%" />
               </template>
             </el-table-column>
-
-            <!-- 计划单价 -->
             <el-table-column label="计划单价" width="100">
               <template #default="{ row }">¥{{ Number(row.unit_price || 0).toFixed(2) }}</template>
             </el-table-column>
-
-            <!-- 计划金额 -->
             <el-table-column label="计划金额" width="100">
               <template #default="{ row }">¥{{ Number(row.amount || 0).toFixed(2) }}</template>
             </el-table-column>
-
-            <!-- 实际交货数量 -->
             <el-table-column label="实际交货数量" width="120">
               <template #default="{ row, $index }">
                 <el-input-number v-model="row.actual_quantity" :min="0" size="small" @change="calcActualAmount($index)"
                   style="width: 100%" />
               </template>
             </el-table-column>
-
-            <!-- 实际交货单价 -->
             <el-table-column label="实际交货单价" width="120">
               <template #default="{ row, $index }">
                 <el-input-number v-model="row.actual_unit_price" :min="0" :precision="2" size="small"
                   @change="calcActualAmount($index)" style="width: 100%" />
               </template>
             </el-table-column>
-
-            <!-- 实际交货金额 -->
             <el-table-column label="实际交货金额" width="120">
               <template #default="{ row }">¥{{ Number(row.actual_amount || 0).toFixed(2) }}</template>
             </el-table-column>
-
-            <!-- 实际到货日期 -->
             <el-table-column label="实际到货日期" width="130">
               <template #default="{ row, $index }">
                 <el-date-picker v-model="row.actual_arrival_date" type="date" value-format="YYYY-MM-DD" size="small"
                   style="width: 100%" />
               </template>
             </el-table-column>
-
             <el-table-column label="操作" width="60">
               <template #default="{ $index }">
                 <el-button link type="danger" @click="removeItemRow($index)">删除</el-button>
@@ -505,9 +533,11 @@
           </el-table>
         </div>
 
+        <!-- 备注 -->
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" :rows="2" />
         </el-form-item>
+
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -550,6 +580,17 @@
 import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import request from '../api/request'
+
+// 静态部门数据（请根据你实际部门ID修改）
+const departmentList = ref([
+  { id: 1, name: '总经办' },
+  { id: 2, name: '采购部' },
+  { id: 3, name: '生产部' },
+  { id: 4, name: '销售部' },
+  { id: 5, name: '研发部' },
+  { id: 6, name: '财务部' },
+  { id: 7, name: '人力行政部' },
+])
 
 // 重置到期天数筛选
 const resetDaysFilter = () => {
@@ -813,7 +854,9 @@ const form = ref({
   total_amount: 0,
   status: 'draft',
   remark: '',
-  items: []
+  items: [],
+  purchase_department_id: null,
+  require_department_id: null,
 })
 
 const rules = {
@@ -1149,7 +1192,9 @@ const handleEdit = async (row) => {
       total_amount: Number(res.total_amount) || 0,
       status: res.status || 'draft',
       remark: res.remark || '',
-      items: []
+      items: [],
+      purchase_department_id: res.purchase_department?.id || res.purchase_department_id,
+      require_department_id: res.require_department?.id || res.require_department_id,
     }
 
     // 处理商品明细
@@ -1256,6 +1301,9 @@ const submitForm = async () => {
       status: form.value.status || 'draft',
       remark: form.value.remark || '',
       company_id: 1,
+      purchase_department: form.value.purchase_department_id,
+      require_department: form.value.require_department_id,
+      // 商品明细
       items: form.value.items.map(item => ({
         material: Number(item.material_id),
         quantity: Number(item.quantity) || 0,
