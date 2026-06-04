@@ -409,22 +409,11 @@
       :append-to-body="true" :body-style="{ maxHeight: '70vh', overflowY: 'auto' }">
       <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
 
-        <!-- 订单号 -->
+        <!-- 第1行：订单号 + 采购员 -->
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="订单号" prop="po_no">
               <el-input v-model="form.po_no" placeholder="留空自动生成" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <!-- 供应商 + 采购员 -->
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="供应商" prop="supplier_id" required>
-              <el-select v-model="form.supplier_id" filterable placeholder="请选择供应商">
-                <el-option v-for="s in supplierAll" :key="s.id" :label="`${s.code} - ${s.name}`" :value="s.id" />
-              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -436,12 +425,12 @@
           </el-col>
         </el-row>
 
-        <!-- 物料申购部门 + 物料需求部门（并排） -->
+        <!-- 第2行：供应商 + 物料需求部门 -->
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="物料申购部门" prop="purchase_department_id">
-              <el-select v-model="form.purchase_department_id" filterable placeholder="请选择申购部门" clearable>
-                <el-option v-for="dept in departmentList" :key="dept.id" :label="dept.name" :value="dept.id" />
+            <el-form-item label="供应商" prop="supplier_id" required>
+              <el-select v-model="form.supplier_id" filterable placeholder="请选择供应商">
+                <el-option v-for="s in supplierAll" :key="s.id" :label="`${s.code} - ${s.name}`" :value="s.id" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -454,19 +443,30 @@
           </el-col>
         </el-row>
 
-        <!-- 三个日期并排 -->
+        <!-- 第3行：物料申购部门 + 下单日期 -->
         <el-row :gutter="20">
-          <el-col :span="8">
+          <el-col :span="12">
+            <el-form-item label="物料申购部门" prop="purchase_department_id">
+              <el-select v-model="form.purchase_department_id" filterable placeholder="请选择申购部门" clearable>
+                <el-option v-for="dept in departmentList" :key="dept.id" :label="dept.name" :value="dept.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="下单日期" prop="order_date">
               <el-date-picker v-model="form.order_date" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+        </el-row>
+
+        <!-- 第4行：预计到货日期 + 实际到货日期 -->
+        <el-row :gutter="20">
+          <el-col :span="12">
             <el-form-item label="预计到货日期" prop="expected_date">
               <el-date-picker v-model="form.expected_date" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="12">
             <el-form-item label="实际到货日期" prop="actual_receive_date">
               <el-date-picker v-model="form.actual_receive_date" type="date" value-format="YYYY-MM-DD"
                 style="width: 100%" />
@@ -474,58 +474,68 @@
           </el-col>
         </el-row>
 
-        <!-- 商品明细表格（原样保留） -->
+        <!-- 商品明细 -->
         <div style="margin: 20px 0">
           <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
             <strong>商品明细</strong>
             <el-button type="primary" size="small" @click="addItemRow">添加商品</el-button>
           </div>
+
           <el-table :data="form.items" border>
-            <!-- 列定义与原文件一致，这里仅示意，实际使用时请从备份文件中复制完整表格列 -->
-            <el-table-column label="物料" width="200">
+            <el-table-column label="物料" width="200" fixed="left">
               <template #default="{ row, $index }">
-                <el-select v-model="row.material_id" filterable placeholder="请选择物料" @change="onMaterialChange($index)">
-                  <el-option v-for="m in materialList" :key="m.id" :label="`${m.name} (${m.code})`" :value="m.id" />
+                <el-select v-model="row.material_id" filterable remote placeholder="选择物料" style="width: 100%"
+                  @change="() => onMaterialChange($index)">
+                  <el-option v-for="m in materialList" :key="m.id" :label="`${m.code} - ${m.name}`" :value="m.id" />
                 </el-select>
               </template>
             </el-table-column>
-            <el-table-column label="规格" width="120">
-              <template #default="{ row }">{{ row.specification || '-' }}</template>
-            </el-table-column>
-            <el-table-column label="计划数量" width="100">
+
+            <el-table-column label="规格型号" prop="specification" width="120" />
+
+            <!-- 计划部分 -->
+            <el-table-column label="计划数量" width="120">
               <template #default="{ row, $index }">
-                <el-input-number v-model="row.quantity" :min="0" size="small" @change="calcItemAmount($index)"
-                  style="width: 100%" />
+                <el-input-number v-model="row.plan_quantity" :min="0" :precision="2" controls-position="right"
+                  size="small" style="width: 100%" @change="() => calcPlanAmount($index)" />
               </template>
             </el-table-column>
-            <el-table-column label="计划单价" width="100">
-              <template #default="{ row }">¥{{ Number(row.unit_price || 0).toFixed(2) }}</template>
-            </el-table-column>
-            <el-table-column label="计划金额" width="100">
-              <template #default="{ row }">¥{{ Number(row.amount || 0).toFixed(2) }}</template>
-            </el-table-column>
-            <el-table-column label="实际交货数量" width="120">
+
+            <el-table-column label="计划单价" width="120">
               <template #default="{ row, $index }">
-                <el-input-number v-model="row.actual_quantity" :min="0" size="small" @change="calcActualAmount($index)"
-                  style="width: 100%" />
+                <el-input-number v-model="row.plan_unit_price" :min="0" :precision="2" controls-position="right"
+                  size="small" style="width: 100%" @change="() => calcPlanAmount($index)" />
               </template>
             </el-table-column>
-            <el-table-column label="实际交货单价" width="120">
-              <template #default="{ row, $index }">
-                <el-input-number v-model="row.actual_unit_price" :min="0" :precision="2" size="small"
-                  @change="calcActualAmount($index)" style="width: 100%" />
+
+            <el-table-column label="计划金额" width="120">
+              <template #default="{ row }">
+                <span style="color: #409EFF;">¥{{ (row.plan_amount || 0).toFixed(2) }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="实际交货金额" width="120">
-              <template #default="{ row }">¥{{ Number(row.actual_amount || 0).toFixed(2) }}</template>
-            </el-table-column>
-            <el-table-column label="实际到货日期" width="130">
+
+            <!-- 实际部分 -->
+            <el-table-column label="实际数量" width="120">
               <template #default="{ row, $index }">
-                <el-date-picker v-model="row.actual_arrival_date" type="date" value-format="YYYY-MM-DD" size="small"
-                  style="width: 100%" />
+                <el-input-number v-model="row.actual_quantity" :min="0" :precision="2" controls-position="right"
+                  size="small" style="width: 100%" @change="() => calcActualAmount($index)" />
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="60">
+
+            <el-table-column label="实际单价" width="120">
+              <template #default="{ row, $index }">
+                <el-input-number v-model="row.actual_unit_price" :min="0" :precision="2" controls-position="right"
+                  size="small" style="width: 100%" @change="() => calcActualAmount($index)" />
+              </template>
+            </el-table-column>
+
+            <el-table-column label="实际金额" width="120">
+              <template #default="{ row }">
+                <span style="color: #67C23A;">¥{{ (row.actual_amount || 0).toFixed(2) }}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column label="操作" width="80" fixed="right">
               <template #default="{ $index }">
                 <el-button link type="danger" @click="removeItemRow($index)">删除</el-button>
               </template>
@@ -580,17 +590,22 @@
 import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import request from '../api/request'
+const departmentList = ref([])
 
-// 静态部门数据（请根据你实际部门ID修改）
-const departmentList = ref([
-  { id: 1, name: '总经办' },
-  { id: 2, name: '采购部' },
-  { id: 3, name: '生产部' },
-  { id: 4, name: '销售部' },
-  { id: 5, name: '研发部' },
-  { id: 6, name: '财务部' },
-  { id: 7, name: '人力行政部' },
-])
+const loadDepartments = async () => {
+  try {
+    const res = await request.get('/api/departments/')
+    departmentList.value = Array.isArray(res) ? res : (res.results || [])
+  } catch (error) {
+    console.error('加载部门列表失败', error)
+  }
+}
+
+// 删除商品明细行
+const removeItemRow = (idx) => {
+  form.value.items.splice(idx, 1)
+  calcTotalAmount()
+}
 
 // 重置到期天数筛选
 const resetDaysFilter = () => {
@@ -1203,16 +1218,17 @@ const handleEdit = async (row) => {
         material_id: item.material,
         material_name: item.material_name || '',
         specification: item.specification || '',
-        quantity: Number(item.quantity) || 0,
-        unit_price: Number(item.unit_price) || 0,
-        amount: Number(item.amount) || 0,
+        // 计划字段
+        plan_quantity: Number(item.plan_quantity) || 0,
+        plan_unit_price: Number(item.plan_unit_price) || 0,
+        plan_amount: Number(item.plan_amount) || 0,
+        // 实际字段
         actual_quantity: item.actual_quantity || null,
         actual_unit_price: item.actual_unit_price || null,
         actual_amount: item.actual_amount || null,
         actual_arrival_date: item.actual_arrival_date || null
       }))
     }
-
     console.log('form.value 已设置:', form.value)
     console.log('弹窗应该打开了')
     dialogVisible.value = true
@@ -1225,34 +1241,55 @@ const handleEdit = async (row) => {
 
 // 商品明细操作
 const addItemRow = () => {
-  form.value.items.push({ material_id: null, specification: '', quantity: 1, unit_price: 0, amount: 0 })
+  form.value.items.push({
+    material_id: null,
+    specification: '',
+    // 计划字段
+    plan_quantity: 0,
+    plan_unit_price: 0,
+    plan_amount: 0,
+    // 实际字段
+    actual_quantity: 0,
+    actual_unit_price: 0,
+    actual_amount: 0,
+    actual_arrival_date: null
+  })
 }
-const removeItemRow = (idx) => {
-  form.value.items.splice(idx, 1)
-  calcTotalAmount()
-}
+
 const onMaterialChange = (idx) => {
   const item = form.value.items[idx]
   const material = materialList.value.find(m => m.id === item.material_id)
   if (material) {
     item.specification = material.specification || ''
-    item.unit_price = Number(material.standard_cost) || Number(material.price) || 0
-    calcItemAmount(idx)
+    item.plan_unit_price = Number(material.standard_cost) || Number(material.price) || 0
+    calcPlanAmount(idx)
   } else {
     item.specification = ''
-    item.unit_price = 0
-    calcItemAmount(idx)
+    item.plan_unit_price = 0
+    calcPlanAmount(idx)
   }
 }
-const calcItemAmount = (idx) => {
+
+// 计算计划金额
+const calcPlanAmount = (idx) => {
   const item = form.value.items[idx]
-  const qty = Number(item.quantity) || 0
-  const price = Number(item.unit_price) || 0
-  item.amount = qty * price
+  const qty = Number(item.plan_quantity) || 0
+  const price = Number(item.plan_unit_price) || 0
+  item.plan_amount = qty * price
   calcTotalAmount()
 }
+
+// 计算实际金额
+const calcActualAmount = (idx) => {
+  const item = form.value.items[idx]
+  const qty = Number(item.actual_quantity) || 0
+  const price = Number(item.actual_unit_price) || 0
+  item.actual_amount = qty * price
+}
+
+// 计算总金额 - 添加这个函数！
 const calcTotalAmount = () => {
-  form.value.total_amount = form.value.items.reduce((sum, i) => sum + (i.amount || 0), 0)
+  form.value.total_amount = form.value.items.reduce((sum, i) => sum + (i.plan_amount || 0), 0)
 }
 
 const submitForm = async () => {
@@ -1263,8 +1300,8 @@ const submitForm = async () => {
     // ========== 第一步：重新计算总金额（基于商品明细）==========
     let calculatedTotal = 0
     for (const item of form.value.items) {
-      const qty = Number(item.quantity) || 0
-      const price = Number(item.unit_price) || 0
+      const qty = Number(item.plan_quantity) || 0
+      const price = Number(item.plan_unit_price) || 0
       const amount = qty * price
       calculatedTotal += amount
     }
@@ -1306,10 +1343,12 @@ const submitForm = async () => {
       // 商品明细
       items: form.value.items.map(item => ({
         material: Number(item.material_id),
-        quantity: Number(item.quantity) || 0,
-        unit_price: Number(item.unit_price) || 0,
-        amount: Number(item.amount) || 0,
+        // 后端期望的字段名（计划数据）
+        quantity: Number(item.plan_quantity) || 0,
+        unit_price: Number(item.plan_unit_price) || 0,
+        amount: Number(item.plan_amount) || 0,
         specification: item.specification || '',
+        // 实际数据（如果后端支持）
         actual_quantity: item.actual_quantity ? Number(item.actual_quantity) : null,
         actual_unit_price: item.actual_unit_price ? Number(item.actual_unit_price) : null,
         actual_amount: item.actual_amount ? Number(item.actual_amount) : null,
@@ -1340,13 +1379,6 @@ const submitForm = async () => {
   } finally {
     submitting.value = false
   }
-}
-
-const calcActualAmount = (idx) => {
-  const item = form.value.items[idx];
-  const qty = Number(item.actual_quantity) || 0;
-  const price = Number(item.actual_unit_price) || 0;
-  item.actual_amount = qty * price;
 }
 
 // ---------- 横向滚动 ----------
@@ -1392,6 +1424,7 @@ onMounted(async () => {
   loadSuppliers()
   loadEmployees()
   loadMaterials()
+  loadDepartments()
 })
 </script>
 
