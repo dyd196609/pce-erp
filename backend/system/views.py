@@ -16,6 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login
 import json
+from .models import Department
 
 
 class LoginView(APIView):
@@ -128,3 +129,10 @@ def api_login(request):
             return JsonResponse({"error": "用户名或密码错误"}, status=401)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def department_list(request):
+    depts = Department.objects.filter(is_active=True).values("id", "name", "code")
+    return JsonResponse(list(depts), safe=False)
