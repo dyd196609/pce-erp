@@ -73,9 +73,24 @@ class PurchaseOrder(models.Model):
         blank=True,
         verbose_name="所属部门",
     )
-    # =================================
 
-    created_by = models.BigIntegerField(blank=True, null=True)
+    purchase_department = models.ForeignKey(
+        "system.Department",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="purchase_orders",
+        verbose_name="物料申购部门",
+    )
+
+    require_department = models.ForeignKey(
+        "system.Department",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="require_orders",
+        verbose_name="物料需求部门",
+    )
 
     created_by = models.BigIntegerField(blank=True, null=True)
     company_id = models.BigIntegerField()

@@ -1,9 +1,15 @@
 """
 PCE 用户模型（对应数据库 user 表）
 """
+
 import threading
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+    Group,
+)
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
@@ -11,52 +17,52 @@ from django.dispatch import receiver
 class UserManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
         if not username:
-            raise ValueError('用户名必须提供')
+            raise ValueError("用户名必须提供")
         user = self.model(username=username, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_superuser(self, username, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('company_id', 1)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("company_id", 1)
         return self.create_user(username, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField('登录账号', max_length=50, unique=True)
-    real_name = models.CharField('真实姓名', max_length=50)
-    email = models.EmailField('邮箱', blank=True, null=True)
-    mobile = models.CharField('手机号', max_length=20, blank=True, null=True)
-    company_id = models.BigIntegerField('所属公司ID')
-    is_active = models.BooleanField('是否启用', default=True)
-    is_staff = models.BooleanField('是否员工', default=False)
-    last_login = models.DateTimeField('最后登录时间', blank=True, null=True)
-    created_at = models.DateTimeField('创建时间', auto_now_add=True)
-    updated_at = models.DateTimeField('更新时间', auto_now=True)
+    username = models.CharField("登录账号", max_length=50, unique=True)
+    real_name = models.CharField("真实姓名", max_length=50)
+    email = models.EmailField("邮箱", blank=True, null=True)
+    mobile = models.CharField("手机号", max_length=20, blank=True, null=True)
+    company_id = models.BigIntegerField("所属公司ID")
+    is_active = models.BooleanField("是否启用", default=True)
+    is_staff = models.BooleanField("是否员工", default=False)
+    last_login = models.DateTimeField("最后登录时间", blank=True, null=True)
+    created_at = models.DateTimeField("创建时间", auto_now_add=True)
+    updated_at = models.DateTimeField("更新时间", auto_now=True)
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['real_name']
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["real_name"]
 
     objects = UserManager()
 
     class Meta:
-        db_table = 'user_system'
-        verbose_name = '用户'
-        verbose_name_plural = '用户'
+        db_table = "user_system"
+        verbose_name = "用户"
+        verbose_name_plural = "用户"
 
     def __str__(self):
         return f"{self.username}({self.real_name})"
 
 
 class Company(models.Model):
-    name = models.CharField('公司名称', max_length=100, unique=True)
-    code = models.CharField('公司编码', max_length=20, unique=True)
-    address = models.CharField('地址', max_length=200, blank=True)
-    contact = models.CharField('联系人', max_length=50, blank=True)
-    phone = models.CharField('联系电话', max_length=20, blank=True)
-    is_active = models.BooleanField('是否启用', default=True)
+    name = models.CharField("公司名称", max_length=100, unique=True)
+    code = models.CharField("公司编码", max_length=20, unique=True)
+    address = models.CharField("地址", max_length=200, blank=True)
+    contact = models.CharField("联系人", max_length=50, blank=True)
+    phone = models.CharField("联系电话", max_length=20, blank=True)
+    is_active = models.BooleanField("是否启用", default=True)
 
     class Meta:
         verbose_name = "公司"
@@ -67,32 +73,52 @@ class Company(models.Model):
 
 
 class Department(models.Model):
-    name = models.CharField('部门名称', max_length=100)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True,
-                               blank=True, related_name='children', verbose_name='上级部门')
+    name = models.CharField("部门名称", max_length=100)
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="children",
+        verbose_name="上级部门",
+    )
     company = models.ForeignKey(
-        Company, on_delete=models.CASCADE, related_name='departments', verbose_name='所属公司')
-    code = models.CharField('部门编码', max_length=20, blank=True)
-    manager = models.CharField('负责人', max_length=50, blank=True)
-    is_active = models.BooleanField('是否启用', default=True)
+        Company,
+        on_delete=models.CASCADE,
+        related_name="departments",
+        verbose_name="所属公司",
+    )
+    code = models.CharField("部门编码", max_length=20, blank=True)
+    manager = models.CharField("负责人", max_length=50, blank=True)
+    is_active = models.BooleanField("是否启用", default=True)
 
     class Meta:
         verbose_name = "部门"
         verbose_name_plural = "部门"
-        unique_together = [['name', 'company']]
+        unique_together = [["name", "company"]]
 
     def __str__(self):
         return f"{self.company.name} - {self.name}"
 
 
 class Workshop(models.Model):
-    name = models.CharField('车间名称', max_length=100)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE,
-                                   null=True, blank=True, related_name='workshops', verbose_name='所属部门')
+    name = models.CharField("车间名称", max_length=100)
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="workshops",
+        verbose_name="所属部门",
+    )
     company = models.ForeignKey(
-        Company, on_delete=models.CASCADE, related_name='workshops', verbose_name='所属公司')
-    code = models.CharField('车间编码', max_length=20, blank=True)
-    is_active = models.BooleanField('是否启用', default=True)
+        Company,
+        on_delete=models.CASCADE,
+        related_name="workshops",
+        verbose_name="所属公司",
+    )
+    code = models.CharField("车间编码", max_length=20, blank=True)
+    is_active = models.BooleanField("是否启用", default=True)
 
     class Meta:
         verbose_name = "车间"
@@ -103,16 +129,26 @@ class Workshop(models.Model):
 
 
 class Team(models.Model):
-    name = models.CharField('班组名称', max_length=100)
+    name = models.CharField("班组名称", max_length=100)
     workshop = models.ForeignKey(
-        Workshop, on_delete=models.CASCADE, related_name='teams', verbose_name='所属车间')
+        Workshop,
+        on_delete=models.CASCADE,
+        related_name="teams",
+        verbose_name="所属车间",
+    )
     department = models.ForeignKey(
-        Department, on_delete=models.CASCADE, null=True, blank=True, verbose_name='所属部门')
+        Department,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="所属部门",
+    )
     company = models.ForeignKey(
-        Company, on_delete=models.CASCADE, related_name='teams', verbose_name='所属公司')
-    code = models.CharField('班组编码', max_length=20, blank=True)
-    leader = models.CharField('班组长', max_length=50, blank=True)
-    is_active = models.BooleanField('是否启用', default=True)
+        Company, on_delete=models.CASCADE, related_name="teams", verbose_name="所属公司"
+    )
+    code = models.CharField("班组编码", max_length=20, blank=True)
+    leader = models.CharField("班组长", max_length=50, blank=True)
+    is_active = models.BooleanField("是否启用", default=True)
 
     class Meta:
         verbose_name = "班组"
@@ -123,12 +159,16 @@ class Team(models.Model):
 
 
 class Process(models.Model):
-    name = models.CharField('工序名称', max_length=100)
+    name = models.CharField("工序名称", max_length=100)
     team = models.ForeignKey(
-        Team, on_delete=models.CASCADE, related_name='processes', verbose_name='所属班组')
-    code = models.CharField('工序编码', max_length=20, blank=True)
-    description = models.TextField('描述', blank=True)
-    is_active = models.BooleanField('是否启用', default=True)
+        Team,
+        on_delete=models.CASCADE,
+        related_name="processes",
+        verbose_name="所属班组",
+    )
+    code = models.CharField("工序编码", max_length=20, blank=True)
+    description = models.TextField("描述", blank=True)
+    is_active = models.BooleanField("是否启用", default=True)
 
     class Meta:
         verbose_name = "工序"
@@ -139,21 +179,42 @@ class Process(models.Model):
 
 
 class Position(models.Model):
-    name = models.CharField('岗位名称', max_length=100, unique=True)
-    code = models.CharField('岗位编码', max_length=20, unique=True)
+    name = models.CharField("岗位名称", max_length=100, unique=True)
+    code = models.CharField("岗位编码", max_length=20, unique=True)
     department = models.ForeignKey(
-        Department, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='所属部门')
+        Department,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="所属部门",
+    )
     workshop = models.ForeignKey(
-        Workshop, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='所属车间')
+        Workshop,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="所属车间",
+    )
     team = models.ForeignKey(
-        Team, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='所属班组')
+        Team, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="所属班组"
+    )
     process = models.ForeignKey(
-        Process, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='所属工序')
+        Process,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="所属工序",
+    )
     company = models.ForeignKey(
-        Company, on_delete=models.CASCADE, related_name='positions', verbose_name='所属公司')
+        Company,
+        on_delete=models.CASCADE,
+        related_name="positions",
+        verbose_name="所属公司",
+    )
     group = models.OneToOneField(
-        Group, on_delete=models.CASCADE, null=True, blank=True, verbose_name='权限组')
-    is_active = models.BooleanField('是否启用', default=True)
+        Group, on_delete=models.CASCADE, null=True, blank=True, verbose_name="权限组"
+    )
+    is_active = models.BooleanField("是否启用", default=True)
 
     class Meta:
         verbose_name = "岗位"
@@ -161,6 +222,93 @@ class Position(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.code})"
+
+
+# ==============================
+# 权限系统（新增）
+# ==============================
+
+
+class Role(models.Model):
+    name = models.CharField("角色名称", max_length=50, unique=True)
+    code = models.CharField("角色编码", max_length=50, unique=True)
+    description = models.CharField("描述", max_length=200, blank=True)
+
+    class Meta:
+        verbose_name = "角色"
+        verbose_name_plural = "角色"
+
+    def __str__(self):
+        return self.name
+
+
+class Permission(models.Model):
+    code = models.CharField("权限编码", max_length=100, unique=True)
+    name = models.CharField("权限名称", max_length=100)
+    module = models.CharField("所属模块", max_length=50)
+
+    class Meta:
+        verbose_name = "权限"
+        verbose_name_plural = "权限"
+
+    def __str__(self):
+        return self.code
+
+
+class RolePermission(models.Model):
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, verbose_name="角色")
+    permission = models.ForeignKey(
+        Permission, on_delete=models.CASCADE, verbose_name="权限"
+    )
+
+    class Meta:
+        verbose_name = "角色权限"
+        verbose_name_plural = "角色权限"
+
+
+# ==============================
+# 菜单系统（新增）
+# ==============================
+
+
+class Menu(models.Model):
+    name = models.CharField("菜单名称", max_length=50)
+    code = models.CharField("菜单编码", max_length=100, unique=True)
+    path = models.CharField("前端路由", max_length=200, blank=True)
+    component = models.CharField("前端组件", max_length=200, blank=True)
+    icon = models.CharField("菜单图标", max_length=50, blank=True)
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="children",
+        verbose_name="上级菜单",
+    )
+    sort_order = models.IntegerField("排序号", default=0)
+    permission_code = models.CharField("权限编码", max_length=100, blank=True)
+    is_active = models.BooleanField("是否启用", default=True)
+
+    class Meta:
+        verbose_name = "菜单"
+        verbose_name_plural = "菜单"
+        ordering = ["sort_order", "id"]
+
+    def __str__(self):
+        return self.name
+
+
+class RoleMenu(models.Model):
+    role = models.ForeignKey(Role, on_delete=models.CASCADE, verbose_name="角色")
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE, verbose_name="菜单")
+
+    class Meta:
+        verbose_name = "角色菜单"
+        verbose_name_plural = "角色菜单"
+        unique_together = [["role", "menu"]]
+
+    def __str__(self):
+        return f"{self.role.name} - {self.menu.name}"
 
 
 # @receiver(pre_save, sender=Position)

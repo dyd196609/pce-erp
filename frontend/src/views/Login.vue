@@ -10,7 +10,9 @@
           <el-input type="password" v-model="form.password" placeholder="密码" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleLogin" :loading="loading">登录</el-button>
+          <el-button type="primary" @click="handleLogin" :loading="loading">
+            登录
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -23,6 +25,7 @@ import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { useUserStore } from '../stores/counter';
 import request from '../api/request';
+import axios from 'axios';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -36,22 +39,27 @@ const rules = {
 };
 
 const handleLogin = async () => {
-  if (!formRef.value) return;
-  await formRef.value.validate();
   loading.value = true;
+
   try {
-    const res = await request.post('/api/auth/login/', {
+    console.log('开始登录', form.username, form.password);
+
+    const response = await axios.post('http://127.0.0.1:8000/api/auth/login/', {
       username: form.username,
       password: form.password
     });
+
+    const res = response.data;
+
+    console.log('登录接口返回：', res);
+
     if (res.token) {
       localStorage.setItem('token', res.token);
       userStore.setToken(res.token);
       userStore.setUserInfo(res.user);
       ElMessage.success('登录成功');
-      router.push('/employees');
+      router.push('/');
     } else if (res.success) {
-      // 如果没有 token 但有 success，用假的 token
       localStorage.setItem('token', 'fake_token');
       userStore.setToken('fake_token');
       userStore.setUserInfo({
@@ -59,7 +67,7 @@ const handleLogin = async () => {
         real_name: res.real_name
       });
       ElMessage.success('登录成功');
-      router.push('/employees');
+      router.push('/');
     } else {
       ElMessage.error(res.error || '登录失败');
     }

@@ -138,7 +138,20 @@
         </el-table-column>
 
         <!-- 采购订单-到期天数 -->
-        <el-table-column prop="days_to_expiry" label="到期天数" width="120">
+        <el-table-column prop="days_to_expiry" label="到期天数" width="180">
+          <template #header>
+            <div>
+              <div>到期天数</div>
+              <div style="margin-top: 4px; display: flex; gap: 4px; align-items: center;">
+                <el-input v-model="filters.days_to_expiry_min" placeholder="最小值" size="small" style="width: 65px"
+                  @input="loadOrders" />
+                <span>~</span>
+                <el-input v-model="filters.days_to_expiry_max" placeholder="最大值" size="small" style="width: 65px"
+                  @input="loadOrders" />
+                <el-button size="small" type="text" @click="resetDaysFilter">重置</el-button>
+              </div>
+            </div>
+          </template>
           <template #default="{ row }">
             <span v-if="row.days_to_expiry !== null && row.days_to_expiry !== undefined">
               {{ row.days_to_expiry }}
@@ -148,7 +161,24 @@
         </el-table-column>
 
         <!-- 采购订单-紧急程度 -->
-        <el-table-column prop="urgency_level" label="紧急程度" width="120">
+        <el-table-column prop="urgency_level" label="紧急程度" width="140">
+          <template #header>
+            <div>
+              <div>紧急程度</div>
+              <div style="margin-top: 4px; display: flex; gap: 4px; align-items: center;">
+                <el-select v-model="filters.urgency_level" placeholder="请选择" size="small" clearable @change="loadOrders"
+                  style="width: 100px">
+                  <el-option label="特急" value="urgent" />
+                  <el-option label="紧急" value="emergency" />
+                  <el-option label="一般" value="normal" />
+                  <el-option label="宽松" value="relaxed" />
+                  <el-option label="已完成" value="completed" />
+                  <el-option label="未计划" value="unscheduled" />
+                </el-select>
+                <el-button size="small" type="text" @click="resetUrgencyFilter">重置</el-button>
+              </div>
+            </div>
+          </template>
           <template #default="{ row }">
             <el-tag :type="getUrgencyTagType(row.urgency_level)" size="small">
               {{ getUrgencyText(row.urgency_level) }}
@@ -157,7 +187,20 @@
         </el-table-column>
 
         <!-- 采购订单-是否达成 -->
-        <el-table-column prop="is_fulfilled" label="是否达成" width="120">
+        <el-table-column prop="is_fulfilled" label="是否达成" width="140">
+          <template #header>
+            <div>
+              <div>是否达成</div>
+              <div style="margin-top: 4px; display: flex; gap: 4px; align-items: center;">
+                <el-select v-model="filters.is_fulfilled" placeholder="请选择" size="small" clearable @change="loadOrders"
+                  style="width: 100px">
+                  <el-option label="是" :value="true" />
+                  <el-option label="否" :value="false" />
+                </el-select>
+                <el-button size="small" type="text" @click="resetFulfilledFilter">重置</el-button>
+              </div>
+            </div>
+          </template>
           <template #default="{ row }">
             <el-tag :type="row.is_fulfilled ? 'success' : 'info'" size="small">
               {{ row.is_fulfilled ? '是' : '否' }}
@@ -191,6 +234,24 @@
             </div>
           </template>
         </el-table-column>
+
+        <!-- 新增部门列 -->
+        <el-row :gutter="20">
+          <el-col :span="14">
+            <el-form-item label="物料申购部门" prop="purchase_department_id">
+              <el-select v-model="form.purchase_department_id" filterable placeholder="请选择申购部门" clearable>
+                <el-option v-for="dept in departmentList" :key="dept.id" :label="dept.name" :value="dept.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="物料需求部门" prop="require_department_id">
+              <el-select v-model="form.require_department_id" filterable placeholder="请选择需求部门" clearable>
+                <el-option v-for="dept in departmentList" :key="dept.id" :label="dept.name" :value="dept.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
 
         <!-- 下单日期范围 -->
         <el-table-column prop="order_date" label="下单日期" width="260" sortable="custom">
@@ -292,31 +353,6 @@
                   <el-option label="已取消" value="cancelled" />
                 </el-select>
 
-                <!-- 紧急程度筛选 -->
-                <el-select v-model="filters.urgency_level" placeholder="紧急程度" clearable size="small"
-                  style="width: 100px" @change="loadOrders">
-                  <el-option label="特急" value="urgent" />
-                  <el-option label="紧急" value="emergency" />
-                  <el-option label="一般" value="normal" />
-                  <el-option label="宽松" value="relaxed" />
-                  <el-option label="已完成" value="completed" />
-                  <el-option label="未计划" value="unscheduled" />
-                </el-select>
-
-                <!-- 是否达成筛选 -->
-                <el-select v-model="filters.is_fulfilled" placeholder="是否达成" clearable size="small" style="width: 100px"
-                  @change="loadOrders">
-                  <el-option label="是" :value="true" />
-                  <el-option label="否" :value="false" />
-                </el-select>
-
-                <!-- 到期天数范围筛选 -->
-                <el-input v-model="filters.days_to_expiry_min" placeholder="到期天数≥" size="small" style="width: 100px"
-                  @input="loadOrders" />
-                <span style="margin: 0 4px">~</span>
-                <el-input v-model="filters.days_to_expiry_max" placeholder="到期天数≤" size="small" style="width: 100px"
-                  @input="loadOrders" />
-
                 <el-button type="text" size="small" @click="resetStatus">重置</el-button>
               </div>
             </div>
@@ -324,12 +360,6 @@
           <template #default="{ row }">
             <el-tag :type="statusTagType(row.status)">{{ statusMap[row.status] || row.status_display || row.status
             }}</el-tag>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="is_fulfilled" label="是否达成" width="100">
-          <template #default="{ row }">
-            <span>{{ row.is_fulfilled !== undefined ? row.is_fulfilled : '0' }}</span>
           </template>
         </el-table-column>
 
@@ -374,9 +404,12 @@
       layout="total, sizes, prev, pager, next, jumper" @current-change="onPageChange" @size-change="onSizeChange"
       style="margin-top: 20px; justify-content: flex-end" />
 
-    <!-- 新增/编辑弹窗 -->
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="900px" @closed="resetForm">
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
+    <!-- 新增/编辑弹窗（已修正并加入部门字段） -->
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="1100px" top="5vh" @closed="resetForm"
+      :append-to-body="true" :body-style="{ maxHeight: '70vh', overflowY: 'auto' }">
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="120px">
+
+        <!-- 第1行：订单号 + 采购员 -->
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="订单号" prop="po_no">
@@ -384,18 +417,38 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="供应商" prop="supplier_id" required>
-              <el-select v-model="form.supplier_id" filterable placeholder="请选择供应商" style="width: 100%">
-                <el-option v-for="s in supplierAll" :key="s.id" :label="`${s.code} - ${s.name}`" :value="s.id" />
+            <el-form-item label="采购员" prop="buyer_id">
+              <el-select v-model="form.buyer_id" filterable placeholder="请选择采购员">
+                <el-option v-for="emp in employeeList" :key="emp.id" :label="emp.full_name" :value="emp.id" />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
+
+        <!-- 第2行：供应商 + 物料需求部门 -->
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="采购员" prop="buyer_id">
-              <el-select v-model="form.buyer_id" filterable placeholder="请选择采购员" style="width: 100%">
-                <el-option v-for="emp in employeeList" :key="emp.id" :label="emp.full_name" :value="emp.id" />
+            <el-form-item label="供应商" prop="supplier_id" required>
+              <el-select v-model="form.supplier_id" filterable placeholder="请选择供应商">
+                <el-option v-for="s in supplierAll" :key="s.id" :label="`${s.code} - ${s.name}`" :value="s.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="物料需求部门" prop="require_department_id">
+              <el-select v-model="form.require_department_id" filterable placeholder="请选择需求部门" clearable>
+                <el-option v-for="dept in departmentList" :key="dept.id" :label="dept.name" :value="dept.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <!-- 第3行：物料申购部门 + 下单日期 -->
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="物料申购部门" prop="purchase_department_id">
+              <el-select v-model="form.purchase_department_id" filterable placeholder="请选择申购部门" clearable>
+                <el-option v-for="dept in departmentList" :key="dept.id" :label="dept.name" :value="dept.id" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -405,6 +458,8 @@
             </el-form-item>
           </el-col>
         </el-row>
+
+        <!-- 第4行：预计到货日期 + 实际到货日期 -->
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="预计到货日期" prop="expected_date">
@@ -419,73 +474,68 @@
           </el-col>
         </el-row>
 
-        <!-- 商品明细表格 -->
+        <!-- 商品明细 -->
         <div style="margin: 20px 0">
           <div style="display: flex; justify-content: space-between; margin-bottom: 10px">
             <strong>商品明细</strong>
             <el-button type="primary" size="small" @click="addItemRow">添加商品</el-button>
           </div>
+
           <el-table :data="form.items" border>
-            <el-table-column label="物料" width="200">
+            <el-table-column label="物料" width="200" fixed="left">
               <template #default="{ row, $index }">
-                <el-select v-model="row.material_id" filterable placeholder="请选择物料" @change="onMaterialChange($index)">
-                  <el-option v-for="m in materialList" :key="m.id" :label="`${m.name} (${m.code})`" :value="m.id" />
+                <el-select v-model="row.material_id" filterable remote placeholder="选择物料" style="width: 100%"
+                  @change="() => onMaterialChange($index)">
+                  <el-option v-for="m in materialList" :key="m.id" :label="`${m.code} - ${m.name}`" :value="m.id" />
                 </el-select>
               </template>
             </el-table-column>
 
-            <el-table-column label="规格" width="120">
-              <template #default="{ row }">{{ row.specification || '-' }}</template>
-            </el-table-column>
+            <el-table-column label="规格型号" prop="specification" width="120" />
 
-            <!-- 计划数量 -->
-            <el-table-column label="计划数量" width="100">
+            <!-- 计划部分 -->
+            <el-table-column label="计划数量" width="120">
               <template #default="{ row, $index }">
-                <el-input-number v-model="row.quantity" :min="0" size="small" @change="calcItemAmount($index)"
-                  style="width: 100%" />
+                <el-input-number v-model="row.plan_quantity" :min="0" :precision="2" controls-position="right"
+                  size="small" style="width: 100%" @change="() => calcPlanAmount($index)" />
               </template>
             </el-table-column>
 
-            <!-- 计划单价 -->
-            <el-table-column label="计划单价" width="100">
-              <template #default="{ row }">¥{{ Number(row.unit_price || 0).toFixed(2) }}</template>
-            </el-table-column>
-
-            <!-- 计划金额 -->
-            <el-table-column label="计划金额" width="100">
-              <template #default="{ row }">¥{{ Number(row.amount || 0).toFixed(2) }}</template>
-            </el-table-column>
-
-            <!-- 实际交货数量 -->
-            <el-table-column label="实际交货数量" width="120">
+            <el-table-column label="计划单价" width="120">
               <template #default="{ row, $index }">
-                <el-input-number v-model="row.actual_quantity" :min="0" size="small" @change="calcActualAmount($index)"
-                  style="width: 100%" />
+                <el-input-number v-model="row.plan_unit_price" :min="0" :precision="2" controls-position="right"
+                  size="small" style="width: 100%" @change="() => calcPlanAmount($index)" />
               </template>
             </el-table-column>
 
-            <!-- 实际交货单价 -->
-            <el-table-column label="实际交货单价" width="120">
-              <template #default="{ row, $index }">
-                <el-input-number v-model="row.actual_unit_price" :min="0" :precision="2" size="small"
-                  @change="calcActualAmount($index)" style="width: 100%" />
+            <el-table-column label="计划金额" width="120">
+              <template #default="{ row }">
+                <span style="color: #409EFF;">¥{{ (row.plan_amount || 0).toFixed(2) }}</span>
               </template>
             </el-table-column>
 
-            <!-- 实际交货金额 -->
-            <el-table-column label="实际交货金额" width="120">
-              <template #default="{ row }">¥{{ Number(row.actual_amount || 0).toFixed(2) }}</template>
-            </el-table-column>
-
-            <!-- 实际到货日期 -->
-            <el-table-column label="实际到货日期" width="130">
+            <!-- 实际部分 -->
+            <el-table-column label="实际数量" width="120">
               <template #default="{ row, $index }">
-                <el-date-picker v-model="row.actual_arrival_date" type="date" value-format="YYYY-MM-DD" size="small"
-                  style="width: 100%" />
+                <el-input-number v-model="row.actual_quantity" :min="0" :precision="2" controls-position="right"
+                  size="small" style="width: 100%" @change="() => calcActualAmount($index)" />
               </template>
             </el-table-column>
 
-            <el-table-column label="操作" width="60">
+            <el-table-column label="实际单价" width="120">
+              <template #default="{ row, $index }">
+                <el-input-number v-model="row.actual_unit_price" :min="0" :precision="2" controls-position="right"
+                  size="small" style="width: 100%" @change="() => calcActualAmount($index)" />
+              </template>
+            </el-table-column>
+
+            <el-table-column label="实际金额" width="120">
+              <template #default="{ row }">
+                <span style="color: #67C23A;">¥{{ (row.actual_amount || 0).toFixed(2) }}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column label="操作" width="80" fixed="right">
               <template #default="{ $index }">
                 <el-button link type="danger" @click="removeItemRow($index)">删除</el-button>
               </template>
@@ -493,9 +543,11 @@
           </el-table>
         </div>
 
+        <!-- 备注 -->
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" :rows="2" />
         </el-form-item>
+
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
@@ -538,6 +590,41 @@
 import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import request from '../api/request'
+const departmentList = ref([])
+
+const loadDepartments = async () => {
+  try {
+    const res = await request.get('/api/departments/')
+    departmentList.value = Array.isArray(res) ? res : (res.results || [])
+  } catch (error) {
+    console.error('加载部门列表失败', error)
+  }
+}
+
+// 删除商品明细行
+const removeItemRow = (idx) => {
+  form.value.items.splice(idx, 1)
+  calcTotalAmount()
+}
+
+// 重置到期天数筛选
+const resetDaysFilter = () => {
+  filters.days_to_expiry_min = ''
+  filters.days_to_expiry_max = ''
+  loadOrders()
+}
+
+// 重置紧急程度筛选
+const resetUrgencyFilter = () => {
+  filters.urgency_level = ''
+  loadOrders()
+}
+
+// 重置是否达成筛选
+const resetFulfilledFilter = () => {
+  filters.is_fulfilled = ''
+  loadOrders()
+}
 
 // ---------- 状态映射 ----------
 const statusMap = {
@@ -721,11 +808,16 @@ const filters = reactive({
   supplier_name: '',
   buyer: '',
   status: '',
-  urgency_level: '',      // 新增：紧急程度筛选
-  is_fulfilled: '',       // 新增：是否达成筛选
-  days_to_expiry_min: '', // 新增：到期天数最小值
-  days_to_expiry_max: ''  // 新增：到期天数最大值
+  urgency_level: '',
+  is_fulfilled: '',
+  days_to_expiry_min: '',
+  days_to_expiry_max: '',
+  // 批量筛选字段
+  po_no__in: '',
+  supplier_name__in: '',
+  buyer__in: '',
 })
+
 const amountMin = ref('')
 const amountMax = ref('')
 const dateRange = reactive({ order_date: [], expected_date: [], actual_receive_date: [] })
@@ -777,7 +869,9 @@ const form = ref({
   total_amount: 0,
   status: 'draft',
   remark: '',
-  items: []
+  items: [],
+  purchase_department_id: null,
+  require_department_id: null,
 })
 
 const rules = {
@@ -827,15 +921,16 @@ const loadOrders = async () => {
       expected_date_end: dateRange.expected_date?.[1],
       actual_receive_date_start: dateRange.actual_receive_date?.[0],
       actual_receive_date_end: dateRange.actual_receive_date?.[1],
-      po_no__in: batch.po_nos.join(','),
-      supplier_name__in: batch.suppliers.join(','),
-      buyer__in: batch.buyers.join(','),
       ordering: sortOrder.value ? `${sortOrder.value === 'asc' ? '' : '-'}${sortField.value}` : '',
       urgency_level: filters.urgency_level,
       is_fulfilled: filters.is_fulfilled,
       days_to_expiry_min: filters.days_to_expiry_min,
-      days_to_expiry_max: filters.days_to_expiry_max
+      days_to_expiry_max: filters.days_to_expiry_max,  // ← 这里必须有逗号
+      po_no__in: filters.po_no__in,                    // ← 注意：这一行会重复，需要处理
+      supplier_name__in: filters.supplier_name__in,
+      buyer__in: filters.buyer__in,
     }
+
     Object.keys(params).forEach(k => {
       if (params[k] === undefined || params[k] === '') delete params[k]
       if (k.endsWith('__in') && !params[k]) delete params[k]
@@ -882,7 +977,28 @@ const handleTextFilter = () => { currentPage.value = 1; loadOrders() }
 const handleSelectFilter = () => { currentPage.value = 1; loadOrders() }
 const handleAmountFilter = () => { currentPage.value = 1; loadOrders() }
 const handleDateRangeFilter = () => { currentPage.value = 1; loadOrders() }
-const applyBatchFilter = () => { currentPage.value = 1; loadOrders() }
+const applyBatchFilter = () => {
+  // 订单批量筛选参数
+  if (batch.po_nos && batch.po_nos.length > 0) {
+    filters.po_no__in = batch.po_nos.join(',')
+  } else {
+    filters.po_no__in = ''
+  }
+  // 供应商批量筛选
+  if (batch.suppliers && batch.suppliers.length > 0) {
+    filters.supplier_name__in = batch.suppliers.join(',')
+  } else {
+    filters.supplier_name__in = ''
+  }
+  // 采购员批量筛选
+  if (batch.buyers && batch.buyers.length > 0) {
+    filters.buyer__in = batch.buyers.join(',')
+  } else {
+    filters.buyer__in = ''
+  }
+  currentPage.value = 1
+  loadOrders()
+}
 
 // 重置总金额
 const resetAmount = () => {
@@ -1091,7 +1207,9 @@ const handleEdit = async (row) => {
       total_amount: Number(res.total_amount) || 0,
       status: res.status || 'draft',
       remark: res.remark || '',
-      items: []
+      items: [],
+      purchase_department_id: res.purchase_department?.id || res.purchase_department_id,
+      require_department_id: res.require_department?.id || res.require_department_id,
     }
 
     // 处理商品明细
@@ -1100,16 +1218,17 @@ const handleEdit = async (row) => {
         material_id: item.material,
         material_name: item.material_name || '',
         specification: item.specification || '',
-        quantity: Number(item.quantity) || 0,
-        unit_price: Number(item.unit_price) || 0,
-        amount: Number(item.amount) || 0,
+        // 计划字段
+        plan_quantity: Number(item.plan_quantity) || 0,
+        plan_unit_price: Number(item.plan_unit_price) || 0,
+        plan_amount: Number(item.plan_amount) || 0,
+        // 实际字段
         actual_quantity: item.actual_quantity || null,
         actual_unit_price: item.actual_unit_price || null,
         actual_amount: item.actual_amount || null,
         actual_arrival_date: item.actual_arrival_date || null
       }))
     }
-
     console.log('form.value 已设置:', form.value)
     console.log('弹窗应该打开了')
     dialogVisible.value = true
@@ -1122,34 +1241,55 @@ const handleEdit = async (row) => {
 
 // 商品明细操作
 const addItemRow = () => {
-  form.value.items.push({ material_id: null, specification: '', quantity: 1, unit_price: 0, amount: 0 })
+  form.value.items.push({
+    material_id: null,
+    specification: '',
+    // 计划字段
+    plan_quantity: 0,
+    plan_unit_price: 0,
+    plan_amount: 0,
+    // 实际字段
+    actual_quantity: 0,
+    actual_unit_price: 0,
+    actual_amount: 0,
+    actual_arrival_date: null
+  })
 }
-const removeItemRow = (idx) => {
-  form.value.items.splice(idx, 1)
-  calcTotalAmount()
-}
+
 const onMaterialChange = (idx) => {
   const item = form.value.items[idx]
   const material = materialList.value.find(m => m.id === item.material_id)
   if (material) {
     item.specification = material.specification || ''
-    item.unit_price = Number(material.standard_cost) || Number(material.price) || 0
-    calcItemAmount(idx)
+    item.plan_unit_price = Number(material.standard_cost) || Number(material.price) || 0
+    calcPlanAmount(idx)
   } else {
     item.specification = ''
-    item.unit_price = 0
-    calcItemAmount(idx)
+    item.plan_unit_price = 0
+    calcPlanAmount(idx)
   }
 }
-const calcItemAmount = (idx) => {
+
+// 计算计划金额
+const calcPlanAmount = (idx) => {
   const item = form.value.items[idx]
-  const qty = Number(item.quantity) || 0
-  const price = Number(item.unit_price) || 0
-  item.amount = qty * price
+  const qty = Number(item.plan_quantity) || 0
+  const price = Number(item.plan_unit_price) || 0
+  item.plan_amount = qty * price
   calcTotalAmount()
 }
+
+// 计算实际金额
+const calcActualAmount = (idx) => {
+  const item = form.value.items[idx]
+  const qty = Number(item.actual_quantity) || 0
+  const price = Number(item.actual_unit_price) || 0
+  item.actual_amount = qty * price
+}
+
+// 计算总金额 - 添加这个函数！
 const calcTotalAmount = () => {
-  form.value.total_amount = form.value.items.reduce((sum, i) => sum + (i.amount || 0), 0)
+  form.value.total_amount = form.value.items.reduce((sum, i) => sum + (i.plan_amount || 0), 0)
 }
 
 const submitForm = async () => {
@@ -1160,8 +1300,8 @@ const submitForm = async () => {
     // ========== 第一步：重新计算总金额（基于商品明细）==========
     let calculatedTotal = 0
     for (const item of form.value.items) {
-      const qty = Number(item.quantity) || 0
-      const price = Number(item.unit_price) || 0
+      const qty = Number(item.plan_quantity) || 0
+      const price = Number(item.plan_unit_price) || 0
       const amount = qty * price
       calculatedTotal += amount
     }
@@ -1198,12 +1338,17 @@ const submitForm = async () => {
       status: form.value.status || 'draft',
       remark: form.value.remark || '',
       company_id: 1,
+      purchase_department: form.value.purchase_department_id,
+      require_department: form.value.require_department_id,
+      // 商品明细
       items: form.value.items.map(item => ({
         material: Number(item.material_id),
-        quantity: Number(item.quantity) || 0,
-        unit_price: Number(item.unit_price) || 0,
-        amount: Number(item.amount) || 0,
+        // 后端期望的字段名（计划数据）
+        quantity: Number(item.plan_quantity) || 0,
+        unit_price: Number(item.plan_unit_price) || 0,
+        amount: Number(item.plan_amount) || 0,
         specification: item.specification || '',
+        // 实际数据（如果后端支持）
         actual_quantity: item.actual_quantity ? Number(item.actual_quantity) : null,
         actual_unit_price: item.actual_unit_price ? Number(item.actual_unit_price) : null,
         actual_amount: item.actual_amount ? Number(item.actual_amount) : null,
@@ -1234,13 +1379,6 @@ const submitForm = async () => {
   } finally {
     submitting.value = false
   }
-}
-
-const calcActualAmount = (idx) => {
-  const item = form.value.items[idx];
-  const qty = Number(item.actual_quantity) || 0;
-  const price = Number(item.actual_unit_price) || 0;
-  item.actual_amount = qty * price;
 }
 
 // ---------- 横向滚动 ----------
@@ -1286,6 +1424,7 @@ onMounted(async () => {
   loadSuppliers()
   loadEmployees()
   loadMaterials()
+  loadDepartments()
 })
 </script>
 
