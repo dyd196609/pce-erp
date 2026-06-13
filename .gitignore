@@ -1,0 +1,48 @@
+# Python
+backend/venv/
+venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django / Database
+backend/db.sqlite3
+db.sqlite3
+*.sqlite3
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/node_modules/.vite/
+frontend/.vite/
+
+# Build
+dist/
+build/
+frontend/dist/
+
+# Logs
+*.log
+logs/
+
+# VSCode
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Temporary / backup
+*.tmp
+*.bak
+*.zip
+*copy*.py
+*copy*.vue
+
+# File lists generated locally
+backend/backend_file_list.txt
+frontend/frontend_file_list.txt
+frontend/src_tree.txt
+今日改动文件清单.txt
