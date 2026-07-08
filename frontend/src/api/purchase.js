@@ -1,25 +1,57 @@
-import request from './request'
+import request from '@/api/request'
 
-export function getPurchaseOrders(params = {}) {
-    return request.get('/api/purchase/orders/', { params })
+// =====================
+// 采购订单 API（统一版本）
+// =====================
+
+// 获取列表
+export const getPurchaseOrders = (params = {}) => {
+  return request({
+    url: '/api/purchase/orders/',
+    method: 'get',
+    params,
+  })
 }
 
-export function createPurchaseOrder(data) {
-    return request.post('/api/purchase/orders/', data)
+// 创建
+export const createPurchaseOrder = (data) => {
+  return request({
+    url: '/api/purchase/orders/',
+    method: 'post',
+    data,
+  })
 }
 
-export function updatePurchaseOrder(id, data) {
-    return request.put(`/api/purchase/orders/${id}/`, data)
+// 更新
+export const updatePurchaseOrder = (id, data) => {
+  return request({
+    url: `/api/purchase/orders/${id}/`,
+    method: 'put',
+    data,
+  })
 }
 
-export function deletePurchaseOrder(id) {
-    return request.delete(`/api/purchase/orders/${id}/`)
+// 删除
+export const deletePurchaseOrder = (id) => {
+  return request({
+    url: `/api/purchase/orders/${id}/`,
+    method: 'delete',
+  })
 }
 
-export function batchDeletePurchaseOrders(ids) {
-    return request.post('/api/purchase/orders/batch-delete/', { ids })
+// 批量删除
+export const batchDeletePurchaseOrders = (ids) => {
+  return request({
+    url: '/api/purchase/orders/batch-delete/',
+    method: 'post',
+    data: { ids },
+  })
 }
 
-export function getPurchaseBaseOptions() {
-    return request.get('/api/purchase/orders/base-options/')
+// 下拉选项
+export const getPurchaseBaseOptions = () => {
+  return request({
+    url: '/api/purchase/orders/base-options/',
+    method: 'get',
+  })
 }

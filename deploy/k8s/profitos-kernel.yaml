@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profitos-kernel
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: profitos-kernel
+  template:
+    metadata:
+      labels:
+        app: profitos-kernel
+    spec:
+      containers:
+        - name: kernel
+          image: profitos/kernel:v1
+          env:
+            - name: MODE
+              value: production
+          ports:
+            - containerPort: 8081

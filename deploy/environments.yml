@@ -1,0 +1,19 @@
+environments:
+  dev:
+    runtimeMode: DEVELOPMENT
+    debugHooks: ENABLED
+    frozenRuntimeOnly: false
+    apiStrictMode: true
+    target: local developer workstation
+  staging:
+    runtimeMode: STAGING
+    debugHooks: LIMITED
+    frozenRuntimeOnly: true
+    apiStrictMode: true
+    target: pre-production validation cluster
+  production:
+    runtimeMode: PRODUCTION
+    debugHooks: DISABLED
+    frozenRuntimeOnly: true
+    apiStrictMode: true
+    target: enterprise SaaS production cluster

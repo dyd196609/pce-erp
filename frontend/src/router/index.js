@@ -1,199 +1,642 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { resolveSchema } from '@/meta/core/schemaResolver'
+import { buildModuleHub } from '@/meta/platform/moduleHub'
+import { h, onMounted, ref, shallowRef } from 'vue'
 
-import Dashboard from '../views/Dashboard.vue'
-import Workbench from '../views/Workbench.vue'
-import Login from '../views/Login.vue'
+function wrapSchemaPage(routePath) {
+  return {
+    name: 'SchemaPage',
 
-import EmployeeList from '../views/EmployeeList.vue'
-import ShiftList from '../views/ShiftList.vue'
-import CertificateList from '../views/CertificateList.vue'
+    setup() {
+      const Page = shallowRef(null)
+      const loading = ref(true)
+      const error = ref(null)
 
-import MaterialCategoryList from '../views/MaterialCategoryList.vue'
-import MaterialList from '../views/MaterialList.vue'
-import SupplierList from '../views/SupplierList.vue'
+      const init = async () => {
+        try {
+          Page.value = await resolveSchema({
+            path: routePath,
+          })
+        } catch (e) {
+          error.value = e
+          console.error('[SCHEMA PAGE ERROR]', e)
+        } finally {
+          loading.value = false
+        }
+      }
 
-import PurchaseOrderList from '../views/PurchaseOrderList.vue'
-import PurchaseReports from '../views/PurchaseReports.vue'
-import PurchaseOrderV2 from '../views/PurchaseOrderV2.vue'
-import ComingSoon from '../views/ComingSoon.vue'
+      onMounted(init)
 
-import SystemOrg from '../views/SystemOrg.vue'
-import SystemDepartment from '../views/SystemDepartment.vue'
-import SystemPosition from '../views/SystemPosition.vue'
-import SystemPermission from '../views/SystemPermission.vue'
-import SystemRole from '../views/SystemRole.vue'
-import SystemUser from '../views/SystemUser.vue'
-import SystemMenu from '../views/SystemMenu.vue'
+      return () => {
+        if (error.value) {
+          return h('div', { class: 'schema-page-error' }, error.value?.message || 'SCHEMA ERROR')
+        }
 
+        if (loading.value || !Page.value) {
+          return h('div', { class: 'schema-page-loading' }, 'LOADING...')
+        }
+
+        return h(Page.value)
+      }
+    },
+  }
+}
+
+const moduleHub = buildModuleHub()
+const knownModulePaths = new Set((moduleHub.menu || []).map((item) => item.path))
+function resolveListFallback(path = '') {
+  const normalized = String(path || '').split('?')[0]
+  const matches = Array.from(knownModulePaths)
+    .filter((modulePath) => normalized === modulePath || normalized.startsWith(`${modulePath}/`))
+    .sort((a, b) => b.length - a.length)
+
+  return matches[0] || '/process-center'
+}
+
+const moduleRoutes = Array.from(
+  new Map((moduleHub.routes || []).map((entry) => [entry.path, entry])).values()
+).map((entry) => ({
+  path: entry.path.replace(/^\//, ''),
+  component: wrapSchemaPage(entry.path),
+}))
 
 const routes = [
   {
     path: '/login',
-    component: Login,
-    meta: { requiresAuth: false }
+    component: () => import('@/meta/pages/LoginPage.vue'),
+  },
+  {
+    path: '/onboarding',
+    component: () => import('@/meta/pages/OnboardingPage.vue'),
+  },
+  {
+    path: '/pricing',
+    component: () => import('@/meta/pages/PricingPage.vue'),
   },
   {
     path: '/',
-    component: Dashboard,
-    meta: { requiresAuth: true },
+    component: () => import('@/meta/shell/ProfitCockpit.vue'),
     children: [
-      // 默认首页
       {
         path: '',
-        redirect: '/dashboard/workbench'
+        redirect: '/process-center',
       },
-
-      // 仪表盘
       {
         path: 'dashboard',
-        redirect: '/dashboard/workbench'
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
+        props: { view: 'dashboard' },
       },
       {
-        path: 'dashboard/workbench',
-        component: Workbench
+        path: 'organization',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
+        props: { view: 'organization' },
       },
       {
-        path: 'dashboard/business',
-        component: ComingSoon
+        path: 'organization/department/:id',
+        name: 'OrganizationDepartmentAction',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'dashboard/warning',
-        component: ComingSoon
-      },
-
-      // 主数据
-      {
-        path: 'masterdata/material-category',
-        component: MaterialCategoryList
+        path: 'organization/role/:id',
+        name: 'OrganizationRoleAction',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'masterdata/material',
-        component: MaterialList
+        path: 'organization/user/:id',
+        name: 'OrganizationUserAction',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'masterdata/supplier',
-        component: SupplierList
+        path: 'organization/permission/:id',
+        name: 'OrganizationPermissionAction',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'masterdata/customer',
-        component: ComingSoon
-      },
-
-      // 采购管理
-      {
-        path: 'purchase/request',
-        component: ComingSoon
+        path: 'process-center',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
+        props: { view: 'process-center' },
       },
       {
-        path: 'purchase/order',
-        component: PurchaseOrderV2
+        path: 'process-center/process/:id',
+        name: 'ProcessDetail',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'purchase/arrival',
-        component: ComingSoon
+        path: 'process-center/process/:id/create',
+        name: 'ProcessCreate',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'purchase/report',
-        component: PurchaseReports
-      },
-
-      // 员工中心
-      {
-        path: 'hr/employee',
-        component: EmployeeList
+        path: 'process-center/process/:id/edit',
+        name: 'ProcessEdit',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'hr/certificate',
-        component: CertificateList
+        path: 'process-center/process/:id/execute',
+        name: 'ProcessExecute',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'hr/shift',
-        component: ShiftList
+        path: 'work-center',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
+        props: { view: 'work-center' },
       },
       {
-        path: 'hr/training',
-        component: ComingSoon
+        path: 'work-center/task/:id',
+        name: 'WorkTaskAction',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'hr/attendance',
-        component: ComingSoon
-      },
-
-      // 效益管理
-      {
-        path: 'profit/realtime',
-        component: ComingSoon
+        path: 'work-center/approval/:id',
+        name: 'ApprovalAction',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'profit/cost',
-        component: ComingSoon
+        path: 'work-center/execution/:id',
+        name: 'ExecutionAction',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'profit/analysis',
-        component: ComingSoon
+        path: 'analytics',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
+        props: { view: 'analytics' },
       },
       {
-        path: 'profit/improvement',
-        component: ComingSoon
+        path: 'admin',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
+        props: { view: 'admin' },
       },
       {
-        path: 'profit/ranking',
-        component: ComingSoon
-      },
-
-      // 系统管理
-      {
-        path: 'system/org',
-        component: SystemOrg
+        path: 'admin/config/:key',
+        name: 'AdminConfig',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'system/department',
-        component: SystemDepartment
+        path: 'admin/role-permission',
+        name: 'AdminRolePermission',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'system/position',
-        component: SystemPosition
+        path: 'admin/process-template',
+        name: 'AdminProcessTemplate',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'system/user',
-        component: SystemUser
+        path: 'admin/tenant-setting',
+        name: 'AdminTenantSetting',
+        component: () => import('@/meta/pages/EnterpriseOSPage.vue'),
       },
       {
-        path: 'system/role',
-        component: SystemRole
+        path: 'admin/approval-flow-config',
+        component: () => import('@/meta/pages/ApprovalFlowConfigPage.vue'),
       },
       {
-        path: 'system/permission',
-        component: SystemPermission
+        path: 'manufacturing',
+        redirect: '/manufacturing/modules',
       },
       {
-        path: 'system/menu',
-        component: SystemMenu
+        path: 'manufacturing/modules',
+        component: () => import('@/meta/pages/ManufacturingOSPage.vue'),
       },
       {
-        path: 'system/log',
-        component: ComingSoon
+        path: 'manufacturing/plan',
+        component: () => import('@/meta/pages/ManufacturingOSPage.vue'),
       },
-    ]
-  }
+      {
+        path: 'manufacturing/module/:moduleId',
+        component: () => import('@/meta/pages/ManufacturingOSPage.vue'),
+      },
+      {
+        path: 'foundation',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/business-partners',
+        component: () => import('@/meta/pages/BusinessPartnerPage.vue'),
+      },
+      {
+        path: 'foundation/suppliers',
+        component: () => import('@/meta/pages/BusinessPartnerPage.vue'),
+      },
+      {
+        path: 'foundation/dealers',
+        component: () => import('@/meta/pages/BusinessPartnerPage.vue'),
+      },
+      {
+        path: 'foundation/company-bank-accounts',
+        component: () => import('@/meta/pages/BusinessPartnerPage.vue'),
+      },
+      {
+        path: 'foundation/review-check',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/import-records',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/pfm/employees',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/pfm/employee/create',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/pfm/employee/:id',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/pfm/skills',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/pfm/certificates',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/pfm/shifts',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/materials',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/material/create',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/material/:id',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/customers',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/customer/create',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/customer/:id',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/suppliers',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/supplier/create',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/supplier/:id',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/work-centers',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/warehouses',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/supplier-material-prices',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/material-suppliers',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/product-categories',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/manufacturing/processes',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/manufacturing/routings',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/manufacturing/routing/:id',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/manufacturing/equipment',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/sample-data',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/data-dictionaries',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/coding-rules',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/erp/system-parameters',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/security/permissions',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/security/role-permissions',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/security/user-roles',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/logs/operation',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/warnings/rules',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/warnings/records',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'foundation/warnings/subscribers',
+        component: () => import('@/meta/pages/ManufacturingFoundationPage.vue'),
+      },
+      {
+        path: 'reference',
+        component: () => import('@/meta/pages/ManufacturingReferencePage.vue'),
+      },
+      {
+        path: 'reference/master-data',
+        component: () => import('@/meta/pages/ManufacturingReferencePage.vue'),
+      },
+      {
+        path: 'reference/organization',
+        component: () => import('@/meta/pages/ManufacturingReferencePage.vue'),
+      },
+      {
+        path: 'reference/warehouse',
+        component: () => import('@/meta/pages/ManufacturingReferencePage.vue'),
+      },
+      {
+        path: 'reference/production',
+        component: () => import('@/meta/pages/ManufacturingReferencePage.vue'),
+      },
+      {
+        path: 'reference/warning',
+        component: () => import('@/meta/pages/ManufacturingReferencePage.vue'),
+      },
+      {
+        path: 'reference/check',
+        component: () => import('@/meta/pages/ManufacturingReferencePage.vue'),
+      },
+      {
+        path: 'scm',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/purchase-requests',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/purchase-request/create',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/purchase-request/:id',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/purchase-inquiries',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/purchase-inquiry/create',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/purchase-inquiry/:id',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/price-approvals',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/price-approval/create',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/price-approval/:id',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/purchase-orders',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/purchase-order/create',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'scm/purchase-order/:id',
+        component: () => import('@/meta/pages/ScmPage.vue'),
+      },
+      {
+        path: 'wms',
+        component: () => import('@/meta/pages/WmsPage.vue'),
+      },
+      {
+        path: 'wms/inventory-balances',
+        component: () => import('@/meta/pages/WmsPage.vue'),
+      },
+      {
+        path: 'wms/inventory-balance/:id',
+        component: () => import('@/meta/pages/WmsPage.vue'),
+      },
+      {
+        path: 'wms/inventory-transactions',
+        component: () => import('@/meta/pages/WmsPage.vue'),
+      },
+      {
+        path: 'wms/inventory-transaction/:id',
+        component: () => import('@/meta/pages/WmsPage.vue'),
+      },
+      {
+        path: 'wms/warehouse-tasks',
+        component: () => import('@/meta/pages/WmsPage.vue'),
+      },
+      {
+        path: 'wms/warehouse-task/:id',
+        component: () => import('@/meta/pages/WmsPage.vue'),
+      },
+      {
+        path: 'wms/stock-warnings',
+        component: () => import('@/meta/pages/WmsPage.vue'),
+      },
+      {
+        path: 'wms/purchase-receive-preview',
+        component: () => import('@/meta/pages/WmsPage.vue'),
+      },
+      {
+        path: 'wms/purchase-receive-preview/:id',
+        component: () => import('@/meta/pages/WmsPage.vue'),
+      },
+      {
+        path: 'wms/purchase-receives',
+        component: () => import('@/meta/pages/PurchaseReceivePage.vue'),
+      },
+      {
+        path: 'wms/purchase-receive/:id',
+        component: () => import('@/meta/pages/PurchaseReceivePage.vue'),
+      },
+      {
+        path: 'qms',
+        component: () => import('@/meta/pages/QmsPage.vue'),
+      },
+      {
+        path: 'qms/incoming-inspections',
+        component: () => import('@/meta/pages/QmsPage.vue'),
+      },
+      {
+        path: 'qms/incoming-inspection/:id',
+        component: () => import('@/meta/pages/QmsPage.vue'),
+      },
+      {
+        path: 'finance/payable-prepares',
+        component: () => import('@/meta/pages/PayablePreparePage.vue'),
+      },
+      {
+        path: 'finance/payable-prepare/:id',
+        component: () => import('@/meta/pages/PayablePreparePage.vue'),
+      },
+      {
+        path: 'finance/payable-checks',
+        component: () => import('@/meta/pages/PayableCheckPage.vue'),
+      },
+      {
+        path: 'finance/payable-check/:id',
+        component: () => import('@/meta/pages/PayableCheckPage.vue'),
+      },
+      {
+        path: 'finance/invoice-prepares',
+        component: () => import('@/meta/pages/InvoicePreparePage.vue'),
+      },
+      {
+        path: 'finance/invoice-prepare/:id',
+        component: () => import('@/meta/pages/InvoicePreparePage.vue'),
+      },
+      {
+        path: 'finance/ap-drafts',
+        component: () => import('@/meta/pages/AccountPayableDraftPage.vue'),
+      },
+      {
+        path: 'finance/ap-draft/:id',
+        component: () => import('@/meta/pages/AccountPayableDraftPage.vue'),
+      },
+      {
+        path: 'finance/payment-drafts',
+        component: () => import('@/meta/pages/SupplierPaymentDraftPage.vue'),
+      },
+      {
+        path: 'finance/payment-draft/:id',
+        component: () => import('@/meta/pages/SupplierPaymentDraftPage.vue'),
+      },
+      {
+        path: 'finance/payment-prepares',
+        component: () => import('@/meta/pages/PaymentOrderPreparePage.vue'),
+      },
+      {
+        path: 'finance/payment-prepare/:id',
+        component: () => import('@/meta/pages/PaymentOrderPreparePage.vue'),
+      },
+      {
+        path: 'finance/payment-order-drafts',
+        component: () => import('@/meta/pages/PaymentOrderDraftPage.vue'),
+      },
+      {
+        path: 'finance/payment-order-draft/:id',
+        component: () => import('@/meta/pages/PaymentOrderDraftPage.vue'),
+      },
+      {
+        path: 'finance/payment-risk-reviews',
+        component: () => import('@/meta/pages/PaymentExecutionRiskReviewPage.vue'),
+      },
+      {
+        path: 'finance/payment-risk-review/:id',
+        component: () => import('@/meta/pages/PaymentExecutionRiskReviewPage.vue'),
+      },
+      {
+        path: 'crm/:pathMatch(.*)*',
+        redirect: '/process-center',
+      },
+      {
+        path: 'scm/:pathMatch(.*)*',
+        redirect: '/process-center',
+      },
+      {
+        path: 'finance/:pathMatch(.*)*',
+        redirect: '/process-center',
+      },
+      {
+        path: 'inventory/:pathMatch(.*)*',
+        redirect: '/process-center',
+      },
+      {
+        path: 'control-tower',
+        component: () => import('@/meta/pages/ControlTower.vue'),
+      },
+      ...moduleRoutes,
+      {
+        path: 'agents',
+        component: () => import('@/meta/pages/CockpitModulePlaceholder.vue'),
+        props: {
+          title: 'Agents',
+          layer: 'ProfitOS Agent Core',
+          owner: 'ProfitOS',
+        },
+      },
+      {
+        path: 'profit-analysis',
+        component: () => import('@/meta/pages/CockpitModulePlaceholder.vue'),
+        props: {
+          title: 'Profit Analysis',
+          layer: 'ProfitOS Decision Layer',
+          owner: 'ProfitOS',
+        },
+      },
+      {
+        path: 'system-health',
+        component: () => import('@/meta/pages/CockpitModulePlaceholder.vue'),
+        props: {
+          title: 'System Health',
+          layer: 'Cockpit Observability',
+          owner: 'ProfitOS',
+        },
+      },
+      {
+        path: ':module/:pathMatch(.*)*',
+        redirect: (to) => resolveListFallback(to.path),
+      },
+    ],
+  },
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
-})
-
-router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-
-  if (requiresAuth && !token) {
-    next('/login')
-  } else if (to.path === '/login' && token) {
-    next('/')
-  } else {
-    next()
-  }
 })
 
 export default router

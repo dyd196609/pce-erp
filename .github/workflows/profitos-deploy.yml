@@ -1,0 +1,33 @@
+name: ProfitOS Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install
+        working-directory: frontend
+        run: npm install
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Docker Build
+        run: docker compose -f deploy/docker-compose.yml build
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/main'
+        run: kubectl apply -f deploy/k8s/

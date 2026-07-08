@@ -1,0 +1,215 @@
+.app-current-module-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 10px;
+  padding: 6px 12px;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  background: #f0f9ff;
+  color: #075985;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.app-module-nav-zone {
+  align-items: stretch;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.app-nav-zone-title {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 4px;
+  color: #475467;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.app-module-nav-zone a,
+.app-module-nav-zone .app-nav-button,
+.page-tabs .app-nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 96px;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app-module-nav-zone a.router-link-active,
+.app-module-nav-zone a.router-link-exact-active,
+.app-module-nav-zone a.app-nav-button-active,
+.page-tabs a.app-nav-button-active {
+  border-color: #0f766e;
+  background: #0f766e;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(15, 118, 110, 0.16);
+}
+
+.app-current-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  color: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.button-row,
+.toolbar,
+.batch-bar,
+.page-actions,
+.empty-actions {
+  row-gap: 8px;
+}
+
+.button-row .el-button,
+.toolbar .el-button,
+.batch-bar .el-button,
+.page-actions .el-button,
+.empty-actions .el-button,
+.button-row button,
+.toolbar button,
+.batch-bar button,
+.page-actions button,
+.empty-actions button {
+  min-width: 96px;
+  white-space: nowrap;
+}
+
+.button-row .el-button--primary,
+.toolbar .el-button--primary,
+.batch-bar .el-button--primary,
+.page-actions .el-button--primary,
+.empty-actions .el-button--primary,
+.button-row .el-button--success,
+.toolbar .el-button--success,
+.batch-bar .el-button--success,
+.page-actions .el-button--success,
+.empty-actions .el-button--success,
+.button-row .el-button--warning,
+.toolbar .el-button--warning,
+.batch-bar .el-button--warning,
+.page-actions .el-button--warning,
+.empty-actions .el-button--warning {
+  min-width: 132px;
+}
+
+.batch-bar .el-button--primary,
+.batch-bar .el-button--success,
+.batch-bar .el-button--warning {
+  min-width: 150px;
+}
+
+.button-row .el-button--small,
+.toolbar .el-button--small,
+.batch-bar .el-button--small,
+.page-actions .el-button--small,
+.empty-actions .el-button--small {
+  min-width: 86px;
+}
+
+.app-action-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.app-action-cell .el-button {
+  margin-left: 0 !important;
+  white-space: nowrap;
+}
+
+.app-action-button-sm,
+.app-action-cell .app-action-button-sm {
+  min-width: 72px;
+}
+
+.app-action-button-md,
+.app-action-cell .app-action-button-md {
+  min-width: 100px;
+}
+
+.app-action-button-lg,
+.app-action-cell .app-action-button-lg {
+  min-width: 150px;
+}
+
+.batch-action-title {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border: 1px solid #f59e0b;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.batch-action-tip {
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.already-done-list {
+  color: #075985;
+}
+
+.app-action-column-compact {
+  width: 140px;
+}
+
+.app-action-column-normal {
+  width: 220px;
+}
+
+.app-action-column-wide {
+  width: 320px;
+}
+
+.app-action-column-xwide {
+  width: 420px;
+}
+
+@media (max-width: 760px) {
+  .app-module-nav-zone {
+    align-items: flex-start;
+  }
+
+  .app-module-nav-zone a,
+  .app-module-nav-zone .app-nav-button,
+  .page-tabs .app-nav-button {
+    justify-content: flex-start;
+    min-width: 128px;
+  }
+}
