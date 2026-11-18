@@ -22,6 +22,8 @@
     </header>
 
     <el-alert v-if="message" :title="message" :type="messageType" show-icon :closable="false" />
+    <RawIncomingLinePanel v-if="route.path==='/qms/incoming-inspections'" mode="quality"
+      :quality-rows="inspections" @changed="refresh" />
 
     <section v-if="detail" class="operation-shell">
       <el-card shadow="never">
@@ -445,9 +447,11 @@
             <template #default="{ row }"><el-tag :type="statusType(row.status)">{{ statusLabel(row.status) }}</el-tag></template>
           </el-table-column>
           <el-table-column prop="inventoryPostStatus" label="入库状态" min-width="130" sortable="custom">
-            <template #default="{ row }">{{ inventoryPostStatusLabel(row.inventoryPostStatus, row) }}</template>
+            <template #default="{ row }">{{ row.formalAuthority ? formalInboundStatus(row) : inventoryPostStatusLabel(row.inventoryPostStatus, row) }}</template>
           </el-table-column>
-          <el-table-column prop="inventoryPostMessage" label="入库结果" min-width="180" sortable="custom" />
+          <el-table-column prop="inventoryPostMessage" label="入库结果" min-width="180" sortable="custom">
+            <template #default="{ row }">{{ row.formalAuthority ? row.lineReleaseFacts?.blockingReason?.message || row.lineReleaseBlockingReason?.message || '' : row.inventoryPostMessage }}</template>
+          </el-table-column>
           <el-table-column prop="remark" label="备注" min-width="180" sortable="custom" />
           <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(['详情', '生成检验合格入库预备'])" class-name="payment-fixed-action-column" header-class-name="payment-fixed-action-column">
             <template #default="{ row }">
@@ -495,6 +499,7 @@ import { sortRecords } from '../runtime/tableSortEngine.js'
 import { resolvePageNameConsumption } from '../governance/pageNameConsumer.js'
 import { exportRowsToCsv as exportRowsToCsvUtil } from '../manufacturing/foundationTableUtils.js'
 import { formalExecutionApi } from '@/api/formalExecution.js'
+import RawIncomingLinePanel from '@/meta/components/RawIncomingLinePanel.vue'
 import {
   goList,
   goParent,
@@ -688,6 +693,14 @@ function adaptFormalInspection(row = {}) {
     formalAuthority: true,
     authoritySource: 'procurement.PurchaseInspection',
   }
+}
+
+function formalInboundStatus(row) {
+  const facts = row.lineReleaseFacts
+  if (!facts) return row.lineReleaseStatus === 'SOURCE_UNKNOWN' ? '来源待核' : '未提供'
+  if (facts.blockingReason?.code === 'RAW_QUALITY_EXHAUSTED') return '本检验额度已用尽'
+  if (facts.inboundRecords?.length) return '已有正式入库记录'
+  return facts.qualityReleaseStatusLabel || '未提供'
 }
 
 async function refresh() {

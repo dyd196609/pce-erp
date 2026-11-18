@@ -19,7 +19,7 @@
       v-else
       type="success"
       :closable="false"
-      title="当前正式路由只读取 Django Service/API；Demo fixture 与浏览器本地状态不参与正式事实。"
+      :title="isInventoryBalance || selectedQuality ? '库存及检验依据来自正式服务，办理以当前单据的服务端资格为准。' : '当前正式路由只读取 Django Service/API；Demo fixture 与浏览器本地状态不参与正式事实。'"
       show-icon
     />
 
@@ -30,13 +30,19 @@
     </section>
 
     <template v-if="isQuality">
+      <RawIncomingLinePanel v-if="selectedQuality" mode="quality" :quality-rows="[selectedQuality]"
+        :initial-source-id="selectedQuality.id" @changed="loadFacts" />
       <h2>来料检验</h2>
       <el-table :data="facts.inspections || []" stripe>
         <el-table-column prop="inspectionNo" label="检验单号" min-width="160" />
         <el-table-column prop="purchaseOrderNo" label="采购订单" min-width="160" />
         <el-table-column prop="status" label="检验单状态" width="120" />
-        <el-table-column prop="qualifiedQuantity" label="合格数量" width="120" />
-        <el-table-column prop="rejectedQuantity" label="不合格数量" width="120" />
+        <el-table-column prop="qualifiedQuantity" label="合格数量" width="120">
+          <template #default="{ row }">{{ row.lineReleaseFacts?.qualifiedQuantity ?? '未提供' }}</template>
+        </el-table-column>
+        <el-table-column prop="rejectedQuantity" label="不合格数量" width="120">
+          <template #default="{ row }">{{ row.lineReleaseFacts?.rejectedQuantity ?? '未提供' }}</template>
+        </el-table-column>
       </el-table>
       <h2>正式入库回读</h2>
       <el-table :data="facts.inbounds || []" stripe>
@@ -49,6 +55,7 @@
     </template>
 
     <template v-else>
+      <RawIncomingLinePanel v-if="isInventoryBalance" mode="inbound" :inventory-facts="facts" @changed="loadFacts" />
       <ProductionMaterialAllocationPanel :inventory-facts="facts" :refresh-version="readVersion" />
       <section v-if="isInventoryBalance" class="m09-stock-panel" aria-label="订单行成品库存分配">
         <h2>订单行成品库存分配</h2>
@@ -131,6 +138,7 @@
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ProductionMaterialAllocationPanel from '@/meta/components/ProductionMaterialAllocationPanel.vue'
+import RawIncomingLinePanel from '@/meta/components/RawIncomingLinePanel.vue'
 import { formalExecutionApi } from '@/api/formalExecution'
 import request from '@/api/request.js'
 import { getTabAuthEpoch } from '@/meta/runtime/tabAuthenticationContext.js'
@@ -143,6 +151,7 @@ const facts = ref({})
 const error = ref('')
 const isQuality = computed(() => route.path.startsWith('/qms'))
 const isInventoryBalance = computed(() => route.path === '/wms/inventory-balances')
+const selectedQuality = computed(() => isQuality.value && (facts.value.inspections || []).find(row => String(row.id) === route.params.id))
 const validStockId = value => typeof value === 'string' && /^[1-9]\d{0,14}$/.test(value)
 const stockLineId = computed(() => isInventoryBalance.value && validStockId(route.query.m09StockLine) ? route.query.m09StockLine : '')
 const stockOrderId = computed(() => isInventoryBalance.value && validStockId(route.query.m09StockOrder) ? route.query.m09StockOrder : '')

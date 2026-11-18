@@ -25,6 +25,8 @@
     </header>
 
     <el-alert v-if="message" :title="message" :type="messageType" show-icon :closable="false" />
+    <RawIncomingLinePanel v-if="['/wms/purchase-receive-preview','/wms/purchase-receives'].includes(route.path)"
+      mode="receipt" @changed="refresh" />
 
     <section v-if="detail" class="operation-shell">
       <el-card shadow="never">
@@ -380,6 +382,7 @@ import { buildMultiFieldSuggestions, filterSuggestions } from '../runtime/filter
 import { sortRecords } from '../runtime/tableSortEngine.js'
 import { exportRowsToCsv as exportRowsToCsvUtil } from '../manufacturing/foundationTableUtils.js'
 import { formalExecutionApi } from '@/api/formalExecution.js'
+import RawIncomingLinePanel from '@/meta/components/RawIncomingLinePanel.vue'
 import {
   getSourceButtonLabel,
   goList,

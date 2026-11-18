@@ -24,6 +24,9 @@
       @reload-page-data="reloadPageData({ userAction: true })"
       @print-audit="handlePrintAudit"
     />
+    <p v-if="purchaseOrder.id && !loadError">
+      <router-link :to="{ path:'/wms/purchase-receive-preview', query:{a07Order:String(purchaseOrder.id)} }">本采购订单的仓管正式收货入口</router-link>
+    </p>
     <PurchaseOrderFulfillmentPanelV1 v-if="purchaseOrder.id"
       :order-id="purchaseOrder.id" @changed="reloadPageData({ userAction: true })" />
     <el-empty v-else-if="!loading" description="未找到当前采购订单" />
