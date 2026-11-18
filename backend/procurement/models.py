@@ -1164,6 +1164,36 @@ class InventoryTransaction(PurposeSeparatedModel):
             raise ValidationError(errors)
 
 
+class IncomingQualityExceptionFact(models.Model):
+    """Append-only rejected-scope registration and personal custody observations; no stock effect."""
+    from planning.fields import ExactDemandQuantityField
+    company = models.ForeignKey('system.Company', on_delete=models.PROTECT)
+    inspection = models.ForeignKey(PurchaseInspection, on_delete=models.PROTECT, related_name='exception_facts')
+    registration = models.ForeignKey('self', null=True, blank=True, on_delete=models.PROTECT, related_name='followups')
+    kind = models.CharField(max_length=16, choices=[('register','异常登记'),('custody','实物保管核对')])
+    quantity = ExactDemandQuantityField(max_digits=20, decimal_places=6, null=True, blank=True)
+    intent_id = models.CharField(max_length=120)
+    intent_hash = models.CharField(max_length=64)
+    payload = models.JSONField(default=dict)
+    source_snapshot = models.JSONField(default=dict)
+    created_by = models.ForeignKey('system.User', on_delete=models.PROTECT)
+    occurred_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=16, choices=[('recorded','已登记事实')], default='recorded')
+    audit_record = models.OneToOneField('system.OrganizationOperatingAuditRecord', on_delete=models.PROTECT)
+    class Meta:
+        db_table = 'scm_incoming_quality_exception_fact'
+        constraints = [models.UniqueConstraint(fields=['company','kind','intent_id'], name='incoming_exception_intent_uq'),
+            models.CheckConstraint(condition=models.Q(quantity__isnull=True)|models.Q(quantity__gte=0), name='incoming_exception_nonnegative')]
+        indexes = [models.Index(fields=['company','inspection','kind'],name='incoming_exception_scope')]
+    def save(self,*args,**kwargs):
+        if self.pk and not self._state.adding:
+            raise ValidationError('来料异常及实物保管核对只能追加，不可覆盖历史。')
+        super().save(*args,**kwargs)
+    def delete(self,*args,**kwargs):
+        raise ValidationError('来料异常历史不得删除。')
+
+
 class ProductionMaterialStockAllocation(models.Model):
     """An occupied source relation; WMS balance and transaction remain authoritative."""
     from planning.fields import ExactDemandQuantityField

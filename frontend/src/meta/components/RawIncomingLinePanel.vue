@@ -1,8 +1,46 @@
 <template>
   <section class="raw-line-panel" :aria-label="title" :data-a07-mode="mode">
     <h2>{{ title }}</h2>
-    <p v-if="mode==='receipt'">使用原采购订单的收货交接入口。选择服务端提供的采购行后，读取本次收货资格。</p>
-    <p v-if="mode==='inbound'">使用原来料检验记录的仓管入库入口。按本张检验单核对合格、已入库和当前额度。</p>
+    <p v-if="mode==='receipt'">按采购单号找单。选中后选择准确采购行，核对当前可收量和单位。</p>
+    <p v-if="mode==='inbound'">按采购单号、收货单号或检验单号找单。选中后核对本次检验的合格量、已入库量和当前额度。</p>
+    <section v-if="supportsDirectory && !pending" aria-label="仓管授权单据目录">
+      <form class="raw-lookup" @submit.prevent="searchDirectory()">
+        <label>{{ directoryLabel }}
+          <input v-model.trim="directoryInput" maxlength="100" :placeholder="directoryLabel" />
+        </label>
+        <button type="submit" :disabled="busy">查找单据</button>
+      </form>
+      <p v-if="directoryLoading" role="status">正在读取仓管授权单据。</p>
+      <p v-else-if="directoryError" role="alert">{{ directoryError }}</p>
+      <template v-else-if="directory">
+        <p v-if="directory.count===0">查无匹配单据。</p>
+        <template v-else>
+          <p role="status">匹配 {{ directory.count }} 条 · 第 {{ directory.page }} 页</p>
+          <ul class="raw-lookup-results">
+            <li v-for="row in directory.results" :key="row.sourceId">
+              <button type="button" :aria-pressed="row.sourceId===sourceId" :disabled="busy" @click="selectDirectoryRow(row)">
+                {{ mode==='receipt' ? row.purchaseOrderNo : row.inspectionNo }}
+              </button>
+              <div>
+                <span v-if="mode==='inbound'">收货单 {{ text(row.receiptNo) }} · 采购订单 {{ text(row.purchaseOrderNo) }} · </span>
+                <strong>{{ text(row.statusLabel) }}</strong>
+                <ul v-if="row.summary?.materials?.length">
+                  <li v-for="(material,index) in row.summary.materials" :key="index">
+                    {{ requestLine(material) }} · {{ text(material.materialName) }} · {{ text(material.materialCode) }} · {{ text(material.unit) }}
+                  </li>
+                </ul>
+                <p v-else-if="row.summary?.materialName">{{ text(row.summary.materialName) }} · {{ text(row.summary.materialCode) }} · {{ text(row.summary.unit) }}</p>
+                <p v-if="directoryBlockingReason(row)">{{ directoryBlockingReason(row) }}</p>
+              </div>
+            </li>
+          </ul>
+          <nav v-if="directory.count>directory.pageSize" class="raw-lookup-pages" aria-label="仓管单据分页">
+            <button type="button" :disabled="directory.page<=1" @click="searchDirectory(directory.page-1)">上一页</button>
+            <button type="button" :disabled="directory.page*directory.pageSize>=directory.count" @click="searchDirectory(directory.page+1)">下一页</button>
+          </nav>
+        </template>
+      </template>
+    </section>
     <form v-if="mode!=='quality' || !sourceId" class="raw-fields" @submit.prevent="openHandoff">
       <label>原单据交接链接<input v-model.trim="handoff" placeholder="粘贴原页面提供的交接链接" :disabled="Boolean(pending)" /></label>
       <button type="submit" :disabled="!handoff || Boolean(pending)">打开交接单据</button>
@@ -136,6 +174,13 @@ const canSubmit = computed(()=>authorized.value && !busy.value && !loading.value
   (!needsQuantity.value || /^\d+(\.\d+)?$/.test(quantity.value)) &&
   (action.value!=='transition-inspection'||Boolean(inspectionAction.value)) &&
   (props.mode!=='inbound'||locations.value.some(row=>row.code===location.value)&&Boolean(lot.value)))
+const supportsDirectory = props.mode==='receipt' || props.mode==='inbound'
+const directoryLabel = props.mode==='receipt' ? '采购单号' : '采购单号、收货单号或检验单号'
+const directoryQuery = computed(()=>typeof route.query.a07Search==='string' ? route.query.a07Search : null)
+const directoryPage = computed(()=>positiveId(route.query.a07Page) || 1)
+const directoryInput = ref(''), directory = ref(null), directoryError = ref(''), directoryLoading = ref(false)
+let directoryCycle = 0
+let selectedContext = null
 let cycle = 0
 
 function text(value){return value==null||value===''?'未提供':String(value)}
@@ -152,6 +197,7 @@ function openHandoff(){
     const key = props.mode==='quality'&&params.has('a07Receipt')?'a07Receipt':keys[props.mode]
     const id = positiveId(params.get(key))
     if(!id)throw Error()
+    selectedContext=null
     const next = {[keys[props.mode]]:undefined,a07Receipt:undefined,a07Line:undefined,[key]:String(id)}
     handoff.value=''
     if(sourceId.value===id&&(!lineId.value||props.mode!=='receipt')&&Boolean(creationSource.value)===(key==='a07Receipt'))return readContext()
@@ -160,6 +206,69 @@ function openHandoff(){
 }
 function chooseLine(id){router.replace({query:{...route.query,a07Line:id||undefined}})}
 function chooseInspection(id){router.replace({query:{...route.query,a07Inspection:id||undefined,a07Receipt:undefined}})}
+
+function directoryBlockingReason(row){
+  return row.summary?.blockingReason?.message ||
+    (row.sourceStatus==='SOURCE_UNKNOWN' ? row.actionAuthorization?.blockingReason?.message : '')
+}
+
+function clearContext(){
+  cycle++
+  facts.value=null
+  error.value=''
+  loading.value=false
+}
+
+async function searchDirectory(requestedPage){
+  if(!supportsDirectory || busy.value || pending.value || !currentOwner())return
+  const page=requestedPage ?? 1
+  const query=requestedPage==null ? directoryInput.value : directoryQuery.value
+  const previousQuery=directoryQuery.value, previousPage=directoryPage.value
+  clearContext()
+  selectedContext=null
+  await router.push({query:{...route.query,[keys[props.mode]]:undefined,a07Line:undefined,a07Search:query,a07Page:page>1 ? String(page) : undefined}})
+  if(query===previousQuery && page===previousPage)await readDirectory()
+}
+
+async function readDirectory(){
+  const ticket=++directoryCycle, query=directoryQuery.value, page=directoryPage.value
+  directory.value=null
+  directoryError.value=''
+  directoryLoading.value=false
+  if(!supportsDirectory || query===null || pending.value || !currentOwner())return
+  directoryInput.value=query
+  directoryLoading.value=true
+  const kind=action.value
+  const response=await read('/api/procurement/scm-runtime-actions/'+kind+'/sources/',{q:query,page,pageSize:20})
+  if(ticket!==directoryCycle || !currentOwner())return
+  directoryLoading.value=false
+  const data=response?.data
+  if(!response?.success || data?.contractVersion!=='PCE-WMS-SCOPED-SOURCE-DIRECTORY-V1' ||
+    data.action!==kind || data.usagePurpose!==purpose || data.currentStateSource!=='server' || data.page!==page ||
+    !Number.isSafeInteger(data.count) || data.count<0 || data.pageSize!==20 || !Array.isArray(data.results) ||
+    data.results.some(row=>!Number.isSafeInteger(row.sourceId) || row.sourceId<=0 || row.sourceType!==sourceTypes[kind])){
+    const status=response?.meta?.status
+    const label=status===401?'请登录后读取单据':status===403?'无权读取仓管单据目录':'仓管单据目录读取失败'
+    directoryError.value=response?.error?.message ? label+'：'+response.error.message : label
+    return
+  }
+  directory.value=data
+}
+
+async function selectDirectoryRow(row){
+  if(busy.value || pending.value || !currentOwner())return
+  const same=sourceId.value===row.sourceId && !lineId.value
+  clearContext()
+  selectedContext=null
+  // The catalogue provides a locator. Only accept the original same-origin action endpoint and purpose.
+  if(row.contextUrl!==url(action.value,row.sourceId)+'?usagePurpose='+purpose){
+    error.value='该目录记录的原单据链接无法核对。'
+    return
+  }
+  selectedContext={id:row.sourceId,path:row.contextUrl}
+  if(same)return readContext()
+  await router.push({query:{...route.query,[keys[props.mode]]:String(row.sourceId),a07Line:undefined}})
+}
 
 function remember(value){
   pending.value=value
@@ -171,7 +280,8 @@ try {
 } catch { /* An unreadable presentation record carries no result facts. */ }
 
 function url(kind,id){return `/api/procurement/scm-runtime-actions/${kind}/${encodeURIComponent(id)}/`}
-async function get(kind,id,params){return request({url:url(kind,id),params,meta:{module,readOnly:true,factLoad:true}}).catch(()=>null)}
+async function read(path,params){return request({url:path,params,meta:{module,readOnly:true,factLoad:true}}).catch(()=>null)}
+async function get(kind,id,params){return read(url(kind,id),params)}
 function parameters(line,key){return {usagePurpose:purpose,...(line?{purchaseOrderItemId:line}:{}),...(key?{idempotencyKey:key}:{})}}
 function currentOwner(){return epoch===getTabAuthEpoch()}
 function validResult(result,original){return result?.usagePurpose===purpose && result?.objectType===types[original.action] && Number.isSafeInteger(result.objectId) && (original.action!=='transition-inspection'||result.objectId===original.id)}
@@ -181,7 +291,8 @@ async function readContext(){
   facts.value=null;error.value='';loading.value=false;quantity.value='';inspectionAction.value='';reason.value=''
   if(!id||pending.value||!currentOwner())return
   loading.value=true
-  const response=await get(kind,id,parameters(selected))
+  const contextUrl=selectedContext?.id===id ? selectedContext.path : null
+  const response=contextUrl ? await read(contextUrl,selected ? {purchaseOrderItemId:selected} : {}) : await get(kind,id,parameters(selected))
   if(ticket!==cycle||!currentOwner())return
   loading.value=false
   const data=response?.data, source=data?.source
@@ -229,10 +340,11 @@ async function acknowledge(){
   const original=pending.value, result=receipt.value
   remember(null);receipt.value=null;emit('changed')
   if(original.action==='create-inspection')return chooseInspection(String(result.objectId))
-  return readContext()
+  return Promise.all([readContext(),readDirectory()])
 }
 watch([sourceId,lineId,action],readContext,{immediate:true})
-onBeforeUnmount(()=>{cycle++})
+if(supportsDirectory)watch([directoryQuery,directoryPage],readDirectory,{immediate:true})
+onBeforeUnmount(()=>{cycle++;directoryCycle++})
 </script>
 
 <style scoped>
@@ -244,5 +356,13 @@ onBeforeUnmount(()=>{cycle++})
 .raw-line-panel input,.raw-line-panel select,.raw-line-panel textarea,.raw-line-panel button,.raw-release a{min-height:44px;max-width:100%;padding:6px 8px}
 .raw-line-panel input,.raw-line-panel select,.raw-line-panel textarea{box-sizing:border-box;width:100%;min-width:0}
 .raw-release a{display:inline-flex;align-items:center}
+.raw-lookup{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin-block:8px}
+.raw-lookup label{flex:1 1 240px}
+.raw-lookup-results{list-style:none;padding:0}
+.raw-lookup-results>li{display:flex;flex-wrap:wrap;align-items:start;gap:8px;border-top:1px solid #d6e0ee;padding:8px 0}
+.raw-lookup-results>li>div{flex:1 1 240px;min-width:0}
+.raw-lookup-results p{margin:4px 0}
+.raw-lookup-results button[aria-pressed=true]{font-weight:700}
+.raw-lookup-pages{display:flex;gap:8px}
 @media(max-width:600px){.raw-fields{grid-template-columns:1fr}.raw-facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
