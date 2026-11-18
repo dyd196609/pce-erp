@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>物料核价上下文运行验收</title>
+  <style>body{margin:0;padding:24px;background:#f5f7fa;font-family:Arial,"Microsoft YaHei",sans-serif}#app{max-width:1440px;margin:auto;background:white;padding:20px}</style>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module">
+    import { createApp, h } from 'vue'
+    import { createRouter, createMemoryHistory } from 'vue-router'
+    import ElementPlus from 'element-plus'
+    import 'element-plus/dist/index.css'
+    import ScmPriceApprovalPreparationEnterpriseList from '/src/meta/components/ScmPriceApprovalPreparationEnterpriseList.vue'
+    import { getScmState } from '/src/meta/scm/scmStore.js'
+
+    const state=getScmState()
+    const historicalItem=state.purchaseOrderItems?.[0]||{}
+    const existingMaterialCode=historicalItem.materialCode||historicalItem.materialId||'MAT-HISTORY'
+    const rows=[
+      {inquiryNo:'PI-V1142815-OLD',sourceRequestNo:'PR-V1142815-OLD',materialCode:existingMaterialCode,
+        materialName:'老物料运行样本',supplierCode:'SUP-CURRENT',supplierName:'当前报价供应商',quotePrice:79,
+        comparisonResult:{summary:'报价比较事实已提供'},manualAssessment:'由采购人员最终判断',
+        preparationStatus:'price_approval_preparation_ready',preparationStatusLabel:'已进入采购核价准备'},
+      {inquiryNo:'PI-V1142815-NEW',sourceRequestNo:'PR-V1142815-NEW',materialCode:'MAT-NEW-V1142815',
+        materialName:'新物料运行样本',supplierCode:'SUP-NEW',supplierName:'新物料供应商',quotePrice:58,
+        comparisonResult:{summary:'报价比较事实已提供'},manualAssessment:'待采购人员复核',
+        preparationStatus:'price_approval_preparation_ready',preparationStatusLabel:'已进入采购核价准备'},
+    ]
+    const router=createRouter({history:createMemoryHistory(),routes:[{path:'/',component:{render:()=>h('div')}}]})
+    createApp({render:()=>h('main',[h('h1','物料核价上下文运行验收'),
+      h(ScmPriceApprovalPreparationEnterpriseList,{rows})])}).use(router).use(ElementPlus).mount('#app')
+  </script>
+</body>
+</html>

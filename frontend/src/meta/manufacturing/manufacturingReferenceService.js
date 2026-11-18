@@ -1,4 +1,9 @@
 import { getFoundationState } from './manufacturingFoundationStore.js'
+import {
+  findMaterialMasterRuntimeByCode,
+  getMaterialMasterRuntimeOptions,
+  hasMaterialMasterRuntimeId,
+} from '../providers/materialMasterRuntimeProvider.js'
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value))
@@ -69,7 +74,7 @@ export function getWorkCenterOptions() {
 }
 
 export function getMaterialOptions() {
-  return state().materials.map((item) => option(item, '物料', { sourceModule: 'ERP主数据' }))
+  return getMaterialMasterRuntimeOptions()
 }
 
 export function getCustomerOptions() {
@@ -135,13 +140,13 @@ export function getEnabledSuppliers() { return getSupplierOptions().filter((item
 export function getEnabledWarehouses() { return getWarehouseOptions().filter((item) => enabled(item.raw)) }
 export function getEnabledWorkCenters() { return getWorkCenterOptions().filter((item) => enabled(item.raw)) }
 
-export function findMaterialByCode(code) { return byCode(state().materials, code) }
+export function findMaterialByCode(code) { return findMaterialMasterRuntimeByCode(code) }
 export function findCustomerByCode(code) { return byCode(state().customers, code) }
 export function findSupplierByCode(code) { return byCode(state().suppliers, code) }
 export function findWarehouseByCode(code) { return byCode(state().warehouses, code) }
 export function findEmployeeByCode(code) { return byCode(state().employees, code, ['employeeNo', 'code']) }
 
-export function validateMaterialExists(materialId) { return exists(state().materials, materialId) }
+export function validateMaterialExists(materialId) { return hasMaterialMasterRuntimeId(materialId) }
 export function validateCustomerExists(customerId) { return exists(state().customers, customerId) }
 export function validateSupplierExists(supplierId) { return exists(state().suppliers, supplierId) }
 export function validateWarehouseExists(warehouseId) { return exists(state().warehouses, warehouseId) }
@@ -242,4 +247,3 @@ export function getProductCategoryOptions() {
 export function getProductCategoriesByIndustry(industryType) {
   return clone((state().productCategories || []).filter((item) => enabled(item) && (!industryType || item.industryType === industryType)))
 }
-

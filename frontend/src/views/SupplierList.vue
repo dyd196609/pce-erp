@@ -305,6 +305,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import request from '../api/request';
+import { getTabAuthToken } from '@/meta/runtime/tabAuthenticationContext.js';
 
 // ========== 列表数据 ==========
 const supplierList = ref([]);
@@ -421,7 +422,7 @@ const emailOptions = computed(() => {
 // ========== 导入导出 ==========
 const uploadUrl = computed(() => 'http://127.0.0.1:8000/api/procurement/suppliers/import_excel/');
 const uploadHeaders = computed(() => ({
-  Authorization: `Bearer ${localStorage.getItem('token')}`
+  Authorization: `Bearer ${getTabAuthToken()}`
 }));
 
 // ========== 弹窗相关 ==========
@@ -582,7 +583,7 @@ const handleSizeChange = (newSize) => {
 
 // ========== 导出数据 ==========
 const exportData = () => {
-  const token = localStorage.getItem('token')
+  const token = getTabAuthToken()
   // 获取选中的订单 ID 列表
   const ids = selectedRows.value.map(row => row.id)
   let url = '/api/procurement/purchase_orders/export/'
@@ -607,7 +608,7 @@ const exportData = () => {
 
 // ========== 下载导入模板 ==========
 const downloadTemplate = () => {
-  const token = localStorage.getItem('token');
+  const token = getTabAuthToken();
   fetch('http://127.0.0.1:8000/api/procurement/suppliers/export_template/', {
     method: 'GET',
     headers: { 'Authorization': `Bearer ${token}` }

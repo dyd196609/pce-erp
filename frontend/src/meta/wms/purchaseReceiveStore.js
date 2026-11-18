@@ -13,7 +13,7 @@ import { isReceivablePurchaseOrderStatus } from '../scm/scmDocumentRules.js'
 import {
   getWarehouseTaskById,
 } from './wmsStore.js'
-import { createIncomingInspectionFromPurchaseReceive } from '../qms/qmsStore.js'
+import { createIncomingInspectionFromPurchaseReceive, getIncomingInspectionById } from '../qms/qmsStore.js'
 
 const STORAGE_KEY = 'wms-purchase-receive-state-v1'
 
@@ -217,6 +217,7 @@ function purchaseReceive(payload = {}) {
     purchaseDepartment: payload.purchaseDepartment || '',
     rootRequestNo: payload.rootRequestNo || '',
     sourcePurchaseOrderNo: payload.sourcePurchaseOrderNo || payload.sourceOrderNo || '',
+    sourcePriceApprovalNo: payload.sourcePriceApprovalNo || '',
     plannedArrivalDate,
     warehouseId,
     warehouseName: payload.warehouseName || getScmDisplayName('warehouse', warehouseId),
@@ -247,6 +248,13 @@ function purchaseReceive(payload = {}) {
     settlementReady: payload.settlementReady ?? status === 'received',
     supplierEvaluationReady: payload.supplierEvaluationReady ?? status === 'received',
     buyerPerformanceReady: payload.buyerPerformanceReady ?? status === 'received',
+    inventoryPosted: Boolean(payload.inventoryPosted),
+    inventoryPostedAt: payload.inventoryPostedAt || '',
+    inventoryTransactionId: payload.inventoryTransactionId || '',
+    inventoryTransactionNo: payload.inventoryTransactionNo || '',
+    inventoryTransactionIds: payload.inventoryTransactionIds || [],
+    inboundWarehouseTaskId: payload.inboundWarehouseTaskId || '',
+    inboundWarehouseTaskNo: payload.inboundWarehouseTaskNo || '',
     status,
     remark: payload.remark || '',
     lines,
@@ -281,6 +289,15 @@ function persist() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
 }
 
+function readPersistedReceive(id) {
+  try {
+    const persisted = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+    return byId(persisted.purchaseReceives || [], id)
+  } catch {
+    return null
+  }
+}
+
 function createReceive(payload = {}, logPayload = {}) {
   const receive = purchaseReceive(payload)
   state.purchaseReceives.unshift(receive)
@@ -297,7 +314,17 @@ function createReceive(payload = {}, logPayload = {}) {
       targetNo: receive.receiveNo,
     })
   }
-  return { success: true, receiveId: receive.id, receiveNo: receive.receiveNo }
+  return {
+    success: true,
+    ok: true,
+    status: 'created',
+    existed: false,
+    targetNo: receive.receiveNo,
+    sourcePurchaseOrderNo: receive.sourcePurchaseOrderNo || receive.sourceOrderNo || '',
+    targetRecord: clone(receive),
+    receiveId: receive.id,
+    receiveNo: receive.receiveNo,
+  }
 }
 
 export function getPurchaseReceiveState() {
@@ -322,8 +349,94 @@ export function listPurchaseReceives() {
   return clone(state.purchaseReceives)
 }
 
+export function resolvePurchaseReceivePrepareLink({ purchaseOrder, purchaseReceivePrepares = state.purchaseReceives } = {}) {
+  if (!purchaseOrder?.id || !purchaseOrder?.poNo || !Array.isArray(purchaseReceivePrepares)) {
+    return {
+      linkStatus: 'read_failed',
+      targetNo: '',
+      targetRecord: null,
+      conflictRecords: [],
+      reason: '采购订单或采购收货预备数据不可读取。',
+    }
+  }
+
+  const activeRecords = purchaseReceivePrepares.filter((item) => (
+    item?.sourceType === 'scmPurchaseOrder'
+    && item.status !== 'cancelled'
+  ))
+  const exactMatches = activeRecords.filter((item) => (
+    String(item.sourceOrderId) === String(purchaseOrder.id)
+    && String(item.sourceOrderNo) === String(purchaseOrder.poNo)
+  ))
+  const partialMatches = activeRecords.filter((item) => (
+    String(item.sourceOrderId) === String(purchaseOrder.id)
+    || String(item.sourceOrderNo) === String(purchaseOrder.poNo)
+  ))
+
+  if (exactMatches.length === 1 && partialMatches.length === 1) {
+    const targetRecord = clone(exactMatches[0])
+    return {
+      linkStatus: 'generated',
+      targetNo: targetRecord.receiveNo || '',
+      targetRecord,
+      conflictRecords: [],
+      reason: '',
+    }
+  }
+  if (partialMatches.length > 0) {
+    return {
+      linkStatus: 'conflict',
+      targetNo: '',
+      targetRecord: null,
+      conflictRecords: clone(partialMatches),
+      reason: exactMatches.length > 1
+        ? '同一采购订单存在多个采购收货预备对象。'
+        : '采购收货预备对象的来源采购订单编号与内部ID不一致。',
+    }
+  }
+  return {
+    linkStatus: 'not_generated',
+    targetNo: '',
+    targetRecord: null,
+    conflictRecords: [],
+    reason: '',
+  }
+}
+
 export function getPurchaseReceiveById(id) {
   return clone(byId(state.purchaseReceives, id))
+}
+
+export function applyPurchaseReceiveInventoryPostResult(id, payload = {}) {
+  const current = byId(state.purchaseReceives, id)
+    || state.purchaseReceives.find((item) => String(item.receiveNo) === String(payload.receiveNo || id))
+  if (!current) return { success: false, error: '未找到来源采购收货预备单。' }
+  if (current.inventoryPosted) {
+    const sameTask = String(current.inboundWarehouseTaskId || '') === String(payload.inboundWarehouseTaskId || '')
+    return sameTask
+      ? { success: true, status: 'already_completed', purchaseReceive: clone(current) }
+      : { success: false, error: '采购收货预备已由其他仓库任务完成入库。' }
+  }
+  Object.assign(current, purchaseReceive({
+    ...current,
+    inventoryPosted: true,
+    inventoryPostedAt: payload.inventoryPostedAt || nowText(),
+    inventoryTransactionId: payload.inventoryTransactionId || '',
+    inventoryTransactionNo: payload.inventoryTransactionNo || '',
+    inventoryTransactionIds: payload.inventoryTransactionIds || [],
+    inboundWarehouseTaskId: payload.inboundWarehouseTaskId || '',
+    inboundWarehouseTaskNo: payload.inboundWarehouseTaskNo || '',
+    id: current.id,
+  }))
+  persist()
+  writePurchaseReceiveLog('确认检验合格入库', {
+    sourceModule: 'WMS仓库任务',
+    sourceNo: payload.inboundWarehouseTaskNo || '',
+    targetId: current.id,
+    targetNo: current.receiveNo,
+    result: payload.inventoryTransactionNo || '已入库',
+  })
+  return { success: true, status: 'completed', purchaseReceive: clone(current) }
 }
 
 export function createPurchaseReceiveFromWarehouseTask(taskId) {
@@ -377,8 +490,19 @@ export function createPurchaseReceiveFromScmPurchaseOrder(poId) {
     .map((item) => item.planDeliveryDate || item.plannedArrivalDate || item.expectedDeliveryDate || item.deliveryDate)
     .filter(Boolean)
     .sort()[0] || order.planDeliveryDate || order.plannedArrivalDate || order.expectedDeliveryDate || ''
-  const existing = state.purchaseReceives.find((item) => item.sourceType === 'scmPurchaseOrder' && item.sourceOrderId === poId && item.status !== 'cancelled')
-  if (existing) {
+  const currentLink = resolvePurchaseReceivePrepareLink({ purchaseOrder: order, purchaseReceivePrepares: state.purchaseReceives })
+  if (currentLink.linkStatus === 'conflict' || currentLink.linkStatus === 'read_failed') {
+    return {
+      success: false,
+      ok: false,
+      status: 'failed',
+      errorCode: currentLink.linkStatus === 'conflict' ? 'PURCHASE_RECEIVE_RELATION_CONFLICT' : 'PURCHASE_RECEIVE_RELATION_READ_FAILED',
+      message: currentLink.reason,
+      error: currentLink.reason,
+    }
+  }
+  const existing = currentLink.targetRecord
+  if (currentLink.linkStatus === 'generated' && existing) {
     writePurchaseReceiveLog('拦截重复生成采购收货预备单', {
       sourceModule: 'SCM采购订单',
       sourceNo: order.poNo,
@@ -386,7 +510,18 @@ export function createPurchaseReceiveFromScmPurchaseOrder(poId) {
       targetNo: existing.receiveNo,
       result: '已生成采购收货预备单，不能重复生成。',
     })
-    return { success: false, error: '已生成采购收货预备单，不能重复生成。' }
+    return {
+      success: true,
+      ok: true,
+      status: 'already_exists',
+      existed: true,
+      targetNo: existing.receiveNo,
+      sourcePurchaseOrderNo: existing.sourcePurchaseOrderNo || existing.sourceOrderNo || order.poNo,
+      targetRecord: clone(existing),
+      receiveId: existing.id,
+      receiveNo: existing.receiveNo,
+      message: '采购收货预备单已存在，未重复生成。',
+    }
   }
   const warehouseId = items[0]?.warehouseId || defaultWarehouseId()
   return createReceive({
@@ -402,6 +537,7 @@ export function createPurchaseReceiveFromScmPurchaseOrder(poId) {
     purchaseDepartment: order.rootPurchaseDepartment || order.purchaseDepartment,
     rootRequestNo: order.rootRequestNo,
     sourcePurchaseOrderNo: order.poNo,
+    sourcePriceApprovalNo: order.sourceOrderNo || '',
     plannedArrivalDate: orderPlanDate,
     warehouseId,
     warehouseName: getScmDisplayName('warehouse', warehouseId),
@@ -506,8 +642,25 @@ export function savePurchaseReceiveDraft(id, payload = {}) {
 
 export function submitPurchaseReceive(id, payload = {}) {
   const current = byId(state.purchaseReceives, id)
-  if (!current || current.status === 'cancelled') return { success: false, error: '当前采购收货预备单不可提交。' }
-  if (current.status === 'received' || current.status === 'inspectionPrepared') return { success: false, error: '当前采购收货预备单已完成收货。' }
+  if (!current || current.status === 'cancelled') {
+    const message = '当前采购收货预备单不可提交。'
+    return { success: false, ok: false, status: 'failed', errorCode: 'receive_not_submittable', message, error: message }
+  }
+  if (current.status === 'received' || current.status === 'inspectionPrepared') {
+    const message = '当前采购收货预备单已完成收货。'
+    return {
+      success: false,
+      ok: false,
+      status: 'already_submitted',
+      errorCode: 'already_submitted',
+      message,
+      error: message,
+      receiveId: current.id,
+      receiveNo: current.receiveNo,
+      actualReceivedQuantity: current.totalActualReceiveQty,
+      record: clone(current),
+    }
+  }
   const actualArrivalDate = payload.actualArrivalDate || current.actualArrivalDate || today()
   const next = recalculateReceive({
     ...current,
@@ -528,7 +681,8 @@ export function submitPurchaseReceive(id, payload = {}) {
       targetNo: current.receiveNo,
       result: errors.join('；'),
     })
-    return { success: false, error: errors.join('；') }
+    const message = errors.join('；')
+    return { success: false, ok: false, status: 'failed', errorCode: 'receive_validation_failed', message, error: message }
   }
   Object.assign(current, next)
   persist()
@@ -544,7 +698,23 @@ export function submitPurchaseReceive(id, payload = {}) {
     result: current.totalActualAmount,
   })
   writeReceiveMetricLogs(current)
-  return { success: true, receive: clone(current) }
+  const persisted = readPersistedReceive(current.id)
+  if (!persisted || persisted.status !== 'received') {
+    const message = '采购收货预备持久化校验失败。'
+    return { success: false, ok: false, status: 'failed', errorCode: 'receive_persistence_failed', message, error: message }
+  }
+  const record = clone(current)
+  return {
+    success: true,
+    ok: true,
+    status: 'received',
+    receiveId: current.id,
+    receiveNo: current.receiveNo,
+    actualReceivedQuantity: current.totalActualReceiveQty,
+    record,
+    receive: record,
+    persisted: true,
+  }
 }
 
 export function cancelPurchaseReceive(id) {
@@ -571,9 +741,15 @@ export function markPurchaseReceiveReceived(id) {
 
 export function createInspectionPreviewFromPurchaseReceive(id) {
   const receive = byId(state.purchaseReceives, id)
-  if (!receive || receive.status === 'cancelled') return { success: false, error: '当前采购收货预备单不可生成来料检验预备。' }
+  if (!receive || receive.status === 'cancelled') {
+    const message = '当前采购收货预备单不可生成来料检验预备。'
+    return { success: false, ok: false, status: 'failed', errorCode: 'receive_not_inspectable', message, error: message }
+  }
   const outcome = createIncomingInspectionFromPurchaseReceive(clone(receive))
-  if (!outcome.success) return outcome
+  if (!outcome.success) {
+    const message = outcome.error || '来料检验单生成失败。'
+    return { ...outcome, ok: false, status: 'failed', errorCode: outcome.errorCode || 'inspection_creation_failed', message, error: message }
+  }
   if (outcome.existed) {
     writePurchaseReceiveLog('拦截重复生成来料检验单', {
       sourceModule: 'WMS采购收货预备',
@@ -582,7 +758,22 @@ export function createInspectionPreviewFromPurchaseReceive(id) {
       targetNo: outcome.inspectionNo,
       result: '已生成来料检验单，不能重复生成。',
     })
-    return { success: false, error: '已生成来料检验单，不能重复生成。' }
+    if (receive.status !== 'inspectionPrepared') {
+      receive.status = 'inspectionPrepared'
+      receive.updatedAt = nowText()
+      persist()
+    }
+    const record = getIncomingInspectionById(outcome.inspectionId)
+    return {
+      success: true,
+      ok: true,
+      status: 'already_exists',
+      existed: true,
+      inspectionId: outcome.inspectionId,
+      inspectionNo: outcome.inspectionNo,
+      sourceReceiveNo: receive.receiveNo,
+      record,
+    }
   }
   receive.status = 'inspectionPrepared'
   receive.updatedAt = nowText()
@@ -594,7 +785,15 @@ export function createInspectionPreviewFromPurchaseReceive(id) {
     targetNo: outcome.inspectionNo,
     result: outcome.existed ? '已存在，未重复生成' : '成功',
   })
-  return outcome
+  const record = getIncomingInspectionById(outcome.inspectionId)
+  return {
+    ...outcome,
+    success: true,
+    ok: true,
+    status: 'created',
+    sourceReceiveNo: receive.receiveNo,
+    record,
+  }
 }
 
 function purchaseReceiveBatchResult(ids = [], handler, label) {

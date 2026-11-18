@@ -46,3 +46,21 @@ backend/backend_file_list.txt
 frontend/frontend_file_list.txt
 frontend/src_tree.txt
 今日改动文件清单.txt
+# Unified source archive: local runtime state is never published
+.env
+.env.*
+*.sqlite
+*.db
+*.pem
+*.key
+*.pfx
+*.p12
+.git-credentials
+work/
+backups/
+outputs/
+test-results/
+**/test-results/
+.pce-runtime/
+.runtime/
+**/.pce-vite-cache/

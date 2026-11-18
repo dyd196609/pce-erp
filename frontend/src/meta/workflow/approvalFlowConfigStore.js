@@ -1,3 +1,5 @@
+import { createApprovalContract, resolveApprovalStatusTransition } from './approvalRuntime.js'
+
 const STORAGE_KEY = 'approval-flow-config-state-v1'
 
 const MODULES = [
@@ -92,6 +94,11 @@ export function getApprovalFlowConfig(moduleName) {
   return clone(state.approvalFlowConfigs.find((item) => item.moduleName === moduleName))
 }
 
+export function getApprovalContract(moduleName) {
+  const config = state.approvalFlowConfigs.find((item) => item.moduleName === moduleName)
+  return createApprovalContract(moduleName, config?.steps?.length || 1)
+}
+
 export function saveApprovalFlowConfig(moduleName, patch = {}) {
   const current = state.approvalFlowConfigs.find((item) => item.moduleName === moduleName)
   if (!current) return null
@@ -115,10 +122,5 @@ export function getApprovalStepCount(moduleName) {
 }
 
 export function getNextApprovalStatus(moduleName, currentStatus) {
-  const count = getApprovalStepCount(moduleName)
-  if (currentStatus === 'draft' || currentStatus === 'rejected') return 'submitted'
-  if (currentStatus === 'submitted') return count === 1 ? 'approved' : 'reviewed'
-  if (currentStatus === 'reviewed') return count === 2 ? 'approved' : 'rechecked'
-  if (currentStatus === 'rechecked') return 'approved'
-  return currentStatus
+  return resolveApprovalStatusTransition(getApprovalContract(moduleName), currentStatus)
 }

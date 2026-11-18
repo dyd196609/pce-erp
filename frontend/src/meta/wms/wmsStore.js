@@ -19,6 +19,7 @@ import {
 } from '../qms/qmsStore.js'
 
 const STORAGE_KEY = 'wms-state-v1'
+const WMS_STATE_VERSION = '1.0.0'
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value))
@@ -133,6 +134,10 @@ function inventoryBalance(payload = {}) {
     sourceInspectionNo: payload.sourceInspectionNo || '',
     sourceReceiveNo: payload.sourceReceiveNo || '',
     sourcePurchaseOrderNo: payload.sourcePurchaseOrderNo || '',
+    sourceWarehouseTaskId: payload.sourceWarehouseTaskId || '',
+    sourceWarehouseTaskNo: payload.sourceWarehouseTaskNo || '',
+    supplierId: payload.supplierId || '',
+    supplierName: payload.supplierName || '',
     rootRequestNo: payload.rootRequestNo || '',
     productionDate: payload.productionDate || today(),
     expiryDate: payload.expiryDate || '',
@@ -171,6 +176,8 @@ function inventoryTransaction(payload = {}) {
     sourceReceiveNo: payload.sourceReceiveNo || '',
     sourcePurchaseOrderId: payload.sourcePurchaseOrderId || '',
     sourcePurchaseOrderNo: payload.sourcePurchaseOrderNo || '',
+    sourceWarehouseTaskId: payload.sourceWarehouseTaskId || '',
+    sourceWarehouseTaskNo: payload.sourceWarehouseTaskNo || '',
     rootRequestNo: payload.rootRequestNo || '',
     supplierId: payload.supplierId || '',
     supplierName: payload.supplierName || '',
@@ -178,6 +185,13 @@ function inventoryTransaction(payload = {}) {
     buyerName: payload.buyerName || '',
     operator: payload.operator || firstId(getEmployeeOptions()),
     remark: payload.remark || '',
+    downstreamActionCode: payload.downstreamActionCode || '',
+    downstreamObjectType: payload.downstreamObjectType || '',
+    downstreamObjectNo: payload.downstreamObjectNo || '',
+    downstreamObjectId: payload.downstreamObjectId || '',
+    downstreamGeneratedAt: payload.downstreamGeneratedAt || '',
+    flowWritebackStatus: payload.flowWritebackStatus || '',
+    nextStepReleaseStatus: payload.nextStepReleaseStatus || '',
     createdAt: payload.createdAt || nowText(),
   }
 }
@@ -220,6 +234,9 @@ function warehouseTask(payload = {}) {
     plannedQuantity: toNumber(payload.plannedQuantity),
     completedQuantity: toNumber(payload.completedQuantity),
     status: payload.status || 'pending',
+    inventoryTransactionId: payload.inventoryTransactionId || '',
+    inventoryTransactionNo: payload.inventoryTransactionNo || '',
+    inventoryTransactionIds: payload.inventoryTransactionIds || [],
     operatorId: payload.operatorId || firstId(getEmployeeOptions()),
     createdAt: payload.createdAt || nowText(),
     completedAt: payload.completedAt || '',
@@ -253,7 +270,20 @@ function sourceData() {
   return { materials, warehouses, employees }
 }
 
-function defaultState() {
+export function createEmptyWmsState(options = {}) {
+  return {
+    version: WMS_STATE_VERSION,
+    initializationMode: 'canonical_empty',
+    demoSeedActivated: false,
+    loadError: options.loadError || '',
+    inventoryBalances: [],
+    inventoryTransactions: [],
+    warehouseTasks: [],
+    stockWarnings: [],
+  }
+}
+
+export function createDemoWmsState() {
   const { materials, warehouses, employees } = sourceData()
   const balances = []
   const transactions = []
@@ -349,6 +379,10 @@ function defaultState() {
   })
 
   return {
+    version: WMS_STATE_VERSION,
+    initializationMode: 'explicit_demo',
+    demoSeedActivated: true,
+    loadError: '',
     inventoryBalances: balances,
     inventoryTransactions: transactions,
     warehouseTasks: tasks,
@@ -358,6 +392,10 @@ function defaultState() {
 
 function normalizeState(raw = {}) {
   return {
+    version: raw.version || WMS_STATE_VERSION,
+    initializationMode: raw.initializationMode || 'persisted',
+    demoSeedActivated: raw.demoSeedActivated === true,
+    loadError: raw.loadError || '',
     inventoryBalances: (raw.inventoryBalances || []).map((item) => inventoryBalance(item)),
     inventoryTransactions: (raw.inventoryTransactions || []).map((item) => inventoryTransaction(item)),
     warehouseTasks: (raw.warehouseTasks || []).map((item) => warehouseTask(item)),
@@ -368,10 +406,10 @@ function normalizeState(raw = {}) {
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? normalizeState(JSON.parse(raw)) : defaultState()
+    return raw ? normalizeState(JSON.parse(raw)) : createEmptyWmsState()
   } catch (error) {
-    console.warn('[WMS STORE] fallback to demo state', error)
-    return defaultState()
+    console.warn('[WMS STORE] invalid persisted state; using canonical empty state', error)
+    return createEmptyWmsState({ loadError: error instanceof Error ? error.message : String(error) })
   }
 }
 
@@ -408,7 +446,7 @@ export function saveWmsState(nextState) {
 }
 
 export function resetWmsState() {
-  state = defaultState()
+  state = createDemoWmsState()
   persist()
   writeLog('恢复WMS演示数据', 'wms', 'demo')
   return getWmsState()
@@ -516,7 +554,7 @@ export function applyInventoryTransaction(payload = {}) {
   return { success: true, balance: clone(balance), transaction: clone(transaction) }
 }
 
-export function updateInventoryBalanceFromInspectionLine(inspection, line, postType = 'purchaseInspectionIn') {
+export function updateInventoryBalanceFromInspectionLine(inspection, line, postType = 'purchaseInspectionIn', context = {}) {
   const quantity = postType === 'concessionIn' ? toNumber(line.concessionQty) : toNumber(line.qualifiedQty)
   if (quantity <= 0) return { success: false, error: '入库数量必须大于0。' }
   const warehouseId = line.warehouseId || inspection.warehouseId
@@ -540,6 +578,10 @@ export function updateInventoryBalanceFromInspectionLine(inspection, line, postT
       sourceInspectionNo: inspection.inspectionNo,
       sourceReceiveNo: inspection.sourceReceiveNo,
       sourcePurchaseOrderNo: inspection.sourcePurchaseOrderNo || inspection.sourceOrderNo,
+      sourceWarehouseTaskId: context.warehouseTask?.id || '',
+      sourceWarehouseTaskNo: context.warehouseTask?.taskNo || '',
+      supplierId: inspection.supplierId,
+      supplierName: inspection.supplierName,
       rootRequestNo: inspection.rootRequestNo,
     })
     state.inventoryBalances.unshift(balance)
@@ -556,6 +598,10 @@ export function updateInventoryBalanceFromInspectionLine(inspection, line, postT
     sourceInspectionNo: inspection.inspectionNo,
     sourceReceiveNo: inspection.sourceReceiveNo,
     sourcePurchaseOrderNo: inspection.sourcePurchaseOrderNo || inspection.sourceOrderNo,
+    sourceWarehouseTaskId: context.warehouseTask?.id || balance.sourceWarehouseTaskId || '',
+    sourceWarehouseTaskNo: context.warehouseTask?.taskNo || balance.sourceWarehouseTaskNo || '',
+    supplierId: inspection.supplierId || balance.supplierId || '',
+    supplierName: inspection.supplierName || balance.supplierName || '',
     rootRequestNo: inspection.rootRequestNo,
     updatedAt: nowText(),
   }))
@@ -570,7 +616,7 @@ export function updateInventoryBalanceFromInspectionLine(inspection, line, postT
   return { success: true, balance: clone(balance), beforeQuantity, afterQuantity, quantity, qualityStatus }
 }
 
-export function createInventoryTransactionFromInspectionLine(inspection, line, postType = 'purchaseInspectionIn', balanceResult = {}) {
+export function createInventoryTransactionFromInspectionLine(inspection, line, postType = 'purchaseInspectionIn', balanceResult = {}, context = {}) {
   const quantity = toNumber(balanceResult.quantity || (postType === 'concessionIn' ? line.concessionQty : line.qualifiedQty))
   const transaction = inventoryTransaction({
     transactionType: postType,
@@ -593,6 +639,8 @@ export function createInventoryTransactionFromInspectionLine(inspection, line, p
     sourceReceiveNo: inspection.sourceReceiveNo,
     sourcePurchaseOrderId: inspection.sourcePurchaseOrderId || inspection.sourceOrderId,
     sourcePurchaseOrderNo: inspection.sourcePurchaseOrderNo || inspection.sourceOrderNo,
+    sourceWarehouseTaskId: context.warehouseTask?.id || '',
+    sourceWarehouseTaskNo: context.warehouseTask?.taskNo || '',
     rootRequestNo: inspection.rootRequestNo,
     supplierId: inspection.supplierId,
     supplierName: inspection.supplierName,
@@ -612,7 +660,7 @@ export function createInventoryTransactionFromInspectionLine(inspection, line, p
   return clone(transaction)
 }
 
-export function receiveQualifiedInspectionToInventory(inspectionId) {
+export function receiveQualifiedInspectionToInventory(inspectionId, context = {}) {
   const inspection = getIncomingInspectionById(inspectionId)
   if (!inspection) return { success: false, error: '未找到来料检验单。' }
   if (inspection.inventoryPosted) {
@@ -635,17 +683,17 @@ export function receiveQualifiedInspectionToInventory(inspectionId) {
     const qualifiedQty = toNumber(line.qualifiedQty)
     const concessionQty = toNumber(line.concessionQty)
     if (qualifiedQty > 0) {
-      const balanceResult = updateInventoryBalanceFromInspectionLine(inspection, line, 'purchaseInspectionIn')
+      const balanceResult = updateInventoryBalanceFromInspectionLine(inspection, line, 'purchaseInspectionIn', context)
       if (balanceResult.success) {
-        const transaction = createInventoryTransactionFromInspectionLine(inspection, line, 'purchaseInspectionIn', balanceResult)
+        const transaction = createInventoryTransactionFromInspectionLine(inspection, line, 'purchaseInspectionIn', balanceResult, context)
         transactionIds.push(transaction.id)
         lineTransactionIds.push(transaction.id)
       }
     }
     if (concessionQty > 0) {
-      const balanceResult = updateInventoryBalanceFromInspectionLine(inspection, line, 'concessionIn')
+      const balanceResult = updateInventoryBalanceFromInspectionLine(inspection, line, 'concessionIn', context)
       if (balanceResult.success) {
-        const transaction = createInventoryTransactionFromInspectionLine(inspection, line, 'concessionIn', balanceResult)
+        const transaction = createInventoryTransactionFromInspectionLine(inspection, line, 'concessionIn', balanceResult, context)
         transactionIds.push(transaction.id)
         lineTransactionIds.push(transaction.id)
       }
@@ -891,6 +939,7 @@ export function batchCompleteWarehouseTasks(ids = []) {
   return wmsBatchResult(ids, (id) => {
     const task = byId(state.warehouseTasks, id)
     if (!task) return { success: false, error: '未找到仓库任务。' }
+    if (getWarehouseTaskBusinessType(task) === 'qualifiedInboundPrepare') return { success: false, error: '检验合格入库预备必须进入详情执行确认入库。' }
     if (!['pending', 'processing'].includes(task.status)) return { success: false, error: '只有待处理或处理中任务可以完成。' }
     return completeWarehouseTask(id)
   }, '批量完成任务', (id) => byId(state.warehouseTasks, id)?.taskNo || id)
@@ -903,17 +952,6 @@ export function batchCancelWarehouseTasks(ids = []) {
     if (['done', 'cancelled'].includes(task.status)) return { success: false, error: '已完成或已取消任务不能重复取消。' }
     return cancelWarehouseTask(id)
   }, '批量取消任务', (id) => byId(state.warehouseTasks, id)?.taskNo || id)
-}
-
-export function batchPostInboundFromWarehouseTasks(ids = []) {
-  return wmsBatchResult(ids, (id) => {
-    const task = byId(state.warehouseTasks, id)
-    if (!task) return { success: false, error: '未找到仓库任务。' }
-    if (getWarehouseTaskBusinessType(task) !== 'qualifiedInboundPrepare') return { success: false, error: '只有检验合格入库预备任务可以确认入库。' }
-    const inspection = getIncomingInspectionById(task.sourceInspectionId || task.sourceId)
-    if (!inspection || inspection.status !== 'inboundPrepared') return { success: false, error: '来源检验单不是已生成入库预备状态。' }
-    return receiveQualifiedInspectionToInventory(inspection.id)
-  }, '批量确认入库', (id) => byId(state.warehouseTasks, id)?.taskNo || id)
 }
 
 export function increaseInventory(payload = {}) {
@@ -958,10 +996,21 @@ export function updateWarehouseTask(id, payload = {}) {
   if (item) writeLog('更新仓库任务', 'warehouseTask', id, item.taskNo)
   return item
 }
-export function completeWarehouseTask(id) {
+export function completeWarehouseTask(id, payload = {}) {
   const task = byId(state.warehouseTasks, id)
   if (!task || ['done', 'cancelled'].includes(task.status)) return { success: false, error: '当前任务不可完成。' }
-  Object.assign(task, { status: 'done', completedQuantity: task.plannedQuantity, completedAt: nowText() })
+  if (getWarehouseTaskBusinessType(task) === 'qualifiedInboundPrepare' && payload.qualifiedInboundConfirmed !== true) {
+    return { success: false, error: '检验合格入库预备必须通过正式确认入库命令完成。' }
+  }
+  Object.assign(task, {
+    status: 'done',
+    businessStatus: getWarehouseTaskBusinessType(task) === 'qualifiedInboundPrepare' ? '已入库' : task.businessStatus,
+    completedQuantity: task.plannedQuantity,
+    completedAt: nowText(),
+    inventoryTransactionId: payload.inventoryTransactionId || task.inventoryTransactionId || '',
+    inventoryTransactionNo: payload.inventoryTransactionNo || task.inventoryTransactionNo || '',
+    inventoryTransactionIds: payload.inventoryTransactionIds || task.inventoryTransactionIds || [],
+  })
   persist()
   writeLog('完成仓库任务', 'warehouseTask', id, task.taskNo)
   return { success: true }

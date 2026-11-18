@@ -82,6 +82,7 @@ function normalizeInventoryTransaction(transaction = {}) {
     id: transaction.id || transaction.transactionId || transaction.transactionNo || '',
     transactionNo: transaction.transactionNo || transaction.transactionId || transaction.id || '',
     transactionType,
+    direction: transaction.direction || (ALLOWED_TRANSACTION_TYPES.includes(transactionType) ? 'in' : ''),
     quantity,
     afterQty: toNumber(transaction.afterQty ?? transaction.afterQuantity),
     sourcePurchaseOrderNo: transaction.sourcePurchaseOrderNo || transaction.poNo || transaction.purchaseOrderNo || '',
@@ -104,6 +105,7 @@ function normalizeInventoryTransaction(transaction = {}) {
     sourceReceiveNo: normalized.sourceReceiveNo || receive.receiveNo || inspection.sourceReceiveNo || '',
     sourcePurchaseOrderId: normalized.sourcePurchaseOrderId || order.id || inspection.sourcePurchaseOrderId || inspection.sourceOrderId || receive.sourceOrderId || '',
     sourcePurchaseOrderNo: normalized.sourcePurchaseOrderNo || order.poNo || inspection.sourcePurchaseOrderNo || inspection.sourceOrderNo || receive.sourcePurchaseOrderNo || receive.sourceOrderNo || '',
+    sourcePriceApprovalNo: normalized.sourcePriceApprovalNo || receive.sourcePriceApprovalNo || inspection.sourcePriceApprovalNo || order.priceApprovalNo || order.sourceOrderNo || '',
     rootRequestNo: normalized.rootRequestNo || inspection.rootRequestNo || receive.rootRequestNo || order.rootRequestNo || '',
     supplierId: normalized.supplierId || inspection.supplierId || receive.supplierId || order.supplierId || '',
     supplierName: normalized.supplierName || inspection.supplierName || receive.supplierName || order.supplierName || '',
@@ -175,12 +177,18 @@ function payablePrepare(payload = {}) {
     payablePrepareNo: payload.payablePrepareNo || createNo('PP'),
     sourceModule: payload.sourceModule || 'wms.inventoryTransaction',
     sourceInventoryTransactionIds: payload.sourceInventoryTransactionIds || [],
+    sourceInventoryTransactionId: payload.sourceInventoryTransactionId || payload.sourceInventoryTransactionIds?.[0] || '',
+    sourceInventoryTransactionNo: payload.sourceInventoryTransactionNo || '',
+    sourceInventoryTransactionType: payload.sourceInventoryTransactionType || '',
+    sourceWarehouseTaskId: payload.sourceWarehouseTaskId || '',
+    sourceWarehouseTaskNo: payload.sourceWarehouseTaskNo || '',
     sourceInspectionId: payload.sourceInspectionId || '',
     sourceInspectionNo: payload.sourceInspectionNo || '',
     sourceReceiveId: payload.sourceReceiveId || '',
     sourceReceiveNo: payload.sourceReceiveNo || '',
     sourcePurchaseOrderId: payload.sourcePurchaseOrderId || '',
     sourcePurchaseOrderNo: payload.sourcePurchaseOrderNo || '',
+    sourcePriceApprovalNo: payload.sourcePriceApprovalNo || '',
     rootRequestNo: payload.rootRequestNo || '',
     supplierId: payload.supplierId || '',
     supplierName: payload.supplierName || '',
@@ -210,6 +218,19 @@ function payablePrepare(payload = {}) {
     duplicateCheckKey: payload.duplicateCheckKey || '',
     remark: payload.remark || '',
     lines,
+    downstreamActionCode: payload.downstreamActionCode || '',
+    downstreamObjectType: payload.downstreamObjectType || '',
+    downstreamObjectNo: payload.downstreamObjectNo || '',
+    downstreamObjectId: payload.downstreamObjectId || '',
+    downstreamGeneratedAt: payload.downstreamGeneratedAt || '',
+    flowWritebackStatus: payload.flowWritebackStatus || '',
+    nextStepReleaseStatus: payload.nextStepReleaseStatus || '',
+    sourceObjectType: payload.sourceObjectType || '',
+    sourceObjectNo: payload.sourceObjectNo || '',
+    sourceObjectId: payload.sourceObjectId || '',
+    sourceBusinessRoute: payload.sourceBusinessRoute || '',
+    createdFromActionCode: payload.createdFromActionCode || '',
+    sourceLinkStatus: payload.sourceLinkStatus || '',
     createdAt: payload.createdAt || stamp,
     updatedAt: payload.updatedAt || stamp,
   }
@@ -276,6 +297,19 @@ export function getPayablePrepareById(id) {
   return clone(byId(state.payablePrepares, id))
 }
 
+export function getPayablePrepareByInventoryTransaction(transactionOrId) {
+  const source = normalizeInventoryTransaction(typeof transactionOrId === 'object' ? transactionOrId : getInventoryTransactionById(transactionOrId))
+  if (!source?.id) return null
+  const duplicateKey = duplicateKeyFromTransaction(source)
+  const matched = state.payablePrepares.find((prepare) => (
+    (prepare.sourceInventoryTransactionIds || []).includes(source.id)
+    || prepare.sourceInventoryTransactionId === source.id
+    || prepare.duplicateCheckKey === duplicateKey
+    || (prepare.lines || []).some((line) => line.sourceInventoryTransactionId === source.id)
+  )) || null
+  return matched ? clone(matched) : null
+}
+
 function duplicateKeyFromTransaction(transaction = {}) {
   const source = normalizeInventoryTransaction(transaction)
   return [
@@ -289,14 +323,7 @@ function duplicateKeyFromTransaction(transaction = {}) {
 }
 
 export function isPayablePrepareGenerated(transactionOrId) {
-  const transaction = normalizeInventoryTransaction(typeof transactionOrId === 'object' ? transactionOrId : getInventoryTransactionById(transactionOrId))
-  if (!transaction?.id) return false
-  const duplicateKey = duplicateKeyFromTransaction(transaction)
-  return state.payablePrepares.some((prepare) => (
-    (prepare.sourceInventoryTransactionIds || []).includes(transaction.id)
-    || prepare.duplicateCheckKey === duplicateKey
-    || (prepare.lines || []).some((line) => line.sourceInventoryTransactionId === transaction.id)
-  ))
+  return Boolean(getPayablePrepareByInventoryTransaction(transactionOrId))
 }
 
 function sourcePurchaseOrderLine(transaction = {}) {
@@ -479,6 +506,20 @@ function buildPayableLine(transaction = {}) {
 export function createPayablePrepareFromInventoryTransaction(transactionId) {
   const transaction = normalizeInventoryTransaction(getInventoryTransactionById(transactionId))
   if (!transaction?.id) return { success: false, error: '未找到库存流水。' }
+  const existing = getPayablePrepareByInventoryTransaction(transaction)
+  if (existing) {
+    return {
+      success: true,
+      ok: true,
+      status: 'already_exists',
+      payablePrepareId: existing.id,
+      payablePrepareNo: existing.payablePrepareNo,
+      sourceInventoryTransactionId: transaction.id,
+      sourceInventoryTransactionNo: transaction.transactionNo,
+      record: existing,
+      payablePrepare: existing,
+    }
+  }
   const guard = canUseTransaction(transaction)
   if (!guard.success) {
     writePayablePrepareLog('生成应付预备被拦截', {
@@ -494,12 +535,18 @@ export function createPayablePrepareFromInventoryTransaction(transactionId) {
   const summary = summarizeLines([line])
   const prepare = payablePrepare({
     sourceInventoryTransactionIds: [transaction.id],
+    sourceInventoryTransactionId: transaction.id,
+    sourceInventoryTransactionNo: transaction.transactionNo,
+    sourceInventoryTransactionType: transaction.transactionType,
+    sourceWarehouseTaskId: transaction.sourceWarehouseTaskId,
+    sourceWarehouseTaskNo: transaction.sourceWarehouseTaskNo,
     sourceInspectionId: transaction.sourceInspectionId,
     sourceInspectionNo: transaction.sourceInspectionNo,
     sourceReceiveId: transaction.sourceReceiveId,
     sourceReceiveNo: transaction.sourceReceiveNo,
     sourcePurchaseOrderId: transaction.sourcePurchaseOrderId,
     sourcePurchaseOrderNo: transaction.sourcePurchaseOrderNo,
+    sourcePriceApprovalNo: transaction.sourcePriceApprovalNo,
     rootRequestNo: transaction.rootRequestNo,
     supplierId: transaction.supplierId,
     supplierName: transaction.supplierName,
@@ -529,7 +576,18 @@ export function createPayablePrepareFromInventoryTransaction(transactionId) {
     targetNo: prepare.payablePrepareNo,
     result: prepare.totalPayableAmount,
   })
-  return { success: true, payablePrepareId: prepare.id, payablePrepareNo: prepare.payablePrepareNo, payablePrepare: clone(prepare) }
+  const record = clone(prepare)
+  return {
+    success: true,
+    ok: true,
+    status: 'created',
+    payablePrepareId: prepare.id,
+    payablePrepareNo: prepare.payablePrepareNo,
+    sourceInventoryTransactionId: transaction.id,
+    sourceInventoryTransactionNo: transaction.transactionNo,
+    record,
+    payablePrepare: record,
+  }
 }
 
 function batchResult(ids = [], handler, label, noGetter = (id) => id) {

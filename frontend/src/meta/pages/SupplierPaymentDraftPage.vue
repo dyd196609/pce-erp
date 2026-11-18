@@ -2,7 +2,7 @@
   <main class="payment-draft-page">
     <header class="page-header">
       <section>
-        <p class="eyebrow">V1.12.6 付款申请预备</p>
+        <p class="eyebrow">V1.14.2.8.3 · Finance</p>
         <h1>{{ detail ? '供应商付款草稿详情' : '供应商付款草稿' }}</h1>
         <p>本页根据应付账款草稿生成供应商付款草稿，只形成付款申请预备数据，不执行真实付款，不生成银行付款，不生成财务凭证。</p>
         <p class="finance-current-module-badge">当前操作模块：供应商付款草稿</p>
@@ -14,7 +14,7 @@
         <router-link class="finance-nav-button" to="/finance/invoice-prepares">发票预备</router-link>
         <router-link class="finance-nav-button" to="/finance/ap-drafts">应付账款草稿</router-link>
         <router-link class="finance-nav-button finance-nav-button-active" to="/finance/payment-drafts">供应商付款草稿 <span class="finance-current-tag">当前</span></router-link>
-        <router-link class="finance-nav-button" to="/finance/payment-prepares">正式付款单预备</router-link>
+        <router-link class="finance-nav-button" to="/finance/payment-prepares">付款单准备</router-link>
       </nav>
     </header>
 
@@ -45,7 +45,7 @@
               <el-button v-if="detail.paymentDraftStatus === 'submitted'" type="primary" @click="approveDraft(detail)">审批付款申请</el-button>
               <el-button v-if="detail.paymentDraftStatus === 'approved'" type="warning" @click="readyDraft(detail)">标记可付款</el-button>
               <el-button v-if="['approved', 'paymentReady'].includes(detail.paymentDraftStatus)" type="success" @click="openPaymentPrepareFromDraft(detail)">
-                {{ detail.paymentPrepareGenerated ? '查看付款预备' : '进入付款预备' }}
+                {{ detail.paymentPrepareGenerated ? '查看付款单准备' : '进入付款单准备' }}
               </el-button>
               <el-button v-if="['draft', 'submitted'].includes(detail.paymentDraftStatus)" type="danger" @click="cancelDraft(detail)">取消草稿</el-button>
             </div>
@@ -106,10 +106,38 @@
             <div class="button-row">
               <el-button type="primary" @click="refresh">刷新来源</el-button>
               <el-button @click="router.push('/finance/ap-drafts')">查看应付账款草稿</el-button>
-              <el-button type="success" @click="router.push('/finance/payment-prepares')">进入正式付款单预备</el-button>
+              <el-button type="success" @click="router.push('/finance/payment-prepares')">进入付款单准备</el-button>
             </div>
           </div>
         </template>
+        <StandardListToolbar
+          page-id="supplier-payment-draft"
+          table-id="supplier-payment-draft-source"
+          v-model:quick-search="sourceQuickSearch"
+          :advanced-visible="isAdvancedFilterExpanded"
+          :result-count="sortedSourceRows.length"
+          :selected-count="selectedSourceRows.length"
+          :active-filter-count="sourceActiveFilterCount"
+          :sort-text="sourceSortText"
+          :export-disabled="sortedSourceRows.length === 0"
+          @search="clearSourceSelection"
+          @toggle-advanced="isAdvancedFilterExpanded = !isAdvancedFilterExpanded"
+          @clear-filters="clearSourceFilters"
+          @clear-sort="resetSourceSorting"
+          @export-current="exportSourceRows"
+          @clear-selection="clearSourceSelection"
+        >
+          <template #batch-action>
+            <span>当前合法批量操作：批量生成供应商付款草稿</span>
+          </template>
+        </StandardListToolbar>
+        <section v-show="isAdvancedFilterExpanded" class="advanced-filter-panel" data-acceptance-id="list-advanced-filter-panel" data-pce-filter-for="supplier-payment-draft-source">
+          <label>应付账款草稿单号<PceResultFilterSelect v-model="sourceFilters.apDraftNo" :rows="sourceRows" :fields="['apDraftNo']" /></label>
+          <label>来源发票预备<PceResultFilterSelect v-model="sourceFilters.sourceInvoicePrepareNo" :rows="sourceRows" :fields="['sourceInvoicePrepareNo']" /></label>
+          <label>供应商<PceResultFilterSelect v-model="sourceFilters.supplierName" :rows="sourceRows" :fields="['supplierName']" /></label>
+          <label>采购订单<PceResultFilterSelect v-model="sourceFilters.sourcePurchaseOrderNo" :rows="sourceRows" :fields="['sourcePurchaseOrderNo']" /></label>
+          <label>状态<PceResultFilterSelect v-model="sourceFilters.apStatus" :rows="sourceRows" :fields="['apStatus']" /></label>
+        </section>
         <div class="batch-bar">
           <span>已选择 {{ selectedSourceRows.length }} 条</span>
           <span>可生成 {{ sourceBatchCounts.create }} 条</span>
@@ -123,13 +151,14 @@
           <el-button size="small" type="success" :disabled="!sourceBatchCounts.create" @click="runBatchCreateDrafts">批量生成供应商付款草稿</el-button>
         </div>
         <BatchResult v-if="sourceBatchResult" :result="sourceBatchResult" :type="sourceBatchResultType" @close="sourceBatchResult = null" />
-        <el-table ref="sourceTableRef" :data="sortedSourceRows" border stripe height="460" @selection-change="handleSourceSelectionChange" @sort-change="handleSourceSortChange">
-          <el-table-column type="selection" width="48" fixed="left" :selectable="sourceSelectable" />
+        <BusinessTableScrollContainer class="pce-baseline-table-shell" acceptance-id="business-table-scroll-supplier-payment-draft-source" min-width="100%">
+        <el-table ref="sourceTableRef" class="pce-baseline-table-shell global-sort-arrow" :data="sortedSourceRows" border stripe height="460" @selection-change="handleSourceSelectionChange" @sort-change="handleSourceSortChange">
+          <el-table-column type="selection" width="48" fixed="left" :selectable="sourceSelectable" class-name="business-table-selection-column" header-class-name="business-table-selection-column" label-class-name="business-table-selection-column" />
           <el-table-column type="expand" width="44" fixed="left">
             <template #default="{ row }">{{ row.sourceRejectReason || '可生成供应商付款草稿' }}</template>
           </el-table-column>
-          <el-table-column type="index" label="序号" width="70" fixed="left" />
-          <el-table-column prop="apDraftNo" label="应付账款草稿单号" min-width="170" sortable="custom" />
+          <el-table-column type="index" label="序号" width="70" fixed="left" class-name="pce-fixed-index-column" header-class-name="pce-fixed-index-column" label-class-name="pce-fixed-index-column" />
+          <el-table-column prop="apDraftNo" label="应付账款草稿单号" min-width="170" sortable="custom" fixed="left" class-name="pce-fixed-primary-no-column" header-class-name="pce-fixed-primary-no-column" label-class-name="pce-fixed-primary-no-column" />
           <el-table-column prop="sourceInvoicePrepareNo" label="来源发票预备" min-width="170" sortable="custom" />
           <el-table-column prop="supplierName" label="供应商" min-width="150" sortable="custom" />
           <el-table-column prop="sourcePurchaseOrderNo" label="采购订单" min-width="150" sortable="custom" />
@@ -142,13 +171,13 @@
           <el-table-column prop="totalPayableAmount" label="应付金额" width="120" sortable="custom" />
           <el-table-column prop="paidAmount" label="已付金额" width="120" sortable="custom" />
           <el-table-column prop="unpaidAmount" label="未付金额" width="120" sortable="custom" />
-          <el-table-column prop="apStatus" label="状态" width="150" sortable="custom">
+          <el-table-column prop="apStatus" label="应付状态" width="150" sortable="custom">
             <template #default="{ row }"><el-tag :type="apStatusType(row.apStatus)">{{ apStatusLabel(row.apStatus) }}</el-tag></template>
           </el-table-column>
           <el-table-column label="是否已生成付款草稿" width="160">
             <template #default="{ row }"><el-tag :type="row.paymentDraftGenerated ? 'success' : 'info'">{{ row.paymentDraftGeneratedText }}</el-tag></template>
           </el-table-column>
-          <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(['查看应付账款草稿', '生成付款草稿'])">
+          <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(['查看应付账款草稿', '生成付款草稿'])" class-name="payment-fixed-action-column" header-class-name="payment-fixed-action-column" label-class-name="payment-fixed-action-column">
             <template #default="{ row }">
               <div class="app-action-cell">
                 <el-button size="small" class="app-action-button-lg" @click="router.push(`/finance/ap-draft/${row.id}`)">查看应付账款草稿</el-button>
@@ -158,10 +187,39 @@
             </template>
           </el-table-column>
         </el-table>
+        </BusinessTableScrollContainer>
       </el-card>
 
       <el-card shadow="never">
-        <template #header><h2>供应商付款草稿列表</h2></template>
+        <template #header><h2 data-acceptance-id="page-internal-subject-title"><PceBusinessNameConsumer page-code="supplier-payment-draft" /></h2></template>
+        <StandardListToolbar
+          page-id="supplier-payment-draft"
+          table-id="supplier-payment-draft-main"
+          v-model:quick-search="draftQuickSearch"
+          :advanced-visible="isAdvancedFilterExpanded"
+          :show-advanced-filter-toggle="false"
+          :result-count="sortedDraftRows.length"
+          :selected-count="selectedDraftRows.length"
+          :active-filter-count="draftActiveFilterCount"
+          :sort-text="draftSortText"
+          :export-disabled="sortedDraftRows.length === 0"
+          @search="clearDraftSelection"
+          @clear-filters="clearDraftFilters"
+          @clear-sort="resetDraftSorting"
+          @export-current="exportDraftRows"
+          @clear-selection="clearDraftSelection"
+        >
+          <template #batch-action>
+            <span>当前合法批量操作：提交、审批、标记可付款、取消草稿</span>
+          </template>
+        </StandardListToolbar>
+        <section v-show="isAdvancedFilterExpanded" class="advanced-filter-panel" data-acceptance-id="list-advanced-filter-panel" data-pce-filter-for="supplier-payment-draft-main">
+          <label>付款草稿单号<PceResultFilterSelect v-model="draftFilters.paymentDraftNo" :rows="draftRows" :fields="['paymentDraftNo']" /></label>
+          <label>来源应付账款草稿<PceResultFilterSelect v-model="draftFilters.sourceApDraftNo" :rows="draftRows" :fields="['sourceApDraftNo']" /></label>
+          <label>供应商<PceResultFilterSelect v-model="draftFilters.supplierName" :rows="draftRows" :fields="['supplierName']" /></label>
+          <label>付款草稿状态<PceResultFilterSelect v-model="draftFilters.paymentDraftStatus" :rows="draftRows" :fields="['paymentDraftStatus']" /></label>
+          <label>审批状态<PceResultFilterSelect v-model="draftFilters.approvalStatus" :rows="draftRows" :fields="['approvalStatus']" /></label>
+        </section>
         <div class="batch-bar">
           <span>已选择 {{ selectedDraftRows.length }} 条</span>
           <span class="sort-help">排序：点击表格表头字段可升序/降序排序；点击“清除排序”恢复默认顺序。</span>
@@ -176,13 +234,14 @@
           <el-button size="small" type="danger" :disabled="!selectedDraftRows.length" @click="runBatchCancel">批量取消草稿</el-button>
         </div>
         <BatchResult v-if="draftBatchResult" :result="draftBatchResult" :type="draftBatchResultType" @close="draftBatchResult = null" />
-        <el-table ref="draftTableRef" :data="sortedDraftRows" border stripe height="520" @selection-change="handleDraftSelectionChange" @sort-change="handleDraftSortChange">
-          <el-table-column type="selection" width="48" fixed="left" />
+        <BusinessTableScrollContainer class="pce-baseline-table-shell" acceptance-id="business-table-scroll-supplier-payment-draft-main" min-width="100%">
+        <el-table ref="draftTableRef" class="pce-baseline-table-shell global-sort-arrow" :data="sortedDraftRows" border stripe height="520" @selection-change="handleDraftSelectionChange" @sort-change="handleDraftSortChange">
+          <el-table-column type="selection" width="48" fixed="left" class-name="business-table-selection-column" header-class-name="business-table-selection-column" label-class-name="business-table-selection-column" />
           <el-table-column type="expand" width="44" fixed="left">
             <template #default="{ row }">来源：{{ row.sourceApDraftNo }}；本页不执行真实付款，不生成银行付款或财务凭证。</template>
           </el-table-column>
-          <el-table-column type="index" label="序号" width="70" fixed="left" />
-          <el-table-column prop="paymentDraftNo" label="付款草稿单号" min-width="170" sortable="custom" />
+          <el-table-column type="index" label="序号" width="70" fixed="left" class-name="pce-fixed-index-column" header-class-name="pce-fixed-index-column" label-class-name="pce-fixed-index-column" />
+          <el-table-column prop="paymentDraftNo" label="付款草稿单号" min-width="170" sortable="custom" fixed="left" class-name="pce-fixed-primary-no-column" header-class-name="pce-fixed-primary-no-column" label-class-name="pce-fixed-primary-no-column" />
           <el-table-column prop="sourceApDraftNo" label="来源应付账款草稿" min-width="170" sortable="custom" />
           <el-table-column prop="supplierName" label="供应商" min-width="150" sortable="custom" />
           <el-table-column prop="applyPayAmount" label="申请付款金额" width="140" sortable="custom" />
@@ -202,7 +261,7 @@
           <el-table-column prop="voucherStatus" label="凭证状态" width="130">
             <template #default="{ row }">{{ voucherStatusLabel(row.voucherStatus) }}</template>
           </el-table-column>
-          <el-table-column label="操作" fixed="right" :width="draftActionColumnWidth">
+          <el-table-column label="操作" fixed="right" :width="draftActionColumnWidth" class-name="payment-fixed-action-column" header-class-name="payment-fixed-action-column" label-class-name="payment-fixed-action-column">
             <template #default="{ row }">
               <div class="app-action-cell">
                 <el-button size="small" class="app-action-button-sm" @click="router.push(`/finance/payment-draft/${row.id}`)">查看详情</el-button>
@@ -210,21 +269,26 @@
                 <el-button v-if="row.paymentDraftStatus === 'submitted'" size="small" class="app-action-button-md" type="primary" @click="approveDraft(row)">审批付款申请</el-button>
                 <el-button v-if="row.paymentDraftStatus === 'approved'" size="small" class="app-action-button-md" type="warning" @click="readyDraft(row)">标记可付款</el-button>
                 <el-button v-if="['approved', 'paymentReady'].includes(row.paymentDraftStatus)" size="small" class="app-action-button-md" type="success" @click="openPaymentPrepareFromDraft(row)">
-                  {{ row.paymentPrepareGenerated ? '查看付款预备' : '进入付款预备' }}
+                  {{ row.paymentPrepareGenerated ? '查看付款单准备' : '进入付款单准备' }}
                 </el-button>
                 <el-button v-if="['draft', 'submitted'].includes(row.paymentDraftStatus)" size="small" class="app-action-button-md" type="danger" @click="cancelDraft(row)">取消草稿</el-button>
               </div>
             </template>
           </el-table-column>
         </el-table>
+        </BusinessTableScrollContainer>
       </el-card>
     </section>
   </main>
 </template>
 
 <script setup>
-import { computed, defineComponent, h, ref, watch } from 'vue'
+import PceBusinessNameConsumer from '../components/PceBusinessNameConsumer.vue'
+import { computed, defineComponent, h, reactive, ref, watch } from 'vue'
+import PceResultFilterSelect from '../components/PceResultFilterSelect.vue'
 import { useRoute, useRouter } from 'vue-router'
+import BusinessTableScrollContainer from '../components/BusinessTableScrollContainer.vue'
+import StandardListToolbar from '../components/StandardListToolbar.vue'
 import {
   approvePaymentDraft,
   batchApprovePaymentDrafts,
@@ -266,6 +330,23 @@ const sourceRows = ref([])
 const draftRows = ref([])
 const selectedSourceRows = ref([])
 const selectedDraftRows = ref([])
+const sourceQuickSearch = ref('')
+const draftQuickSearch = ref('')
+const isAdvancedFilterExpanded = ref(false)
+const sourceFilters = reactive({
+  apDraftNo: '',
+  sourceInvoicePrepareNo: '',
+  supplierName: '',
+  sourcePurchaseOrderNo: '',
+  apStatus: '',
+})
+const draftFilters = reactive({
+  paymentDraftNo: '',
+  sourceApDraftNo: '',
+  supplierName: '',
+  paymentDraftStatus: '',
+  approvalStatus: '',
+})
 const sourceSortState = ref({ key: '', direction: 'asc' })
 const draftSortState = ref({ key: '', direction: 'asc' })
 const sourceTableRef = ref(null)
@@ -298,10 +379,14 @@ const draftSortColumns = [
   { key: 'expectedPayDate', sortType: 'date' },
   { key: 'paymentDraftStatus', sortType: 'status' },
 ]
-const sortedSourceRows = computed(() => sortRecords(sourceRows.value, sourceSortState.value, sourceSortColumns))
-const sortedDraftRows = computed(() => sortRecords(draftRows.value, draftSortState.value, draftSortColumns))
+const filteredSourceRows = computed(() => sourceRows.value.filter(matchSourceRow))
+const filteredDraftRows = computed(() => draftRows.value.filter(matchDraftRow))
+const sortedSourceRows = computed(() => sortRecords(filteredSourceRows.value, sourceSortState.value, sourceSortColumns))
+const sortedDraftRows = computed(() => sortRecords(filteredDraftRows.value, draftSortState.value, draftSortColumns))
 const sourceBatchCounts = computed(() => ({ create: selectedSourceRows.value.filter((row) => row.canCreatePaymentDraft).length }))
 const draftActionColumnWidth = computed(() => getActionColumnWidthForRows(sortedDraftRows.value, draftRowActions, ['查看详情']))
+const sourceActiveFilterCount = computed(() => Object.values(sourceFilters).filter((item) => String(item || '').trim()).length + (sourceQuickSearch.value.trim() ? 1 : 0))
+const draftActiveFilterCount = computed(() => Object.values(draftFilters).filter((item) => String(item || '').trim()).length + (draftQuickSearch.value.trim() ? 1 : 0))
 const sourceSortText = computed(() => currentSortText(sourceSortState.value, {
   apDraftNo: '应付账款草稿单号',
   sourceInvoicePrepareNo: '来源发票预备',
@@ -372,13 +457,67 @@ function clearSourceSelection() { selectedSourceRows.value = []; sourceTableRef.
 function clearDraftSelection() { selectedDraftRows.value = []; draftTableRef.value?.clearSelection?.() }
 function sourceSelectable(row) { return row.canCreatePaymentDraft }
 
+function includeField(value, keyword) {
+  const text = String(keyword || '').trim().toLowerCase()
+  if (!text) return true
+  return String(value || '').toLowerCase().includes(text)
+}
+
+function matchSourceRow(row = {}) {
+  const q = sourceQuickSearch.value.trim().toLowerCase()
+  if (q && ![
+    row.apDraftNo,
+    row.sourceInvoicePrepareNo,
+    row.supplierName,
+    row.sourcePurchaseOrderNo,
+    apStatusLabel(row.apStatus),
+    row.paymentDraftGeneratedText,
+  ].join(' ').toLowerCase().includes(q)) return false
+  if (!includeField(row.apDraftNo, sourceFilters.apDraftNo)) return false
+  if (!includeField(row.sourceInvoicePrepareNo, sourceFilters.sourceInvoicePrepareNo)) return false
+  if (!includeField(row.supplierName, sourceFilters.supplierName)) return false
+  if (!includeField(row.sourcePurchaseOrderNo, sourceFilters.sourcePurchaseOrderNo)) return false
+  if (!includeField(row.apStatus, sourceFilters.apStatus)) return false
+  return true
+}
+
+function matchDraftRow(row = {}) {
+  const q = draftQuickSearch.value.trim().toLowerCase()
+  if (q && ![
+    row.paymentDraftNo,
+    row.sourceApDraftNo,
+    row.supplierName,
+    paymentDraftStatusLabel(row.paymentDraftStatus),
+    approvalStatusLabel(row.approvalStatus),
+    paymentStatusLabel(row.paymentStatus),
+  ].join(' ').toLowerCase().includes(q)) return false
+  if (!includeField(row.paymentDraftNo, draftFilters.paymentDraftNo)) return false
+  if (!includeField(row.sourceApDraftNo, draftFilters.sourceApDraftNo)) return false
+  if (!includeField(row.supplierName, draftFilters.supplierName)) return false
+  if (!includeField(row.paymentDraftStatus, draftFilters.paymentDraftStatus)) return false
+  if (!includeField(row.approvalStatus, draftFilters.approvalStatus)) return false
+  return true
+}
+
+function clearSourceFilters() {
+  sourceQuickSearch.value = ''
+  Object.keys(sourceFilters).forEach((key) => { sourceFilters[key] = '' })
+  clearSourceSelection()
+}
+
+function clearDraftFilters() {
+  draftQuickSearch.value = ''
+  Object.keys(draftFilters).forEach((key) => { draftFilters[key] = '' })
+  clearDraftSelection()
+}
+
 function draftRowActions(row = {}) {
   return [
     '查看详情',
     { label: '提交付款申请', visible: row.paymentDraftStatus === 'draft' },
     { label: '审批付款申请', visible: row.paymentDraftStatus === 'submitted' },
     { label: '标记可付款', visible: row.paymentDraftStatus === 'approved' },
-    { label: row.paymentPrepareGenerated ? '查看付款预备' : '进入付款预备', visible: ['approved', 'paymentReady'].includes(row.paymentDraftStatus) },
+    { label: row.paymentPrepareGenerated ? '查看付款单准备' : '进入付款单准备', visible: ['approved', 'paymentReady'].includes(row.paymentDraftStatus) },
     { label: '取消草稿', visible: ['draft', 'submitted'].includes(row.paymentDraftStatus) },
   ]
 }
@@ -395,6 +534,52 @@ function handleDraftSortChange({ prop, order }) {
 
 function resetSourceSorting() { sourceSortState.value = { key: '', direction: 'asc' }; clearSourceSelection() }
 function resetDraftSorting() { draftSortState.value = { key: '', direction: 'asc' }; clearDraftSelection() }
+
+function csvEscape(value) {
+  return `"${String(value ?? '').replaceAll('"', '""')}"`
+}
+
+function exportSourceRows() {
+  const headers = ['应付账款草稿单号', '来源发票预备', '供应商', '采购订单', '应付金额', '未付金额', '状态']
+  const csv = [headers.join(',')]
+    .concat(sortedSourceRows.value.map((row) => [
+      row.apDraftNo,
+      row.sourceInvoicePrepareNo,
+      row.supplierName,
+      row.sourcePurchaseOrderNo,
+      row.totalPayableAmount,
+      row.unpaidAmount,
+      apStatusLabel(row.apStatus),
+    ].map(csvEscape).join(',')))
+    .join('\n')
+  downloadCsv(csv, 'supplier-payment-draft-sources.csv')
+}
+
+function exportDraftRows() {
+  const headers = ['付款草稿单号', '来源应付账款草稿', '供应商', '申请付款金额', '预计付款日期', '付款草稿状态', '审批状态', '付款状态']
+  const csv = [headers.join(',')]
+    .concat(sortedDraftRows.value.map((row) => [
+      row.paymentDraftNo,
+      row.sourceApDraftNo,
+      row.supplierName,
+      row.applyPayAmount,
+      row.expectedPayDate,
+      paymentDraftStatusLabel(row.paymentDraftStatus),
+      approvalStatusLabel(row.approvalStatus),
+      paymentStatusLabel(row.paymentStatus),
+    ].map(csvEscape).join(',')))
+    .join('\n')
+  downloadCsv(csv, 'supplier-payment-drafts.csv')
+}
+
+function downloadCsv(csv, filename) {
+  const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(link.href)
+}
 
 function nextBatchSuggestion(reasons = []) {
   const text = reasons.join('；')
@@ -557,6 +742,8 @@ h1, h2 { margin: 0; }
 .info-grid article { border: 1px solid #dbe3ef; border-radius: 8px; padding: 12px; background: #fff; }
 .info-grid strong { display: block; margin-top: 4px; }
 .batch-bar { border: 1px solid #dbe3ef; border-radius: 8px; padding: 10px; margin-bottom: 12px; background: #f8fafc; }
+.advanced-filter-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; padding: 10px; margin: 10px 0 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; }
+.advanced-filter-panel label { display: grid; gap: 5px; color: #334155; font-size: 12px; font-weight: 800; }
 .button-row .el-button, .batch-bar .el-button { min-width: 96px; white-space: nowrap; }
 .button-row .el-button--small, .batch-bar .el-button--small { min-width: 86px; }
 .button-row .el-button--primary, .button-row .el-button--success, .button-row .el-button--warning,

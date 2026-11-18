@@ -3,9 +3,11 @@
     <header class="page-header">
       <section>
         <p class="eyebrow">V1.12.9.3.1 WMS采购收货预备筛选修复</p>
-        <h1>{{ detail ? '采购收货预备单详情' : '采购收货预备单' }}</h1>
+        <h1 data-acceptance-id="page-business-title">{{ detail ? '采购收货预备单详情' : '采购收货预备' }}</h1>
         <p>本页只登记预计收货与待检信息，不直接增加库存、不生成库存入库流水、不生成应付。</p>
-        <p class="app-current-module-badge">当前操作模块：采购收货预备</p>
+        <p class="app-current-module-badge" data-acceptance-id="page-breadcrumb-current-title">
+          当前操作模块：<strong>采购收货预备</strong>
+        </p>
       </section>
       <nav class="page-tabs app-module-nav-zone">
         <span class="app-nav-zone-title">WMS收货流程导航</span>
@@ -39,8 +41,9 @@
               <el-button @click="goList(router, 'wms', 'purchaseReceives')">返回列表</el-button>
               <el-button @click="goParent(router, 'wms')">返回上级</el-button>
               <el-button v-if="hasSourceRoute(sourceRecord)" type="primary" @click="goSource(router, sourceRecord, notify)">{{ getSourceButtonLabel(sourceRecord) }}</el-button>
-              <el-button v-if="detail.status === 'received'" type="primary" @click="createInspection(detail)">生成来料检验单</el-button>
-              <el-button v-if="detail.status !== 'cancelled'" type="warning" @click="cancelReceive(detail)">取消风险较高</el-button>
+              <el-button v-if="!detail.formalAuthority && detail.status === 'received'" type="primary" @click="createInspection(detail)">生成来料检验单</el-button>
+              <el-button v-if="detail.status === 'inspectionPrepared'" type="primary" @click="goInspection(detail)">查看来料检验单</el-button>
+              <el-button v-if="!detail.formalAuthority && detail.status !== 'cancelled'" type="warning" @click="cancelReceive(detail)">取消风险较高</el-button>
             </div>
           </div>
         </template>
@@ -207,8 +210,13 @@
         </div>
       </el-card>
 
-      <el-card shadow="never">
-        <template #header><h2>采购收货预备单</h2></template>
+      <el-card
+        shadow="never"
+        data-acceptance-id="standard-list-toolbar"
+        data-pce-page-id="purchase-receive-preview"
+        data-pce-toolbar-for="purchase-receive-preview-main"
+      >
+        <template #header><h2 data-acceptance-id="page-internal-subject-title"><PceBusinessNameConsumer page-code="purchase-receive-preview" /></h2></template>
         <div class="toolbar">
           <el-button @click="quickSearchVisible = !quickSearchVisible">
             {{ quickSearchVisible ? '收起快速搜索' : '展开快速搜索' }}
@@ -217,27 +225,34 @@
         </div>
 
         <div v-if="quickSearchVisible" class="toolbar">
-          <el-autocomplete
-            v-model="keyword"
-            :fetch-suggestions="querySearchSuggestions"
-            placeholder="搜索收货单、供应商、物料、状态"
-            clearable
-            @select="handleSuggestionSelect"
-          />
+          <span data-acceptance-id="list-fuzzy-search-input">
+            <el-autocomplete
+              v-model="keyword"
+              :fetch-suggestions="querySearchSuggestions"
+              placeholder="搜索收货单、供应商、物料、状态"
+              clearable
+              @select="handleSuggestionSelect"
+            />
+          </span>
+          <el-button data-acceptance-id="list-fuzzy-search-button" @click="clearSelection">鎼滅储</el-button>
           <el-button @click="keyword = ''">重置快速搜索</el-button>
         </div>
 
         <div class="toolbar">
-          <el-button @click="resetSorting">清除排序</el-button>
+          <el-button data-acceptance-id="list-clear-sort-button" @click="resetSorting">清除排序</el-button>
+          <el-button type="success" data-acceptance-id="list-export-current-result-button" data-pce-export-for="purchase-receive-preview-main" @click="exportCurrentResults">导出当前结果</el-button>
+          <el-button type="primary" plain @click="copyDiagnosticData">复制诊断数据</el-button>
           <span class="sort-help">排序：点击表格表头字段可升序/降序排序；点击“清除排序”恢复默认顺序。</span>
           <span class="sort-help">{{ currentSortText }}</span>
-          <el-button @click="advancedFilterVisible = !advancedFilterVisible">
+          <span data-acceptance-id="list-result-count-visible">当前结果 {{ sortedReceives.length }} 条</span>
+          <span data-acceptance-id="business-flow-selected-count">已选择 {{ selectedRows.length }} 条</span>
+          <el-button data-acceptance-id="list-advanced-filter-toggle" data-pce-filter-toggle-for="purchase-receive-preview-main" :aria-expanded="String(advancedFilterVisible)" @click="advancedFilterVisible = !advancedFilterVisible">
             {{ advancedFilterVisible ? '收起高级筛选' : '展开高级筛选' }}
           </el-button>
-          <el-button @click="resetAdvancedFilters">重置</el-button>
+          <el-button data-acceptance-id="list-clear-filter-button" @click="clearAdvancedFilters">清空筛选</el-button>
         </div>
 
-        <div v-if="advancedFilterVisible" class="filter-grid">
+        <div v-if="advancedFilterVisible" class="filter-grid advanced-filter-panel" data-acceptance-id="list-advanced-filter-panel" data-pce-filter-for="purchase-receive-preview-main">
           <label v-for="field in advancedFilterFields" :key="field.key">
             <span>{{ field.label }}</span>
             <el-date-picker
@@ -269,14 +284,14 @@
           show-icon
           :closable="false"
         />
-        <div class="batch-bar">
+        <div class="batch-bar" data-pce-section="purchase-receive-batch-actions">
           <span>已选择 {{ selectedRows.length }} 条</span>
           <span>可提交收货 {{ receiveBatchCounts.submit }} 条</span>
           <span>可生成来料检验 {{ receiveBatchCounts.inspection }} 条</span>
           <span>将跳过 {{ selectedRows.length - activeBatchExecutableCount }} 条</span>
           <el-button size="small" @click="clearSelection">清空选择</el-button>
-          <el-button size="small" type="warning" :disabled="!receiveBatchCounts.submit" :title="receiveBatchCounts.submit ? '' : '所选记录没有可提交收货预备。'" @click="runBatchSubmit">批量提交收货预备</el-button>
-          <el-button size="small" type="success" :disabled="!receiveBatchCounts.inspection" :title="receiveInspectionDisabledReason" @click="runBatchInspection">批量生成来料检验</el-button>
+          <el-button size="small" type="warning" data-pce-action-id="submit-purchase-receives" :disabled="!receiveBatchCounts.submit" :title="receiveBatchCounts.submit ? '' : '所选记录没有可提交收货预备。'" @click="runBatchSubmit">批量提交收货预备</el-button>
+          <el-button size="small" type="success" data-pce-action-id="create-incoming-inspections" :disabled="!receiveBatchCounts.inspection" :title="receiveInspectionDisabledReason" @click="runBatchInspection">批量生成来料检验</el-button>
         </div>
         <div v-if="batchResult" class="batch-result" :class="batchMessageType">
           <button type="button" @click="batchResult = null">关闭</button>
@@ -293,51 +308,58 @@
             <span>下一步建议：{{ batchResult.nextSuggestion }}</span>
           </template>
         </div>
-        <el-table ref="listTableRef" :data="sortedReceives" border stripe height="520" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
-          <el-table-column type="selection" width="48" fixed="left" />
-          <el-table-column type="index" label="序号" width="70" fixed="left" />
-          <el-table-column prop="receiveNo" label="收货预备单号" min-width="170" sortable="custom" />
-          <el-table-column label="来源类型">
+        <BusinessTableScrollContainer acceptance-id="business-table-scroll-purchase-receive-preview-main" page-id="purchase-receive-preview" table-id="purchase-receive-preview-main">
+        <el-table ref="listTableRef" :data="sortedReceives" border stripe height="520" class="global-sort-arrow" scrollbar-always-on @selection-change="handleSelectionChange" @sort-change="handleSortChange">
+          <el-table-column type="selection" :selectable="(row) => !row.formalAuthority" width="48" fixed="left" class-name="business-table-selection-column" header-class-name="business-table-selection-column" />
+          <el-table-column type="index" label="序号" width="70" fixed="left" class-name="pce-fixed-index-column" header-class-name="pce-fixed-index-column" />
+          <el-table-column prop="receiveNo" label="收货预备单号" min-width="170" fixed="left" sortable="custom" class-name="pce-fixed-primary-no-column" header-class-name="pce-fixed-primary-no-column" />
+          <el-table-column prop="sourceType" label="来源类型" sortable="custom">
             <template #default="{ row }">{{ sourceTypeLabel(row.sourceType) }}</template>
           </el-table-column>
           <el-table-column prop="sourceOrderNo" label="来源采购订单号" min-width="150" sortable="custom" />
-          <el-table-column prop="sourceTaskNo" label="来源仓库任务号" min-width="150" />
-          <el-table-column prop="rootRequestNo" label="原始请购单号" min-width="150" />
+          <el-table-column prop="sourceTaskNo" label="来源仓库任务号" min-width="150" sortable="custom" />
+          <el-table-column prop="rootRequestNo" label="原始请购单号" min-width="150" sortable="custom" />
           <el-table-column prop="supplierName" label="供应商" sortable="custom" />
-          <el-table-column prop="receiverName" label="收货人" />
-          <el-table-column prop="warehouseName" label="仓库" />
-          <el-table-column prop="locationNames" label="库位" min-width="130" />
-          <el-table-column prop="batchNos" label="批号" min-width="140" />
-          <el-table-column prop="materialCodes" label="物料编码" min-width="150" />
-          <el-table-column prop="materialNames" label="物料名称" min-width="170" />
+          <el-table-column prop="receiverName" label="收货人" sortable="custom" />
+          <el-table-column prop="warehouseName" label="仓库" sortable="custom" />
+          <el-table-column prop="locationNames" label="库位" min-width="130" sortable="custom" />
+          <el-table-column prop="batchNos" label="批号" min-width="140" sortable="custom" />
+          <el-table-column prop="materialCodes" label="物料编码" min-width="150" sortable="custom" />
+          <el-table-column prop="materialNames" label="物料名称" min-width="170" sortable="custom" />
+          <el-table-column prop="totalOrderQty" label="数量" width="100" sortable="custom" />
+          <el-table-column prop="totalActualReceiveQty" label="收货数量" width="110" sortable="custom" />
           <el-table-column prop="plannedArrivalDate" label="计划到货日期" sortable="custom" />
           <el-table-column prop="actualReceiveDate" label="实际到货日期" sortable="custom" />
-          <el-table-column prop="submitStatus" label="是否已提交收货" min-width="130" />
-          <el-table-column prop="inspectionStatus" label="是否已生成来料检验" min-width="150" />
-          <el-table-column prop="deliveryNoteNo" label="送货单号" min-width="140" />
+          <el-table-column prop="submitStatus" label="是否已提交收货" min-width="130" sortable="custom" />
+          <el-table-column prop="inspectionStatus" label="是否已生成来料检验" min-width="150" sortable="custom" />
+          <el-table-column prop="deliveryNoteNo" label="送货单号" min-width="140" sortable="custom" />
           <el-table-column prop="status" label="收货状态" sortable="custom">
             <template #default="{ row }"><el-tag :type="statusType(row.status)">{{ statusLabel(row.status) }}</el-tag></template>
           </el-table-column>
-          <el-table-column prop="remark" label="备注" min-width="180" />
-          <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(['详情', '生成检验预备', '查看来料检验', '取消'])">
+          <el-table-column prop="createdAt" label="生成时间" min-width="150" sortable="custom" />
+          <el-table-column prop="remark" label="备注" min-width="180" sortable="custom" />
+          <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(['详情', '生成检验预备', '查看来料检验', '取消'])" class-name="payment-fixed-action-column" header-class-name="payment-fixed-action-column">
             <template #default="{ row }">
               <div class="app-action-cell">
                 <el-button size="small" class="app-action-button-sm" @click="router.push(`/wms/purchase-receive/${row.id}`)">详情</el-button>
-                <el-button v-if="row.status === 'received'" size="small" class="app-action-button-md" type="primary" @click="createInspection(row)">生成检验预备</el-button>
+                <el-button v-if="!row.formalAuthority && row.status === 'received'" size="small" class="app-action-button-md" type="primary" @click="createInspection(row)">生成检验预备</el-button>
                 <el-button v-if="row.status === 'inspectionPrepared'" size="small" class="app-action-button-md" @click="goInspection(row)">查看来料检验</el-button>
-                <el-button v-if="row.status !== 'cancelled'" size="small" class="app-action-button-sm" @click="cancelReceive(row)">取消</el-button>
+                <el-button v-if="!row.formalAuthority && row.status !== 'cancelled'" size="small" class="app-action-button-sm" @click="cancelReceive(row)">取消</el-button>
               </div>
             </template>
           </el-table-column>
         </el-table>
+        </BusinessTableScrollContainer>
       </el-card>
     </section>
   </main>
 </template>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue'
+import PceBusinessNameConsumer from '../components/PceBusinessNameConsumer.vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import BusinessTableScrollContainer from '../components/BusinessTableScrollContainer.vue'
 import {
   beginEditPurchaseReceive,
   batchCreateIncomingInspectionsFromReceives,
@@ -356,6 +378,8 @@ import { listIncomingInspections } from '../qms/qmsStore.js'
 import { getActionColumnWidth } from '../runtime/tableActionColumnEngine.js'
 import { buildMultiFieldSuggestions, filterSuggestions } from '../runtime/filterSuggestionEngine.js'
 import { sortRecords } from '../runtime/tableSortEngine.js'
+import { exportRowsToCsv as exportRowsToCsvUtil } from '../manufacturing/foundationTableUtils.js'
+import { formalExecutionApi } from '@/api/formalExecution.js'
 import {
   getSourceButtonLabel,
   goList,
@@ -373,6 +397,7 @@ const messageType = ref('success')
 const sortState = ref({ key: '', direction: 'asc' })
 const selectedRows = ref([])
 const listTableRef = ref(null)
+const copyStatus = ref('')
 const batchResult = ref(null)
 const batchMessageType = ref('success')
 const editMode = ref(false)
@@ -381,7 +406,11 @@ const quickSearchVisible = ref(false)
 const advancedFilterVisible = ref(false)
 const advancedFilters = reactive(defaultAdvancedFilters())
 
-const detail = computed(() => route.params.id ? getPurchaseReceiveById(route.params.id) : null)
+const detail = computed(() => {
+  const id = route.params.id
+  if (!id) return null
+  return receives.value.find((record) => String(record.id) === String(id)) || null
+})
 const sourceRecord = computed(() => detail.value ? {
   sourceType: detail.value.sourceType,
   sourceOrderId: detail.value.sourceOrderId,
@@ -389,8 +418,8 @@ const sourceRecord = computed(() => detail.value ? {
 } : {})
 const candidateTasks = computed(() => getWarehouseTasks().filter((item) => item.taskType === 'purchaseReceive' && item.status !== 'cancelled'))
 const candidateOrders = computed(() => getReceivableScmPurchaseOrders())
-const canEditDetail = computed(() => detail.value && ['prepared', 'receiving'].includes(detail.value.status))
-const canSubmitDetail = computed(() => detail.value && ['prepared', 'receiving'].includes(detail.value.status))
+const canEditDetail = computed(() => detail.value && !detail.value.formalAuthority && ['prepared', 'receiving'].includes(detail.value.status))
+const canSubmitDetail = computed(() => detail.value && !detail.value.formalAuthority && ['prepared', 'receiving'].includes(detail.value.status))
 const detailLines = computed(() => editMode.value ? editDraft.value.lines || [] : detail.value?.lines || [])
 const displayReceives = computed(() => receives.value.map(enrichReceiveRow))
 const filteredReceives = computed(() => {
@@ -402,22 +431,54 @@ const filteredReceives = computed(() => {
 })
 const receiveSortColumns = [
   { key: 'receiveNo', sortType: 'string' },
+  { key: 'sourceType', sortType: 'string' },
   { key: 'sourceOrderNo', sortType: 'string' },
+  { key: 'sourceTaskNo', sortType: 'string' },
+  { key: 'rootRequestNo', sortType: 'string' },
   { key: 'supplierName', sortType: 'string' },
+  { key: 'receiverName', sortType: 'string' },
+  { key: 'warehouseName', sortType: 'string' },
+  { key: 'locationNames', sortType: 'string' },
+  { key: 'batchNos', sortType: 'string' },
+  { key: 'materialCodes', sortType: 'string' },
+  { key: 'materialNames', sortType: 'string' },
+  { key: 'totalOrderQty', sortType: 'number' },
+  { key: 'totalActualReceiveQty', sortType: 'number' },
   { key: 'plannedArrivalDate', sortType: 'date' },
   { key: 'actualReceiveDate', sortType: 'date' },
+  { key: 'submitStatus', sortType: 'string' },
+  { key: 'inspectionStatus', sortType: 'string' },
+  { key: 'deliveryNoteNo', sortType: 'string' },
   { key: 'status', sortType: 'status' },
+  { key: 'createdAt', sortType: 'date' },
+  { key: 'remark', sortType: 'string' },
 ]
 const sortedReceives = computed(() => sortRecords(filteredReceives.value, sortState.value, receiveSortColumns))
 const currentSortText = computed(() => {
   if (!sortState.value.key) return '当前排序：默认顺序'
   const labels = {
     receiveNo: '收货预备单号',
+    sourceType: '来源类型',
     sourceOrderNo: '来源采购订单号',
+    sourceTaskNo: '来源仓库任务号',
+    rootRequestNo: '原始请购单号',
     supplierName: '供应商',
+    receiverName: '收货人',
+    warehouseName: '仓库',
+    locationNames: '库位',
+    batchNos: '批号',
+    materialCodes: '物料编码',
+    materialNames: '物料名称',
+    totalOrderQty: '数量',
+    totalActualReceiveQty: '收货数量',
     plannedArrivalDate: '计划到货日期',
     actualReceiveDate: '实际到货日期',
+    submitStatus: '是否已提交收货',
+    inspectionStatus: '是否已生成来料检验',
+    deliveryNoteNo: '送货单号',
     status: '收货状态',
+    createdAt: '生成时间',
+    remark: '备注',
   }
   return `当前排序：${labels[sortState.value.key] || sortState.value.key} / ${sortState.value.direction === 'desc' ? '降序' : '升序'}`
 })
@@ -435,29 +496,62 @@ const receiveInspectionDisabledReason = computed(() => {
   return '所选记录没有可生成来料检验的已收货单据。'
 })
 const advancedFilterFields = [
-  { key: 'receiveNo', label: '收货预备单号', type: 'text' },
-  { key: 'sourceOrderNo', label: '来源采购订单号', type: 'text' },
-  { key: 'sourceTaskNo', label: '来源仓库任务号', type: 'text' },
-  { key: 'rootRequestNo', label: '原始请购单号', type: 'text' },
-  { key: 'supplierName', label: '供应商', type: 'text' },
-  { key: 'receiverName', label: '收货人', type: 'text' },
-  { key: 'warehouseName', label: '仓库', type: 'text' },
-  { key: 'locationNames', label: '库位', type: 'text' },
-  { key: 'batchNos', label: '批号', type: 'text' },
-  { key: 'materialCodes', label: '物料编码', type: 'text' },
-  { key: 'materialNames', label: '物料名称', type: 'text' },
+  { key: 'receiveNo', label: '收货预备单号', type: 'enum' },
+  { key: 'sourceOrderNo', label: '来源采购订单号', type: 'enum' },
+  { key: 'sourceTaskNo', label: '来源仓库任务号', type: 'enum' },
+  { key: 'rootRequestNo', label: '原始请购单号', type: 'enum' },
+  { key: 'supplierName', label: '供应商', type: 'enum' },
+  { key: 'receiverName', label: '收货人', type: 'enum' },
+  { key: 'warehouseName', label: '仓库', type: 'enum' },
+  { key: 'locationNames', label: '库位', type: 'enum' },
+  { key: 'batchNos', label: '批号', type: 'enum' },
+  { key: 'materialCodes', label: '物料编码', type: 'enum' },
+  { key: 'materialNames', label: '物料名称', type: 'enum' },
   { key: 'plannedArrivalDate', label: '计划到货日期范围', type: 'date' },
   { key: 'actualReceiveDate', label: '实际到货日期范围', type: 'date' },
   { key: 'status', label: '收货状态', type: 'enum' },
   { key: 'submitStatus', label: '是否已提交收货', type: 'enum' },
   { key: 'inspectionStatus', label: '是否已生成来料检验', type: 'enum' },
-  { key: 'deliveryNoteNo', label: '送货单号', type: 'text' },
+  { key: 'deliveryNoteNo', label: '送货单号', type: 'enum' },
   { key: 'remark', label: '备注', type: 'text' },
 ]
+const exportColumns = [
+  { key: 'sourceOrderNo', label: '采购订单号' },
+  { key: 'rootRequestNo', label: '来源请购单号' },
+  { key: 'supplierName', label: '供应商' },
+  { key: 'materialCodes', label: '物料编码' },
+  { key: 'materialNames', label: '物料名称' },
+  { key: 'specs', label: '规格型号' },
+  { key: 'units', label: '单位' },
+  { key: 'totalOrderQty', label: '数量' },
+  { key: 'totalActualReceiveQty', label: '收货数量' },
+  { key: 'warehouseName', label: '仓库' },
+  { key: 'statusText', label: '状态' },
+  { key: 'arrivalDate', label: '到货日期 / 计划日期' },
+  { key: 'remark', label: '备注' },
+]
+const sortableColumns = receiveSortColumns.map((item) => item.key)
+const diagnosticData = computed(() => ({
+  page: 'purchase-receive-preview',
+  version: 'V1.13.29.3.2',
+  filterState: {
+    quickSearch: keyword.value,
+    advancedFilters: { ...advancedFilters },
+  },
+  sortState: { ...sortState.value },
+  resultCount: sortedReceives.value.length,
+  selectedCount: selectedRows.value.length,
+  exportEnabled: true,
+  sortableColumns,
+  sortArrowStyle: 'no-tail-bold-arrow',
+  sortArrowShape: 'upright-triangle',
+  timestamp: new Date().toISOString(),
+}))
 const detailFields = computed(() => detail.value ? [
   { label: '收货预备单号', value: detail.value.receiveNo },
   { label: '来源类型', value: sourceTypeLabel(detail.value.sourceType) },
   { label: '来源采购订单号', value: detail.value.sourceOrderNo || '-' },
+  { label: '来源核价单号', value: detail.value.sourcePriceApprovalNo || '-' },
   { label: '原始请购单号', value: detail.value.rootRequestNo || '-' },
   { label: '请购部门', value: detail.value.requestDepartment || '-' },
   { label: '需求部门', value: detail.value.demandDepartment || '-' },
@@ -514,8 +608,37 @@ function syncEditDraft() {
   editDraft.value = cloneDraft(detail.value)
 }
 
-function refresh() {
-  receives.value = listPurchaseReceives()
+function adaptFormalReceipt(row = {}) {
+  const quantity = Number(row.quantity || 0)
+  return {
+    ...row,
+    sourceType: 'formalPurchaseReceipt',
+    plannedArrivalDate: row.receiptDate || '',
+    actualReceiveDate: row.receiptDate || '',
+    totalOrderQty: quantity,
+    totalActualReceiveQty: quantity,
+    totalPlanAmount: Number(row.amount || 0),
+    totalActualAmount: Number(row.amount || 0),
+    settlementReady: ['received', 'closed'].includes(row.status),
+    inspectionPrepared: Number(row.inspectionCount || 0) > 0,
+    lines: Array.isArray(row.lines) ? row.lines : [],
+    formalAuthority: true,
+    authoritySource: 'procurement.PurchaseReceipt',
+  }
+}
+
+async function refresh() {
+  const response = await formalExecutionApi.purchaseReceiptFacts()
+  if (!response?.success) {
+    receives.value = []
+    notify(response?.error?.message || '正式采购收货事实读取失败', 'error')
+    return
+  }
+  const formalRows = (response.data?.receipts || []).map(adaptFormalReceipt)
+  const allowedDrafts = listPurchaseReceives()
+    .filter((row) => ['prepared', 'receiving'].includes(row.status))
+    .map((row) => ({ ...row, draftAuthority: 'DRAFT_ALLOWED', formalAuthority: false }))
+  receives.value = [...formalRows, ...allowedDrafts]
 }
 
 function notify(text, type = 'success') {
@@ -589,6 +712,7 @@ function sourceTypeLabel(type) {
   return {
     warehouseTask: '仓库任务',
     scmPurchaseOrder: 'SCM采购订单',
+    formalPurchaseReceipt: '正式采购收货',
   }[type] || type || '-'
 }
 
@@ -641,6 +765,10 @@ function enrichReceiveRow(row = {}) {
     batchNos: uniqueJoin(lines.map((line) => line.batchNo)),
     materialCodes: uniqueJoin(lines.map((line) => line.materialCode)),
     materialNames: uniqueJoin(lines.map((line) => line.materialName)),
+    specs: uniqueJoin(lines.map((line) => line.spec)),
+    units: uniqueJoin(lines.map((line) => line.unit)),
+    statusText: statusLabel(row.status),
+    arrivalDate: actualDate || row.plannedArrivalDate || row.expectedReceiveDate || uniqueJoin(lines.map((line) => line.expectedDeliveryDate)),
     submitStatus: ['received', 'inspectionPrepared', 'closed'].includes(row.status) ? '已提交' : '未提交',
     inspectionStatus: row.status === 'inspectionPrepared' ? '已生成' : '未生成',
   }
@@ -682,7 +810,7 @@ function filterOptions(field) {
   return values.map((value) => ({ label: field.key === 'status' ? statusLabel(value) : String(value), value: String(value) }))
 }
 
-function resetAdvancedFilters() {
+function clearAdvancedFilters() {
   Object.assign(advancedFilters, defaultAdvancedFilters())
   keyword.value = ''
   currentPageToFirst()
@@ -742,6 +870,46 @@ function handleSuggestionSelect(item) {
   keyword.value = item.value
 }
 
+function todayStamp() {
+  return new Date().toISOString().slice(0, 10).replaceAll('-', '')
+}
+
+function exportCurrentResults() {
+  exportRowsToCsvUtil(sortedReceives.value, exportColumns, `purchase-receive-preview-${todayStamp()}.csv`)
+  notify(`已导出当前筛选结果 ${sortedReceives.value.length} 条`)
+}
+
+async function copyDiagnosticData() {
+  const text = JSON.stringify(diagnosticData.value, null, 2)
+  try {
+    if (navigator?.clipboard?.writeText) await navigator.clipboard.writeText(text)
+    else fallbackCopy(text)
+    copyStatus.value = '已复制诊断数据'
+    notify('已复制诊断数据')
+  } catch (error) {
+    try {
+      fallbackCopy(text)
+      copyStatus.value = '已复制诊断数据'
+      notify('已复制诊断数据')
+    } catch (fallbackError) {
+      copyStatus.value = '复制失败，请重试'
+      notify('复制失败，请重试', 'warning')
+    }
+  }
+}
+
+function fallbackCopy(text) {
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', 'readonly')
+  textarea.style.position = 'fixed'
+  textarea.style.left = '-9999px'
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
+}
+
 function createFromFirstTask() {
   const task = candidateTasks.value[0]
   if (!task) return notify('暂无可用仓库任务', 'warning')
@@ -760,11 +928,16 @@ function createFromFirstOrder() {
   notify(`${outcome.existed ? '已存在' : '已生成'}采购收货预备单 ${outcome.receiveNo}，库存余额不变`)
 }
 
-function createInspection(row) {
+async function createInspection(row) {
   const outcome = createInspectionPreviewFromPurchaseReceive(row.id)
   if (!outcome.success) return notify(outcome.error, 'warning')
   refresh()
-  notify(`${outcome.existed ? '已存在' : '已生成'}来料检验单 ${outcome.inspectionNo}，库存余额不变`)
+  await nextTick()
+  const target = listIncomingInspections().find((item) => String(item.id) === String(outcome.inspectionId))
+  if (!target || detail.value?.status !== 'inspectionPrepared') {
+    return notify('来料检验单生成结果校验失败，请勿重复生成', 'error')
+  }
+  notify(`${outcome.status === 'already_exists' ? '已存在' : '已生成'}来料检验单 ${outcome.inspectionNo}，库存余额不变`)
 }
 
 function goInspection(row) {
@@ -792,7 +965,7 @@ function saveDraft() {
   notify('收货预备已保存')
 }
 
-function submitDraft() {
+async function submitDraft() {
   if (!detail.value) return
   const payload = editMode.value ? buildDraftPayload() : detail.value
   const outcome = submitPurchaseReceive(detail.value.id, payload)
@@ -800,6 +973,11 @@ function submitDraft() {
   refresh()
   editMode.value = false
   editDraft.value = cloneDraft(outcome.receive)
+  await nextTick()
+  const refreshed = detail.value
+  if (!refreshed || refreshed.status !== 'received' || Number(refreshed.totalActualReceiveQty) !== Number(outcome.actualReceivedQuantity)) {
+    return notify('采购收货预备提交结果校验失败，请勿重复提交', 'error')
+  }
   notify('收货预备已提交，库存余额不变')
 }
 
@@ -813,7 +991,7 @@ function cancelReceive(row) {
 watch(() => route.fullPath, () => {
   refresh()
   editMode.value = false
-  quickSearchVisible.value = false
+  quickSearchVisible.value = true
   advancedFilterVisible.value = false
   syncEditDraft()
 }, { immediate: true })

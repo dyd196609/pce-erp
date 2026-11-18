@@ -1,9 +1,15 @@
 import datetime
 import json
+import hashlib
 import jwt
+import logging
+import secrets
+import uuid
+from pathlib import Path
 
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.core.cache import cache
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import Group
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -28,6 +34,123 @@ from .models import (
     Process,
 )
 from .serializers import MenuSerializer
+from .authorization import user_access_profile
+from pce_backend.identity_context import jwt_identity_claims
+
+
+logger = logging.getLogger(__name__)
+
+AUTH_HANDOFF_TTL_SECONDS = 60
+AUTH_HANDOFF_CACHE_PREFIX = "pce:tab-auth-handoff:v1:"
+
+
+def _authentication_runtime_fingerprint():
+    """Return a non-secret correlation fingerprint for server-side diagnosis."""
+    configured = Path(settings.DATABASES["default"]["NAME"]).resolve()
+    return hashlib.sha256(str(configured).encode("utf-8")).hexdigest()[:16]
+
+
+def _jwt_for_user(user):
+    payload = {
+        "user_id": user.id,
+        **jwt_identity_claims(user),
+        "exp": datetime.datetime.utcnow()
+        + datetime.timedelta(hours=settings.JWT_EXPIRATION_HOURS),
+    }
+    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm="HS256")
+
+
+def _user_payload(user):
+    return {
+        "id": user.id,
+        "username": user.username,
+        "real_name": user.real_name,
+        "email": user.email,
+        "mobile": user.mobile,
+        "company_id": user.company_id,
+        "access": user_access_profile(user),
+    }
+
+
+def _handoff_cache_key(code):
+    digest = hashlib.sha256(str(code).encode("utf-8")).hexdigest()
+    return f"{AUTH_HANDOFF_CACHE_PREFIX}{digest}"
+
+
+def _legal_handoff_target(value):
+    target = str(value or "").strip()
+    return target.startswith("/") and not target.startswith("//") and "://" not in target
+
+
+class TabAuthenticationHandoffIssueView(APIView):
+    """Issue a short-lived opaque code to an already authenticated tab."""
+
+    def post(self, request):
+        target_path = str(request.data.get("targetPath") or "").strip()
+        if not _legal_handoff_target(target_path):
+            return Response(
+                {"error": "新标签目标必须是当前系统内的合法路径。"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        code = secrets.token_urlsafe(32)
+        cache.set(
+            _handoff_cache_key(code),
+            {
+                "userId": request.user.pk,
+                "companyId": request.user.company_id,
+                "credentialContext": jwt_identity_claims(request.user),
+                "targetPath": target_path,
+            },
+            timeout=AUTH_HANDOFF_TTL_SECONDS,
+        )
+        return Response({
+            "handoffCode": code,
+            "targetPath": target_path,
+            "expiresInSeconds": AUTH_HANDOFF_TTL_SECONDS,
+        })
+
+
+class TabAuthenticationHandoffExchangeView(APIView):
+    """Consume a single-use code and establish only the receiving tab's JWT."""
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        code = str(request.data.get("handoffCode") or "").strip()
+        target_path = str(request.data.get("targetPath") or "").strip()
+        if not code or not _legal_handoff_target(target_path):
+            return Response(
+                {"error": "新标签身份衔接信息无效。"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        key = _handoff_cache_key(code)
+        handoff = cache.get(key)
+        # Delete before further validation so every presented code is one-shot.
+        cache.delete(key)
+        if not isinstance(handoff, dict) or handoff.get("targetPath") != target_path:
+            return Response(
+                {"error": "新标签身份衔接已失效或已经使用，请从业务流程中心重新打开。"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        user = User.objects.filter(
+            pk=handoff.get("userId"), company_id=handoff.get("companyId"), is_active=True,
+        ).first()
+        if not user or not Company.objects.filter(pk=user.company_id, is_active=True).exists():
+            return Response(
+                {"error": "原登录身份已失效，请重新登录。"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        if jwt_identity_claims(user) != handoff.get("credentialContext"):
+            return Response(
+                {"error": "原登录权限上下文已变化，请重新登录。"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        return Response({
+            "token": _jwt_for_user(user),
+            "user": _user_payload(user),
+            "targetPath": target_path,
+        })
 
 
 class LoginView(APIView):
@@ -63,23 +186,14 @@ class LoginView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
-        payload = {
-            "user_id": user.id,
-            "username": user.username,
-            "exp": datetime.datetime.utcnow()
-            + datetime.timedelta(hours=settings.JWT_EXPIRATION_HOURS),
-        }
+        if not Company.objects.filter(pk=user.company_id, is_active=True).exists():
+            return Response(
+                {"error": "所属公司已退出有效经营范围，请联系管理员纠正登录范围"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
-        token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm="HS256")
-
-        user_data = {
-            "id": user.id,
-            "username": user.username,
-            "real_name": user.real_name,
-            "email": user.email,
-            "mobile": user.mobile,
-            "company_id": user.company_id,
-        }
+        token = _jwt_for_user(user)
+        user_data = _user_payload(user)
 
         return Response({"token": token, "user": user_data})
 
@@ -87,6 +201,7 @@ class LoginView(APIView):
 @csrf_exempt
 @require_http_methods(["POST"])
 def api_login(request):
+    request_id = uuid.uuid4().hex
     try:
         data = json.loads(request.body)
         username = data.get("username")
@@ -98,27 +213,39 @@ def api_login(request):
         user = authenticate(request, username=username, password=password)
 
         if user is None:
+            candidate = User.objects.filter(username=username).only(
+                "id", "is_active", "company_id", "password",
+            ).first()
+            logger.warning(
+                "authentication_rejected request_id=%s account_id=%s active=%s "
+                "company_id=%s password_algorithm=%s database_fingerprint=%s",
+                request_id,
+                candidate.pk if candidate else None,
+                candidate.is_active if candidate else None,
+                candidate.company_id if candidate else None,
+                (
+                    candidate.password.split("$", 1)[0]
+                    if candidate and "$" in candidate.password else "unavailable"
+                ),
+                _authentication_runtime_fingerprint(),
+            )
             return JsonResponse({"error": "用户名或密码错误"}, status=401)
 
+        if not Company.objects.filter(pk=user.company_id, is_active=True).exists():
+            return JsonResponse(
+                {"error": "所属公司已退出有效经营范围，请联系管理员纠正登录范围"},
+                status=401,
+            )
+
         login(request, user)
+        logger.info(
+            "authentication_succeeded request_id=%s account_id=%s company_id=%s "
+            "database_fingerprint=%s",
+            request_id, user.pk, user.company_id, _authentication_runtime_fingerprint(),
+        )
 
-        payload = {
-            "user_id": user.id,
-            "username": user.username,
-            "exp": datetime.datetime.utcnow()
-            + datetime.timedelta(hours=settings.JWT_EXPIRATION_HOURS),
-        }
-
-        token = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm="HS256")
-
-        user_data = {
-            "id": user.id,
-            "username": user.username,
-            "real_name": user.real_name,
-            "email": user.email,
-            "mobile": user.mobile,
-            "company_id": user.company_id,
-        }
+        token = _jwt_for_user(user)
+        user_data = _user_payload(user)
 
         return JsonResponse(
             {
@@ -128,8 +255,22 @@ def api_login(request):
             }
         )
 
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+    except Exception:
+        logger.exception("authentication_error request_id=%s", request_id)
+        return JsonResponse({"error": "登录服务暂时不可用，请联系管理员。"}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_logout(request):
+    """Terminate the legacy Django session paired with a browser-held JWT.
+
+    JWT removal remains a client responsibility. Formal APIs authenticate only
+    the active tab's bearer token; clearing this cookie is retained as defense
+    in depth for non-DRF and older endpoints.
+    """
+    logout(request)
+    return JsonResponse({"success": True})
 
 
 @csrf_exempt
@@ -392,26 +533,25 @@ def my_menus(request):
 
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
-        username = payload.get("username")
+        user_id = payload.get("user_id")
     except Exception as e:
         return JsonResponse(
             {"success": False, "error": f"token 无效：{str(e)}"},
             status=401,
         )
 
-    if username == "admin":
-        role_code = "superadmin"
-    else:
-        role_code = "employee"
-
     try:
-        role = Role.objects.get(code=role_code)
-    except Role.DoesNotExist:
-        return JsonResponse({"success": False, "error": "未找到用户角色"}, status=404)
+        user = User.objects.get(pk=user_id, is_active=True)
+    except User.DoesNotExist:
+        return JsonResponse({"success": False, "error": "未找到有效登录账户"}, status=404)
 
-    menu_ids = list(
-        RoleMenu.objects.filter(role=role).values_list("menu_id", flat=True)
-    )
+    if user.is_superuser:
+        menu_ids = list(Menu.objects.filter(is_active=True).values_list("id", flat=True))
+    else:
+        role_codes = user_access_profile(user)["roles"]
+        menu_ids = list(RoleMenu.objects.filter(
+            role__code__in=role_codes,
+        ).values_list("menu_id", flat=True).distinct())
 
     menus = Menu.objects.filter(
         id__in=menu_ids,

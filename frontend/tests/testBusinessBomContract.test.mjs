@@ -1,0 +1,7 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import {listPceBusinessActionContracts,resolvePceBusinessActions} from '../src/meta/runtime/pceBusinessActionRegistry.js'
+import {listPceBusinessActionContracts as originalContracts} from 'file:///D:/Dev-PCE/Source/frontend/src/meta/runtime/pceBusinessActionRegistry.js'
+test('existing contracts preserved',()=>{const current=new Map(listPceBusinessActionContracts().map(c=>[c.currentModule,c]));for(const before of originalContracts())assert.deepEqual(current.get(before.currentModule),before)})
+test('generation requires server permission, ready state and eligibility',()=>{const base={currentModule:'bom-management',currentStatus:'ready',permissions:['pce.action.bom-management.generate-test-business-bom'],eligibility:true};assert.equal(resolvePceBusinessActions(base).availableActions.length,1);for(const change of [{permissions:[]},{currentStatus:'blocked'},{eligibility:false}])assert.equal(resolvePceBusinessActions({...base,...change}).availableActions.length,0)})
+test('copy reuses maintenance authority and denies released state',()=>{const base={currentModule:'bom-management',currentStatus:'draft',permissions:['pce.action.bom-management.derive-test-business-bom']};assert.equal(resolvePceBusinessActions(base).availableActions[0].serverPermission,'production.master_data.bom.maintain');assert.equal(resolvePceBusinessActions({...base,currentStatus:'released'}).availableActions.length,0)})

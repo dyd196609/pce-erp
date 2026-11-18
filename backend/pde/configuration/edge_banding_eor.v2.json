@@ -1,0 +1,351 @@
+{
+  "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+  "companyId": 1,
+  "modes": [],
+  "rules": [
+    {
+      "ruleCode": "EDGE-BANDING-SOURCE25.PCT11",
+      "ruleName": "封边皮25净长度承接精裁后封边 / QSFB/FM",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "EDGE-BANDING-LENGTH",
+          "version": "V2"
+        },
+        "expression": "EdgeBandingLength",
+        "inputs": [
+          {
+            "canonicalName": "EdgeBandingLength",
+            "sourceCanonicalField": "Z",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m",
+            "unitDimension": "length",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "edge_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m",
+            "unitDimension": "length",
+            "uomId": 17,
+            "operationId": 5,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "SOURCE25"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-LENGTH",
+          "modeVersion": "V1",
+          "capacityUsageScope": {
+            "contractVersion": "PCE-MANUFACTURING-CAPACITY-SCOPE-V1",
+            "usageScope": "ENGINEERING_EOR_ONLY",
+            "version": "V2",
+            "businessFactReference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+            "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94"
+          },
+          "workCenterId": 6,
+          "standardCapacityCode": "SC-EDGE-LENGTH-PCT11-V2",
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "Z",
+            "producerRuleId": 11,
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "resultScope": "original"
+            },
+            "objectTraceKeys": [
+              "baselineId",
+              "baselineItemId",
+              "baselineContentHash",
+              "designItemId",
+              "sourceAttributeId"
+            ]
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "EDGE-BANDING-SOURCE50.PCT11",
+      "ruleName": "封边皮50净长度承接精裁后封边 / QSFB/FM",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "EDGE-BANDING-LENGTH",
+          "version": "V2"
+        },
+        "expression": "EdgeBandingLength",
+        "inputs": [
+          {
+            "canonicalName": "EdgeBandingLength",
+            "sourceCanonicalField": "AA",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m",
+            "unitDimension": "length",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "edge_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m",
+            "unitDimension": "length",
+            "uomId": 17,
+            "operationId": 5,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "SOURCE50"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-LENGTH",
+          "modeVersion": "V1",
+          "capacityUsageScope": {
+            "contractVersion": "PCE-MANUFACTURING-CAPACITY-SCOPE-V1",
+            "usageScope": "ENGINEERING_EOR_ONLY",
+            "version": "V2",
+            "businessFactReference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+            "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94"
+          },
+          "workCenterId": 6,
+          "standardCapacityCode": "SC-EDGE-LENGTH-PCT11-V2",
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "AA",
+            "producerRuleId": 11,
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "resultScope": "original"
+            },
+            "objectTraceKeys": [
+              "baselineId",
+              "baselineItemId",
+              "baselineContentHash",
+              "designItemId",
+              "sourceAttributeId"
+            ]
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "EDGE-BANDING-STRUCTURAL.PCT15",
+      "ruleName": "结构封边净长度承接精裁后封边 / BTKF/SM",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "EDGE-BANDING-LENGTH",
+          "version": "V2"
+        },
+        "expression": "EdgeBandingLength",
+        "inputs": [
+          {
+            "canonicalName": "EdgeBandingLength",
+            "sourceCanonicalField": "R",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m",
+            "unitDimension": "length",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "edge_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m",
+            "unitDimension": "length",
+            "uomId": 17,
+            "operationId": 5,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "STRUCTURAL"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-LENGTH",
+          "modeVersion": "V1",
+          "capacityUsageScope": {
+            "contractVersion": "PCE-MANUFACTURING-CAPACITY-SCOPE-V1",
+            "usageScope": "ENGINEERING_EOR_ONLY",
+            "version": "V2",
+            "businessFactReference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+            "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94"
+          },
+          "workCenterId": 6,
+          "standardCapacityCode": "SC-EDGE-LENGTH-PCT15-V2",
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "R",
+            "producerRuleId": 11,
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "resultScope": "original"
+            },
+            "objectTraceKeys": [
+              "baselineId",
+              "baselineItemId",
+              "baselineContentHash",
+              "designItemId",
+              "sourceAttributeId"
+            ]
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "EDGE-BANDING-STRUCTURAL.PCT28",
+      "ruleName": "结构封边净长度承接精裁后封边 / BTKF/GT",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "EDGE-BANDING-LENGTH",
+          "version": "V2"
+        },
+        "expression": "EdgeBandingLength",
+        "inputs": [
+          {
+            "canonicalName": "EdgeBandingLength",
+            "sourceCanonicalField": "R",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m",
+            "unitDimension": "length",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "edge_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m",
+            "unitDimension": "length",
+            "uomId": 17,
+            "operationId": 5,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "STRUCTURAL"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-LENGTH",
+          "modeVersion": "V1",
+          "capacityUsageScope": {
+            "contractVersion": "PCE-MANUFACTURING-CAPACITY-SCOPE-V1",
+            "usageScope": "ENGINEERING_EOR_ONLY",
+            "version": "V2",
+            "businessFactReference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+            "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94"
+          },
+          "workCenterId": 6,
+          "standardCapacityCode": "SC-EDGE-LENGTH-PCT28-V2",
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "R",
+            "producerRuleId": 11,
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "resultScope": "original"
+            },
+            "objectTraceKeys": [
+              "baselineId",
+              "baselineItemId",
+              "baselineContentHash",
+              "designItemId",
+              "sourceAttributeId"
+            ]
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    }
+  ]
+}

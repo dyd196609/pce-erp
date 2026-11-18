@@ -18,7 +18,7 @@
         <router-link class="app-nav-button" :class="{ 'app-nav-button-active': activeTab === 'banks' }" to="/foundation/company-bank-accounts">
           企业银行账户 <span v-if="activeTab === 'banks'" class="app-current-tag">当前</span>
         </router-link>
-        <router-link class="app-nav-button" to="/foundation">第一期基础资料</router-link>
+        <router-link class="app-nav-button" to="/foundation">基础资料维护</router-link>
         <router-link class="app-nav-button" to="/reference">数据引用中心</router-link>
       </nav>
     </header>

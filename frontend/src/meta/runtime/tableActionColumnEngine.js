@@ -1,5 +1,8 @@
-const MIN_COLUMN_WIDTH = 120
-const MAX_COLUMN_WIDTH = 460
+export const ACTION_COLUMN_WIDTH_RUNTIME_CODE = 'ActionColumnWidthRuntime'
+export const ACTION_COLUMN_WIDTH_RUNTIME_VERSION = 'V1.14.2.8.4.27.2.39'
+
+const MIN_COLUMN_WIDTH = 88
+const MAX_COLUMN_WIDTH = 520
 const BUTTON_GAP = 8
 const CELL_PADDING = 24
 
@@ -14,7 +17,7 @@ function visibleAction(action) {
 
 function actionLabel(action) {
   if (typeof action === 'string') return action
-  return action?.label || action?.text || action?.name || ''
+  return action?.label || action?.actionName || action?.text || action?.name || ''
 }
 
 function clampWidth(width) {
@@ -23,10 +26,10 @@ function clampWidth(width) {
 
 function buttonWidth(label = '') {
   const length = Array.from(String(label || '')).length
-  if (length >= 10) return 150
-  if (length >= 7) return 132
-  if (length >= 5) return 104
-  return 86
+  if (length >= 10) return 142
+  if (length >= 7) return 116
+  if (length >= 5) return 88
+  return Math.max(32, length * 14 + 8)
 }
 
 export function normalizeActionButtons(actions = []) {
@@ -49,11 +52,26 @@ export function getActionColumnWidth(actions = [], options = {}) {
   const count = normalized.length
   if (!count) return options.emptyWidth || MIN_COLUMN_WIDTH
 
-  const baseByCount = count === 1 ? 140 : count === 2 ? 220 : count === 3 ? 300 : count === 4 ? 380 : MAX_COLUMN_WIDTH
+  const baseByCount = count === 1 ? 96 : count === 2 ? 152 : 208 + (count - 3) * 56
   const contentWidth = normalized.reduce((sum, action) => sum + buttonWidth(action.label), 0)
     + Math.max(count - 1, 0) * BUTTON_GAP
     + CELL_PADDING
   return clampWidth(Math.max(baseByCount, contentWidth))
+}
+
+export function createActionColumnWidthRuntime(actions = [], options = {}) {
+  const normalizedActions = normalizeActionButtons(actions)
+  const actionCount = normalizedActions.length
+  const width = getActionColumnWidth(normalizedActions, options)
+  return Object.freeze({
+    runtimeCode: ACTION_COLUMN_WIDTH_RUNTIME_CODE,
+    runtimeVersion: ACTION_COLUMN_WIDTH_RUNTIME_VERSION,
+    source: 'Schema Action Contract',
+    actionCount,
+    density: actionCount <= 1 ? 'compact' : actionCount === 2 ? 'normal' : 'expanded',
+    width,
+    actions: Object.freeze(normalizedActions),
+  })
 }
 
 export function getActionColumnWidthForRows(rows = [], resolver, fallbackActions = []) {

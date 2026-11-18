@@ -1,0 +1,140 @@
+{
+  "baselineId": "PCE_FORMAL_CONTINUATION_CURRENT_PROTECTION_V4_SAVED_PAGE_CONTEXT_20261102",
+  "appliesTo": "Prospective read-only saved-page context and reviewed V3 protections; no fixedN authorization",
+  "historicalAuthorization": "UNKNOWN_RETAINED",
+  "legacyExpected": {
+    "create_instance": "07f9d304cfbf1f11ccc58ccff6e46402cee6704b6c83cfee758ee69b14e65bc5",
+    "confirm_instance_source": "7456c0e2ffb1746aa0fc885b1eefd7c87f169292443406613caa5a3f5e4b80e9",
+    "validate": "ee92d6d6580ae43cf827918ae184f609cd0e5aa44bd9753ffaca548e023d8b75",
+    "execute": "2afafc3779388e1d80adce93a3c96398e1eda1bd6aa3ee89ec0dee5b6c0b2f69",
+    "_execute_atomic": "26ac07d593d10e5ec2522d9795ae5372e2e3e9b117302dc9a22e0d3a5e2c30a1"
+  },
+  "currentMethods": {
+    "create_instance": "bad48dc1eaa10117b28c7eb3d204da1b009eadfe8771fd6bc528bb3bae7ca8df",
+    "confirm_instance_source": "7456c0e2ffb1746aa0fc885b1eefd7c87f169292443406613caa5a3f5e4b80e9",
+    "validate": "75432fe3f7838e9a9e5350710af2bc827776e5d8e228b92dc61e6d6e34bd8abc",
+    "execute": "2afafc3779388e1d80adce93a3c96398e1eda1bd6aa3ee89ec0dee5b6c0b2f69",
+    "_execute_atomic": "a205c22528cd671874603fc5db4fdf5efef52d8fd1888126387d914c40a8f69a"
+  },
+  "helpers": {
+    "formal_engineering_continuation_service.py": {
+      "_baseline_reference": "49873d4b67ef0f4a999f0875da90ef952e1f85dc68b69c2b84f1fba87f12575c",
+      "_snapshot_design_input": "36c0645e13fcfa677ba4133230782dcd9e2d02f4b59e838edfbfe87b7f99b247",
+      "_guard_consumed_legacy_revision": "5102c188aa9ea2f0ae010d165d4d3f4dc3f64e36adcb8b58ab55e3a337eda92f",
+      "_resolve_context": "9abfa3a5d4b4e23b07e5e3d5de000fc3ad3ef558210bd1d06984fc0f5bc25ead",
+      "_selected_workbook": "a525d5c83302c631e64bf26adeabe24a9833d7a915f7bd9a3bc577fdf4b297b4",
+      "_preview_baseline_inputs": "14bf974b93c648e558476ebe8f2b59f81f4623247c75e369392b8bd1496a69e2"
+    },
+    "baseline_source_identity.py": {
+      "_hash": "a621190852ffe0a50916d6b44a79b67dfd30ee1ff7abd4f7a8ff35c7d362add8",
+      "resolve_baseline_source_identity": "bd3fe6343cfe13c1d9a7c1b7d0dbda6092825c09896aa6c897ce3444a778d8ca"
+    },
+    "native_design_calculation_adapter.py": {
+      "_fail": "b1ac142a5fe536ef227f647568b6023065cf262a77cf5da0d301944391a501db",
+      "_number": "4b1843c622b87d1925fafb982609ac895276043bc5d5f91dba5b9ea21e4241bd",
+      "normalize_contract": "b4086ca76d3ede6fad885fd6c39751095061bffff3945eb6fa5a5cec5bbc4b96",
+      "_unit_proof": "f87414f9b3aad0abfe6fa800aa7de81d63147fca9f1f870feadd40d618614255",
+      "freeze_contract_units": "fc403a21f42d530d3f80d0be84c24c9209fb12cb791805cf7e779f5e93d8fd64",
+      "_mm": "08cefe00b90731f2ad21323da74bc07409f57209635c17b7eeb768b2c2a2ff7c",
+      "map_native_input": "dd4dfdf7e8953433f1ac27c9eb18d7e33a4c58c59cb1dff1ce1aa1b66e0a4ce7",
+      "preview_native_inputs": "01fb8d29603d3a322bbd7aeae745befffa22f40e304272a705d9fbba65e5a4a5"
+    },
+    "calculation_batch_reuse.py": {
+      "_rule_value": "3331d6b8c258a6f999894eb49b695320e6cf8899c6375afb1fd3848760096953",
+      "_source_cell": "ae14fea4e9d9feaaddc1a00bdfaf20df09512ce5e4a37296c5e1c25eb648618e",
+      "_source_reference": "0e5d4497dcdb9a3bb7ef7bb8ea08aabe95c79659adbb1651e0a382459a4533f2",
+      "evaluate_row": "8c00e62a6d916856ce5f99e649fa3e3b9ed4bfcfb9d3211beb4b954f18610356",
+      "identity": "ede680c9430509c0d8ae43c0c8b0a7e9a8b19a8398b9cf06f12d08bec9182e24",
+      "gap_result": "7064825ae99ca704e0e9ea1b181683665f3681c1e095740b22d331b3b50b959e",
+      "_linear_gap": "c2ccd5b705785f9eb8b4db4bd49933d2a0903095046dd5e54b9a82be1a6b32c2",
+      "_linear_value": "457442951b997e18eb2fd7021ecce77252b35c0e7fffb8b40a6053c5312ff46a",
+      "evaluate_linear_row": "e49bc9ba811731485b7ba77568259b8771551d6b6dc7b91019e7f4119ff6a9f8"
+    },
+    "product_design_service.py": {
+      "save_design_content": "ad05fa706018166e7bffbefbc87347e276f86749a2fe177e57ccfd59e68ab789",
+      "_design_snapshot": "4c2e3c21c285274efcc67402ecdd3b1bceef29b4848be3ba184184a09619803e"
+    },
+    "oei_calculated_transition_repair_service.py": {
+      "calculated_state_facts": "7d20f2bc1765f1c802889c6798aca03f2cbe75b2a933664e0252bd86b942238c",
+      "_fail": "7e12dfe6eca0b261ad6ae570db1c91e8f9f62e70cd20ac8523ee36d406172f21",
+      "_hash": "a621190852ffe0a50916d6b44a79b67dfd30ee1ff7abd4f7a8ff35c7d362add8",
+      "_isolation": "52c31ab9176ccd6fdff671621481193a7a44b3c83f912a2209fb8c767fa38cbb",
+      "inspect_calculated_transition": "99b75396cb48f9b6346996be22ba5af142aeea02ee030aeda601e2974c2ab385",
+      "repair_calculated_transition": "320e46fbbc32880ce8cdd15c34ea5f3ab34cb54a4a2fae05a6731cfabfda17fa"
+    },
+    "acceptance_isolation.py": {
+      "_verify_pinned_readonly_copy": "7e089d459316aa02e2b2f89bd08933a09931653953660dad833367dd8ff101d0",
+      "verify_acceptance_connections": "1a5424d9eabb044807d358fe423ddf27728b0477178577ad85e3f02f78c5b054",
+      "verify_declared_acceptance_runtime": "7373675a8193560db017da206a6450756bce9c1d9ee013ba3206285aa7af03b9"
+    },
+    "engineering_calculation_service.py": {
+      "serialize_calculation": "ead36d1425c829e59aff8ef5e17f7ebfe857c6587993848ed89494eff5165aa1"
+    },
+    "saved_calculation_context.py": {
+      "_hash": "a621190852ffe0a50916d6b44a79b67dfd30ee1ff7abd4f7a8ff35c7d362add8",
+      "project_saved_context": "0ebcf209f1c5665d1538090cbabb2c923bf000823af11cf9c7633fb283d5961d",
+      "saved_context_from_record": "b10f94a6c9c2e0927d66c6fad92d75a072809c253fea3962540a52139a902f8d"
+    }
+  },
+  "reviewEvidence": {
+    "path": "docs/governance/evidence/PCE_SAVED_CALCULATION_PAGE_CONTEXT_REVIEW_20261102.json",
+    "sha256": "d3f479581452d62de08401ac74ae7856b0faa5e56ad43d545a2facc2c30c0579"
+  },
+  "requiredBehaviorTests": "pde.test_baseline_source_identity; pde.test_existing_instance_fact_handoff; readonly integration evidence; pde.test_native_design_calculation_adapter; Excel parity; numeric/rollback/replay evidence; pde.test_oei_calculated_transition_repair; isolated normal/fault save and repair replay; pde.test_saved_calculation_context; frontend formalCalculationReadbackPresentation10tests;347table readonly equality",
+  "legacyFailureEvidence": "work/oei7-controlled-baseline-20261102/TARGETED_TEST_RESULT.json; work/oei7-native-source-identity-20261102/TESTS_BEFORE_BASELINE.json",
+  "previousBaseline": {
+    "path": "formal_continuation_protection_baseline.v3.json",
+    "sha256": "d4bc468b4e6ad4f7b0f282be3699ad04f8e767b9907d648322634ffae75b8069",
+    "currentMethods": {
+      "create_instance": "bad48dc1eaa10117b28c7eb3d204da1b009eadfe8771fd6bc528bb3bae7ca8df",
+      "confirm_instance_source": "7456c0e2ffb1746aa0fc885b1eefd7c87f169292443406613caa5a3f5e4b80e9",
+      "validate": "75432fe3f7838e9a9e5350710af2bc827776e5d8e228b92dc61e6d6e34bd8abc",
+      "execute": "2afafc3779388e1d80adce93a3c96398e1eda1bd6aa3ee89ec0dee5b6c0b2f69",
+      "_execute_atomic": "a205c22528cd671874603fc5db4fdf5efef52d8fd1888126387d914c40a8f69a"
+    }
+  },
+  "constants": {
+    "native_design_calculation_adapter.py": {
+      "CONTRACT": "e67c87ae6e75eeb06bde3ca6ad2225452449323362745a3ffa116b0db2738a96",
+      "STRUCTURES": "673a3771860b2465fd34538a783bc48f2888982022d19c2110323898fc566ca3",
+      "PAINT_BRANCHES": "c94011e787d6feb20a8f2a13992a401d4fbcf2786e7f51942870ed0c69aef2de",
+      "LINE_MODES": "de40381c437641f9d39f4cc6a4f96309bbe3999a6fd0e9ddd41425d9b3afa5b6"
+    },
+    "product_design_service.py": {
+      "ALLOWED_DESIGN_FIELDS": "ffb046d9036759420cabcb3613838ac15eece5a24105f53e2663d491243bad05"
+    },
+    "calculation_batch_reuse.py": {
+      "VERSION": "bb728eb6f22379a226c0a46d4c957e774a2a129ef56da3b6ba7a138ff78e9853",
+      "LINEAR_RULE_VERSION": "516832a78e895729c3166c7df2985104ce24de5133bc8ce24068e6b0da053066",
+      "CUT_LENGTH_TIERS_MM": "3958ba2739c24c7a36491307853e48ddad1361231731713d4faaac38530b2da8",
+      "EDGE_BRANCHES": "3876bc1f4173e31eb7fb8ec5b91c0835f1dbc9bce8ae5289ae0e9a55a14a7d79"
+    },
+    "oei_calculated_transition_repair_service.py": {
+      "ACTION": "e0b83229716fd1d5e4fbe2d1c2610e32782cfdb4d384e267c946de10982155e8",
+      "OBJECT": "8088b1682278f3ad9fd089fb0874125bfe71da94927f0625202de0d616f8d977"
+    },
+    "acceptance_isolation.py": {
+      "ACCEPTANCE_RUNTIME_PROFILE": "e455113f5761fc3bcb23e9b1bda4bfc23b9e36aa75a066ea3a5e493b88e7a724"
+    },
+    "saved_calculation_context.py": {
+      "CONTRACT": "35a478e2a0e7c51df782c95359b726683d4a4b8599255954b80fa37ee3ed5f61"
+    }
+  },
+  "knownBlocker": "Historical failures retained; manufacturing purpose remains unknown; human acceptance pending",
+  "classMethods": {
+    "production_foundation_service.py": {
+      "EngineeringLifecycleService": {
+        "transition": "7fe31e66986f1d651f4de006313d74ecc86cd7e7af04e6ffa032fd148fa8706b"
+      }
+    },
+    "formal_engineering_continuation_service.py": {
+      "FormalEngineeringContinuationService": {
+        "facts": "1882764672e87aa0af0caf88205a5abc52814ce93033f3220cfcbfe45969801b"
+      }
+    }
+  },
+  "files": {
+    "frontend/src/meta/pages/PdeOrderEngineeringCalculationPage.vue": "90f41d5d9521bd7eb4bf089e90b1e7eb7609d3a088c8b64c4c852eeb6c0963e2",
+    "frontend/src/meta/runtime/formalCalculationReadbackPresentation.js": "162da6ebd7eb458f9307e52c2076ccb996147f626eeaaa1f21772106517717e0"
+  }
+}

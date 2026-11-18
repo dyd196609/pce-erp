@@ -1,9 +1,10 @@
 <template>
-  <main class="approval-flow-page">
+  <main class="approval-flow-page" data-page-code="approval-flow-config" :data-page-name="businessName.pageTitle"
+    data-module-code="SCM" data-business-object="ApprovalConfiguration">
     <header class="page-header">
       <section>
         <p class="eyebrow">V1.11.10 审批流配置</p>
-        <h1>审批关卡配置</h1>
+        <h1>{{ businessName.pageTitle }}</h1>
         <p>本轮只配置 1 关、2 关、3 关，不做复杂条件审批。</p>
       </section>
       <nav class="page-tabs">
@@ -15,7 +16,7 @@
 
     <el-alert v-if="message" :title="message" type="success" show-icon :closable="false" />
 
-    <section class="operation-shell">
+    <section class="operation-shell" data-acceptance-region="approval-config-core">
       <el-card shadow="never">
         <template #header><h2>模块审批关卡</h2></template>
         <el-table :data="configs" border stripe>
@@ -39,6 +40,7 @@
               {{ row.steps.map((step) => step.stepLabel).join(' / ') }}
             </template>
           </el-table-column>
+          <el-table-column prop="approvalContractCode" label="审批契约" min-width="260" />
           <el-table-column label="状态流转说明" min-width="260">
             <template #default="{ row }">
               {{ flowText(row.stepCount) }}
@@ -52,7 +54,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { resolveBusinessName } from '@/meta/governance/businessNameRegistry.js'
 import {
+  getApprovalContract,
   listApprovalFlowConfigs,
   saveApprovalFlowConfig,
 } from '../workflow/approvalFlowConfigStore.js'
@@ -62,6 +66,7 @@ const stepOptions = [
   { label: '2关', value: 2 },
   { label: '3关', value: 3 },
 ]
+const businessName = resolveBusinessName('approval-configuration')
 const message = ref('')
 const configs = ref(loadRows())
 
@@ -69,6 +74,7 @@ function loadRows() {
   return listApprovalFlowConfigs().map((item) => ({
     ...item,
     stepCount: item.steps?.length || 1,
+    approvalContractCode: getApprovalContract(item.moduleName).approvalContractCode,
   }))
 }
 

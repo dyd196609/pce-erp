@@ -3,7 +3,7 @@
     <header class="page-header">
       <section>
         <p class="eyebrow">V1.11.9 QMS来料检验预备</p>
-        <h1>{{ detail ? '来料检验单详情' : 'QMS来料检验' }}</h1>
+        <h1>{{ currentQmsPageName }}</h1>
         <p>本页登记来料检验结果，并只将合格与让步接收数量推送到 WMS 入库。</p>
         <p class="app-current-module-badge">当前操作模块：{{ currentQmsModuleName }}</p>
       </section>
@@ -32,12 +32,11 @@
               <span>来源收货单号：{{ detail.sourceReceiveNo || '-' }}</span>
             </div>
             <div class="button-row">
-              <el-button v-if="detail.status === 'pending'" type="primary" @click="startInspection">开始检验</el-button>
-              <el-button v-if="detail.status === 'inspecting'" type="success" @click="saveResult">保存检验结果</el-button>
-              <el-button v-if="detail.status === 'inspecting'" type="warning" @click="submitResult">提交检验结果</el-button>
-              <el-button v-if="detail.status === 'inspected'" type="primary" @click="prepareInbound">生成检验合格入库预备</el-button>
-              <el-button v-if="detail.status === 'inboundPrepared'" type="primary" @click="postInventory">确认入库</el-button>
-              <el-button v-if="detail.status === 'inboundPrepared'" @click="notify('检验合格入库预备已在本页入库预备区块展示。')">查看入库预备</el-button>
+              <el-button v-if="!detail.formalAuthority && detail.status === 'pending'" type="primary" @click="startInspection">开始检验</el-button>
+              <el-button v-if="!detail.formalAuthority && detail.status === 'inspecting'" type="success" @click="saveResult">保存检验结果</el-button>
+              <el-button v-if="!detail.formalAuthority && detail.status === 'inspecting'" type="warning" @click="submitResult">提交检验结果</el-button>
+              <el-button v-if="!detail.formalAuthority && detail.status === 'inspected'" type="primary" @click="prepareInbound">生成检验合格入库预备</el-button>
+              <el-button v-if="detail.status === 'inboundPrepared'" @click="viewInboundPrepare">查看入库预备</el-button>
               <el-button v-if="detail.status === 'rejected'" @click="notify('退货、报废、返工已记录，不进入库存。')">查看不合格处理</el-button>
               <el-button v-if="detail.status === 'inventoryPosted'" @click="viewInventoryTransactions">查看库存流水</el-button>
               <el-button v-if="detail.status === 'inventoryPosted'" @click="viewInventoryBalances">查看库存余额</el-button>
@@ -191,7 +190,7 @@
           <el-table-column prop="concessionQty" label="让步接收数量" width="130" />
           <el-table-column prop="inboundPreparedQty" label="预备入库数量" width="130" />
           <el-table-column prop="inventoryPostedQty" label="已入库数量" width="120" />
-          <el-table-column label="状态" width="120">
+          <el-table-column label="合格品入库状态" width="120">
             <template #default="{ row }">{{ row.inventoryPosted ? '已入库' : '待确认入库' }}</template>
           </el-table-column>
         </el-table>
@@ -234,57 +233,108 @@
       </el-card>
 
       <el-card shadow="never">
-        <template #header><h2>来料检验单列表</h2></template>
+        <template #header><h2 data-acceptance-id="page-internal-subject-title">{{ currentQmsPageName }}</h2></template>
         <div class="toolbar">
           <el-button @click="quickSearchVisible = !quickSearchVisible">
             {{ quickSearchVisible ? '收起快速搜索' : '展开快速搜索' }}
           </el-button>
           <span class="sort-help">快速搜索用于跨字段临时查找；精准查询请使用高级筛选。</span>
         </div>
-        <div v-if="quickSearchVisible" class="toolbar">
-          <el-autocomplete
-            v-model="keyword"
-            :fetch-suggestions="querySearchSuggestions"
-            placeholder="搜索检验单、收货单、供应商、物料、状态"
-            clearable
-            @select="handleSuggestionSelect"
-          />
-          <el-button @click="resetFilters">重置</el-button>
-          <el-button @click="showAdvancedFilters = !showAdvancedFilters">
+        <div
+          v-if="quickSearchVisible"
+          class="toolbar"
+          data-acceptance-id="standard-list-toolbar"
+          data-pce-page-id="incoming-inspection"
+          data-pce-toolbar-for="incoming-inspections-main"
+        >
+          <span data-acceptance-id="list-fuzzy-search-input">
+            <el-autocomplete
+              v-model="keyword"
+              :fetch-suggestions="querySearchSuggestions"
+              placeholder="搜索检验单、收货单、供应商、物料、状态"
+              clearable
+              @select="handleSuggestionSelect"
+            />
+          </span>
+          <el-button data-acceptance-id="list-fuzzy-search-button" @click="clearSelection">搜索</el-button>
+          <el-button
+            data-acceptance-id="list-advanced-filter-toggle"
+            data-pce-filter-toggle-for="incoming-inspections-main"
+            :aria-expanded="String(showAdvancedFilters)"
+            @click="showAdvancedFilters = !showAdvancedFilters"
+          >
             {{ showAdvancedFilters ? '收起高级筛选' : '展开高级筛选' }}
           </el-button>
+          <el-button data-acceptance-id="list-clear-filter-button" @click="resetFilters">清空筛选</el-button>
+          <el-button data-acceptance-id="list-clear-sort-button" @click="resetSorting">清除排序</el-button>
+          <el-button
+            type="success"
+            data-acceptance-id="list-export-current-result-button"
+            data-pce-export-for="incoming-inspections-main"
+            @click="exportCurrentResults"
+          >
+            导出当前结果
+          </el-button>
+          <span data-acceptance-id="list-result-count-visible">当前结果 {{ sortedInspections.length }} 条</span>
+          <span data-acceptance-id="business-flow-selected-count">已选择 {{ selectedRows.length }} 条</span>
+          <el-button @click="resetFilters">重置</el-button>
+        </div>
+        <div
+          class="toolbar advanced-filter-toolbar"
+          data-pce-page-id="incoming-inspection"
+        >
+          <strong>高级筛选</strong>
+          <el-button @click="resetFilters">清空筛选</el-button>
           <el-button @click="resetSorting">清除排序</el-button>
+          <el-button
+            type="success"
+            data-acceptance-id="list-export-current-result-button"
+            data-pce-export-for="incoming-inspections-main"
+            @click="exportCurrentResults"
+          >
+            导出当前结果
+          </el-button>
+          <el-button type="primary" plain @click="copyDiagnosticData">复制诊断数据</el-button>
           <span class="sort-help">排序：点击表格表头字段可升序/降序排序；点击“清除排序”恢复默认顺序。</span>
           <span class="sort-help">{{ currentSortText }}</span>
         </div>
-        <div v-if="showAdvancedFilters" class="advanced-filter-panel">
+        <div
+          v-show="showAdvancedFilters"
+          class="advanced-filter-panel"
+          data-acceptance-id="list-advanced-filter-panel"
+          data-pce-filter-for="incoming-inspections-main"
+        >
           <label>
             <span>检验单号</span>
-            <el-input v-model="advancedFilters.inspectionNo" clearable />
+            <PceResultFilterSelect v-model="advancedFilters.inspectionNo" :rows="inspections" :fields="['inspectionNo']" />
           </label>
           <label>
             <span>来源收货单号</span>
-            <el-input v-model="advancedFilters.sourceReceiveNo" clearable />
+            <PceResultFilterSelect v-model="advancedFilters.sourceReceiveNo" :rows="inspections" :fields="['sourceReceiveNo']" />
           </label>
           <label>
             <span>来源采购订单号</span>
-            <el-input v-model="advancedFilters.sourcePurchaseOrderNo" clearable />
+            <PceResultFilterSelect v-model="advancedFilters.sourcePurchaseOrderNo" :rows="inspections" :fields="['sourcePurchaseOrderNo']" />
           </label>
           <label>
             <span>原始请购单号</span>
-            <el-input v-model="advancedFilters.rootRequestNo" clearable />
+            <PceResultFilterSelect v-model="advancedFilters.rootRequestNo" :rows="inspections" :fields="['rootRequestNo']" />
           </label>
           <label>
             <span>供应商</span>
-            <el-input v-model="advancedFilters.supplierName" clearable />
+            <PceResultFilterSelect v-model="advancedFilters.supplierName" :rows="inspections" :fields="['supplierName']" />
+          </label>
+          <label>
+            <span>仓库</span>
+            <PceResultFilterSelect v-model="advancedFilters.warehouseName" :rows="inspections" :fields="['warehouseName']" />
           </label>
           <label>
             <span>物料编码</span>
-            <el-input v-model="advancedFilters.materialCode" clearable />
+            <PceResultFilterSelect v-model="advancedFilters.materialCode" :rows="inspections" :fields="['materialCode']" />
           </label>
           <label>
             <span>物料名称</span>
-            <el-input v-model="advancedFilters.materialName" clearable />
+            <PceResultFilterSelect v-model="advancedFilters.materialName" :rows="inspections" :fields="['materialName']" />
           </label>
           <label>
             <span>检验状态</span>
@@ -299,8 +349,16 @@
             </el-select>
           </label>
           <label>
+            <span>入库状态</span>
+            <el-select v-model="advancedFilters.inventoryPostStatus" clearable>
+              <el-option label="未入库" value="notPosted" />
+              <el-option label="已生成入库预备" value="inboundPrepared" />
+              <el-option label="已入库" value="posted" />
+            </el-select>
+          </label>
+          <label>
             <span>检验员</span>
-            <el-input v-model="advancedFilters.inspectorName" clearable />
+            <PceResultFilterSelect v-model="advancedFilters.inspectorName" :rows="inspections" :fields="['inspectorName']" />
           </label>
           <label>
             <span>计划检验日期起</span>
@@ -339,17 +397,16 @@
           show-icon
           :closable="false"
         />
-        <div class="batch-bar">
+        <div class="batch-bar" data-pce-section="incoming-inspection-batch-actions">
           <span>已选择 {{ selectedRows.length }} 条</span>
           <span>可开始 {{ qmsBatchCounts.start }} 条</span>
           <span>可提交 {{ qmsBatchCounts.submit }} 条</span>
           <span>可生成入库预备 {{ qmsBatchCounts.prepare }} 条</span>
-          <span>可确认入库 {{ qmsBatchCounts.post }} 条</span>
+          <span>待仓库确认入库 {{ qmsBatchCounts.post }} 条</span>
           <el-button size="small" @click="clearSelection">清空选择</el-button>
-          <el-button size="small" type="primary" :disabled="!qmsBatchCounts.start" @click="runBatchStart">批量开始检验</el-button>
-          <el-button size="small" type="warning" :disabled="!qmsBatchCounts.submit" @click="runBatchSubmit">批量提交检验结果</el-button>
-          <el-button size="small" type="success" :disabled="!qmsBatchCounts.prepare" @click="runBatchPrepareInbound">批量生成检验合格入库预备</el-button>
-          <el-button size="small" type="success" :disabled="!qmsBatchCounts.post" @click="runBatchPostInbound">批量确认入库</el-button>
+          <el-button size="small" type="primary" data-pce-action-id="start-incoming-inspections" :disabled="!qmsBatchCounts.start" :title="qmsBatchCounts.start ? '' : '所选记录没有待检单据。'" @click="runBatchStart">批量开始检验</el-button>
+          <el-button size="small" type="warning" data-pce-action-id="submit-incoming-inspection-results" :disabled="!qmsBatchCounts.submit" :title="qmsBatchCounts.submit ? '' : '所选记录没有可提交的检验结果。'" @click="runBatchSubmit">批量提交检验结果</el-button>
+          <el-button size="small" type="success" data-pce-action-id="create-qualified-inbound-prepares" :disabled="!qmsBatchCounts.prepare" :title="qmsBatchCounts.prepare ? '' : '所选记录没有可生成入库预备的检验单。'" @click="runBatchPrepareInbound">批量生成检验合格入库预备</el-button>
         </div>
         <div v-if="batchResult" class="batch-result" :class="batchMessageType">
           <button type="button" @click="batchResult = null">关闭</button>
@@ -366,35 +423,46 @@
             <span>下一步建议：{{ batchResult.nextSuggestion }}</span>
           </template>
         </div>
-        <el-table ref="listTableRef" :data="sortedInspections" border stripe height="520" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
-          <el-table-column type="selection" width="48" fixed="left" />
-          <el-table-column type="index" label="序号" width="70" fixed="left" />
-          <el-table-column prop="inspectionNo" label="检验单号" min-width="170" sortable="custom" />
+        <BusinessTableScrollContainer
+          class="pce-baseline-table-shell"
+          acceptance-id="business-table-scroll-incoming-inspections-main"
+          page-id="incoming-inspection"
+          table-id="incoming-inspections-main"
+        >
+        <el-table ref="listTableRef" :data="sortedInspections" border stripe height="520" class="global-sort-arrow" scrollbar-always-on @selection-change="handleSelectionChange" @sort-change="handleSortChange">
+          <el-table-column type="selection" :selectable="(row) => !row.formalAuthority" width="48" fixed="left" class-name="business-table-selection-column" header-class-name="business-table-selection-column" />
+          <el-table-column type="index" label="序号" width="70" fixed="left" class-name="pce-fixed-index-column" header-class-name="pce-fixed-index-column" />
+          <el-table-column prop="inspectionNo" label="检验单号" min-width="170" sortable="custom" fixed="left" class-name="pce-fixed-primary-no-column" header-class-name="pce-fixed-primary-no-column" />
           <el-table-column prop="sourceReceiveNo" label="来源收货单号" min-width="150" sortable="custom" />
           <el-table-column prop="sourceOrderNo" label="来源采购订单号" min-width="150" sortable="custom" />
-          <el-table-column prop="rootRequestNo" label="原始请购单号" min-width="150" />
-          <el-table-column prop="supplierName" label="供应商" />
-          <el-table-column prop="warehouseName" label="仓库" />
-          <el-table-column prop="inspectorName" label="检验员" />
+          <el-table-column prop="rootRequestNo" label="原始请购单号" min-width="150" sortable="custom" />
+          <el-table-column prop="supplierName" label="供应商" sortable="custom" />
+          <el-table-column prop="warehouseName" label="仓库" sortable="custom" />
+          <el-table-column prop="inspectorName" label="检验员" sortable="custom" />
           <el-table-column prop="plannedInspectDate" label="计划检验日期" sortable="custom" />
           <el-table-column prop="actualInspectDate" label="实际检验日期" sortable="custom" />
-          <el-table-column prop="status" label="状态" sortable="custom">
+          <el-table-column prop="status" label="检验单状态" sortable="custom">
             <template #default="{ row }"><el-tag :type="statusType(row.status)">{{ statusLabel(row.status) }}</el-tag></template>
           </el-table-column>
-          <el-table-column prop="remark" label="备注" min-width="180" />
-          <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(['详情', '生成检验合格入库预备'])">
+          <el-table-column prop="inventoryPostStatus" label="入库状态" min-width="130" sortable="custom">
+            <template #default="{ row }">{{ inventoryPostStatusLabel(row.inventoryPostStatus, row) }}</template>
+          </el-table-column>
+          <el-table-column prop="inventoryPostMessage" label="入库结果" min-width="180" sortable="custom" />
+          <el-table-column prop="remark" label="备注" min-width="180" sortable="custom" />
+          <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(['详情', '生成检验合格入库预备'])" class-name="payment-fixed-action-column" header-class-name="payment-fixed-action-column">
             <template #default="{ row }">
               <div class="app-action-cell">
                 <el-button size="small" class="app-action-button-sm" @click="router.push(`/qms/incoming-inspection/${row.id}`)">详情</el-button>
-                <el-button v-if="row.status === 'pending'" size="small" class="app-action-button-sm" type="primary" @click="startInspectionFromList(row)">开始检验</el-button>
-                <el-button v-if="row.status === 'inspecting'" size="small" class="app-action-button-md" type="primary" @click="router.push(`/qms/incoming-inspection/${row.id}`)">填写检验结果</el-button>
-                <el-button v-if="row.status === 'inspected' && hasInboundQty(row)" size="small" class="app-action-button-lg" type="success" @click="prepareInboundFromList(row)">生成检验合格入库预备</el-button>
-                <el-button v-if="row.status === 'inboundPrepared'" size="small" class="app-action-button-sm" type="success" @click="postInventoryFromList(row)">确认入库</el-button>
+                <el-button v-if="!row.formalAuthority && row.status === 'pending'" size="small" class="app-action-button-sm" type="primary" @click="startInspectionFromList(row)">开始检验</el-button>
+                <el-button v-if="!row.formalAuthority && row.status === 'inspecting'" size="small" class="app-action-button-md" type="primary" @click="router.push(`/qms/incoming-inspection/${row.id}`)">填写检验结果</el-button>
+                <el-button v-if="!row.formalAuthority && row.status === 'inspected' && hasInboundQty(row)" size="small" class="app-action-button-lg" type="success" @click="prepareInboundFromList(row)">生成检验合格入库预备</el-button>
+                <el-button v-if="row.status === 'inboundPrepared'" size="small" class="app-action-button-lg" type="success" @click="viewInboundPrepareFromList(row)">查看入库预备</el-button>
                 <el-button v-if="row.status === 'inventoryPosted'" size="small" class="app-action-button-sm" @click="viewInventoryTransactions">查看库存</el-button>
               </div>
             </template>
           </el-table-column>
         </el-table>
+        </BusinessTableScrollContainer>
       </el-card>
     </section>
   </main>
@@ -402,11 +470,11 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import PceResultFilterSelect from '../components/PceResultFilterSelect.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createInspectionPreviewFromPurchaseReceive, listPurchaseReceives } from '../wms/purchaseReceiveStore.js'
 import {
   createInboundPrepareTaskFromInspection,
-  receiveQualifiedInspectionToInventory,
 } from '../wms/wmsStore.js'
 import { getEmployeeOptions } from '../manufacturing/manufacturingReferenceService.js'
 import {
@@ -421,8 +489,12 @@ import {
   writeQmsLog,
 } from '../qms/qmsStore.js'
 import { buildMultiFieldSuggestions, filterSuggestions } from '../runtime/filterSuggestionEngine.js'
+import BusinessTableScrollContainer from '../components/BusinessTableScrollContainer.vue'
 import { getActionColumnWidth } from '../runtime/tableActionColumnEngine.js'
 import { sortRecords } from '../runtime/tableSortEngine.js'
+import { resolvePageNameConsumption } from '../governance/pageNameConsumer.js'
+import { exportRowsToCsv as exportRowsToCsvUtil } from '../manufacturing/foundationTableUtils.js'
+import { formalExecutionApi } from '@/api/formalExecution.js'
 import {
   goList,
   goParent,
@@ -431,7 +503,11 @@ import {
 
 const route = useRoute()
 const router = useRouter()
-const currentQmsModuleName = computed(() => route.path.startsWith('/qms/incoming-inspection') ? '来料检验' : 'QMS首页')
+const incomingInspectionName = resolvePageNameConsumption({ pageCode: 'incoming-inspection', route: '/qms/incoming-inspections' })
+const currentQmsPageName = computed(() => route.path.startsWith('/qms/incoming-inspection')
+  ? incomingInspectionName.pageTitle
+  : 'QMS首页')
+const currentQmsModuleName = computed(() => currentQmsPageName.value)
 
 function isQmsNavActive(type) {
   if (type === 'inspection') return route.path.startsWith('/qms/incoming-inspection')
@@ -439,7 +515,7 @@ function isQmsNavActive(type) {
 }
 const inspections = ref([])
 const keyword = ref('')
-const quickSearchVisible = ref(false)
+const quickSearchVisible = ref(true)
 const showAdvancedFilters = ref(false)
 const advancedFilters = ref(defaultAdvancedFilters())
 const message = ref('')
@@ -447,6 +523,7 @@ const messageType = ref('success')
 const sortState = ref({ key: '', direction: 'asc' })
 const selectedRows = ref([])
 const listTableRef = ref(null)
+const copyStatus = ref('')
 const batchResult = ref(null)
 const batchMessageType = ref('success')
 const editDraft = ref({ lines: [] })
@@ -496,9 +573,16 @@ const inspectionSortColumns = [
   { key: 'inspectionNo', sortType: 'string' },
   { key: 'sourceReceiveNo', sortType: 'string' },
   { key: 'sourceOrderNo', sortType: 'string' },
+  { key: 'rootRequestNo', sortType: 'string' },
+  { key: 'supplierName', sortType: 'string' },
+  { key: 'warehouseName', sortType: 'string' },
+  { key: 'inspectorName', sortType: 'string' },
   { key: 'plannedInspectDate', sortType: 'date' },
   { key: 'actualInspectDate', sortType: 'date' },
   { key: 'status', sortType: 'status' },
+  { key: 'inventoryPostStatus', sortType: 'status' },
+  { key: 'inventoryPostMessage', sortType: 'string' },
+  { key: 'remark', sortType: 'string' },
 ]
 const sortedInspections = computed(() => sortRecords(filteredInspections.value, sortState.value, inspectionSortColumns))
 const currentSortText = computed(() => {
@@ -507,13 +591,55 @@ const currentSortText = computed(() => {
     inspectionNo: '检验单号',
     sourceReceiveNo: '来源收货单号',
     sourceOrderNo: '来源采购订单号',
+    rootRequestNo: '原始请购单号',
+    supplierName: '供应商',
+    warehouseName: '仓库',
+    inspectorName: '检验员',
     plannedInspectDate: '计划检验日期',
     actualInspectDate: '实际检验日期',
-    status: '状态',
+    status: '检验单状态',
+    inventoryPostStatus: '入库状态',
+    inventoryPostMessage: '入库结果',
+    remark: '备注',
   }
   return `当前排序：${labels[sortState.value.key] || sortState.value.key} / ${sortState.value.direction === 'desc' ? '降序' : '升序'}`
 })
 const selectedIds = computed(() => selectedRows.value.map((row) => row.id).filter(Boolean))
+const sortableColumns = inspectionSortColumns.map((item) => item.key)
+const exportColumns = [
+  { key: 'inspectionNo', label: '检验单号' },
+  { key: 'sourceReceiveNo', label: '来源收货单号' },
+  { key: 'sourceOrderNo', label: '来源采购订单号' },
+  { key: 'rootRequestNo', label: '原始请购单号' },
+  { key: 'supplierName', label: '供应商' },
+  { key: 'warehouseName', label: '仓库' },
+  { key: 'inspectorName', label: '检验员' },
+  { key: 'plannedInspectDate', label: '计划检验日期' },
+  { key: 'actualInspectDate', label: '实际检验日期' },
+  { key: 'statusText', label: '检验单状态' },
+  { key: 'inventoryPostStatusText', label: '入库状态' },
+  { key: 'inventoryPostMessage', label: '入库结果' },
+  { key: 'remark', label: '备注' },
+]
+const exportRows = computed(() => sortedInspections.value.map((row) => ({
+  ...row,
+  statusText: statusLabel(row.status),
+  inventoryPostStatusText: inventoryPostStatusLabel(row.inventoryPostStatus, row),
+})))
+const diagnosticData = computed(() => ({
+  page: 'incoming-inspections',
+  version: 'V1.13.29.3.2',
+  quickSearch: keyword.value,
+  advancedFilterState: { ...advancedFilters.value },
+  sortState: { ...sortState.value },
+  resultCount: sortedInspections.value.length,
+  selectedCount: selectedRows.value.length,
+  exportEnabled: true,
+  sortableColumns,
+  sortArrowStyle: 'no-tail-bold-arrow',
+  sortArrowShape: 'upright-triangle',
+  timestamp: new Date().toISOString(),
+}))
 const qmsBatchCounts = computed(() => ({
   start: selectedRows.value.filter((row) => row.status === 'pending').length,
   submit: selectedRows.value.filter((row) => row.status === 'inspecting' && hasInspectionResultQty(row)).length,
@@ -524,6 +650,7 @@ const detailFields = computed(() => detail.value ? [
   { label: '检验单号', value: detail.value.inspectionNo },
   { label: '来源收货单号', value: detail.value.sourceReceiveNo || '-' },
   { label: '来源采购订单号', value: detail.value.sourceOrderNo || '-' },
+  { label: '来源核价单号', value: detail.value.sourcePriceApprovalNo || '-' },
   { label: '原始请购单号', value: detail.value.rootRequestNo || '-' },
   { label: '供应商', value: detail.value.supplierName || '-' },
   { label: '仓库', value: detail.value.warehouseName || '-' },
@@ -532,7 +659,7 @@ const detailFields = computed(() => detail.value ? [
   { label: '实际检验日期', value: detail.value.actualInspectDate || '-' },
   { label: '入库状态', value: detail.value.inventoryPostStatus || 'notPosted' },
   { label: '入库结果', value: detail.value.inventoryPostMessage || '-' },
-  { label: '状态', value: statusLabel(detail.value.status) },
+  { label: '检验单状态', value: statusLabel(detail.value.status) },
   { label: '备注', value: detail.value.remark || '-' },
 ] : [])
 const flowPosition = computed(() => {
@@ -548,8 +675,29 @@ const flowPosition = computed(() => {
   }[status] || { current: status, next: '-' }
 })
 
-function refresh() {
-  inspections.value = listIncomingInspections()
+function adaptFormalInspection(row = {}) {
+  const items = Array.isArray(row.items) ? row.items : []
+  return {
+    ...row,
+    sourceReceiveNo: row.receiptNo || '',
+    sourceOrderNo: row.purchaseOrderNo || '',
+    actualInspectDate: row.inspectionDate || '',
+    qualityStatus: row.status === 'qualified' ? 'qualified' : (row.status === 'rejected' ? 'rejected' : 'pending'),
+    status: row.status === 'qualified' ? 'inspected' : row.status,
+    lines: items,
+    formalAuthority: true,
+    authoritySource: 'procurement.PurchaseInspection',
+  }
+}
+
+async function refresh() {
+  const response = await formalExecutionApi.qualityFacts()
+  if (!response?.success) {
+    inspections.value = []
+    notify(response?.error?.message || '正式来料检验事实读取失败', 'error')
+    return
+  }
+  inspections.value = (response.data?.inspections || []).map(adaptFormalInspection)
 }
 
 function notify(text, type = 'success') {
@@ -568,10 +716,12 @@ function defaultAdvancedFilters() {
     sourcePurchaseOrderNo: '',
     rootRequestNo: '',
     supplierName: '',
+    warehouseName: '',
     materialCode: '',
     materialName: '',
     status: '',
     qualityStatus: '',
+    inventoryPostStatus: '',
     inspectorName: '',
     plannedInspectDateStart: '',
     plannedInspectDateEnd: '',
@@ -613,10 +763,12 @@ function matchesAdvancedFilters(row) {
     && fuzzyMatch(row.sourceOrderNo || row.sourcePurchaseOrderNo, filters.sourcePurchaseOrderNo)
     && fuzzyMatch(row.rootRequestNo, filters.rootRequestNo)
     && fuzzyMatch(row.supplierName, filters.supplierName)
+    && fuzzyMatch(row.warehouseName, filters.warehouseName)
     && rowHasLineMatch(row, 'materialCode', filters.materialCode)
     && rowHasLineMatch(row, 'materialName', filters.materialName)
     && (!filters.status || row.status === filters.status)
     && rowHasQualityStatus(row, filters.qualityStatus)
+    && (!filters.inventoryPostStatus || normalizeInventoryPostStatus(row) === filters.inventoryPostStatus)
     && fuzzyMatch(row.inspectorName, filters.inspectorName)
     && dateInRange(row.plannedInspectDate, filters.plannedInspectDateStart, filters.plannedInspectDateEnd)
     && dateInRange(row.actualInspectDate, filters.actualInspectDateStart, filters.actualInspectDateEnd)
@@ -722,12 +874,6 @@ function runBatchPrepareInbound() {
   showBatchResult(buildPageBatchResult(selectedIds.value, (id) => createInboundPrepareTaskFromInspection(id), '批量生成检验合格入库预备'), '批量生成检验合格入库预备')
 }
 
-function runBatchPostInbound() {
-  if (!selectedIds.value.length) return notify('请先选择要批量处理的来料检验单', 'warning')
-  if (!qmsBatchCounts.value.post) return notify('所选记录没有可确认入库的检验单。', 'warning')
-  showBatchResult(buildPageBatchResult(selectedIds.value, (id) => receiveQualifiedInspectionToInventory(id), '批量确认入库'), '批量确认入库')
-}
-
 function statusLabel(status) {
   return {
     pending: '待检',
@@ -787,6 +933,21 @@ function qualityStatusLabel(status) {
     scrapped: '已报废',
     reworkPending: '返工待处理',
   }[status] || status || '-'
+}
+
+function normalizeInventoryPostStatus(row = {}) {
+  if (row.inventoryPosted || row.status === 'inventoryPosted' || row.inventoryPostStatus === 'posted') return 'posted'
+  if (row.inboundPrepared || row.status === 'inboundPrepared' || row.inventoryPostStatus === 'inboundPrepared' || row.inboundPrepareTaskIds?.length) return 'inboundPrepared'
+  return row.inventoryPostStatus || 'notPosted'
+}
+
+function inventoryPostStatusLabel(status, row = {}) {
+  const normalized = normalizeInventoryPostStatus({ ...row, inventoryPostStatus: status || row.inventoryPostStatus })
+  return {
+    notPosted: '未入库',
+    inboundPrepared: '已生成入库预备',
+    posted: '已入库',
+  }[normalized] || normalized || '-'
 }
 
 function cloneDraft(value) {
@@ -863,6 +1024,46 @@ function handleSuggestionSelect(item) {
   keyword.value = item.value
 }
 
+function todayStamp() {
+  return new Date().toISOString().slice(0, 10).replaceAll('-', '')
+}
+
+function exportCurrentResults() {
+  exportRowsToCsvUtil(exportRows.value, exportColumns, `incoming-inspections-${todayStamp()}.csv`)
+  notify(`已导出当前筛选结果 ${exportRows.value.length} 条`)
+}
+
+async function copyDiagnosticData() {
+  const text = JSON.stringify(diagnosticData.value, null, 2)
+  try {
+    if (navigator?.clipboard?.writeText) await navigator.clipboard.writeText(text)
+    else fallbackCopy(text)
+    copyStatus.value = '已复制诊断数据'
+    notify('已复制诊断数据')
+  } catch (error) {
+    try {
+      fallbackCopy(text)
+      copyStatus.value = '已复制诊断数据'
+      notify('已复制诊断数据')
+    } catch (fallbackError) {
+      copyStatus.value = '复制失败，请重试'
+      notify('复制失败，请重试', 'warning')
+    }
+  }
+}
+
+function fallbackCopy(text) {
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', 'readonly')
+  textarea.style.position = 'fixed'
+  textarea.style.left = '-9999px'
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
+}
+
 function createFromFirstReceive() {
   const receive = candidateReceives.value[0]
   if (!receive) return notify('暂无可用采购收货预备单', 'warning')
@@ -934,28 +1135,24 @@ function prepareInbound() {
   notify(`已生成检验合格入库预备 ${outcome.taskIds?.length || 0} 条`)
 }
 
+function viewInboundPrepare() {
+  const taskId = detail.value?.inboundPrepareTaskIds?.[0]
+  if (!taskId) return notify('未找到当前检验单关联的检验合格入库预备。', 'warning')
+  router.push(`/wms/warehouse-task/${taskId}`)
+}
+
+function viewInboundPrepareFromList(row) {
+  const taskId = row?.inboundPrepareTaskIds?.[0]
+  if (!taskId) return notify('未找到当前检验单关联的检验合格入库预备。', 'warning')
+  router.push(`/wms/warehouse-task/${taskId}`)
+}
+
 function prepareInboundFromList(row) {
   const outcome = createInboundPrepareTaskFromInspection(row.id)
   if (!outcome.success) return notify(outcome.error, 'warning')
   refresh()
   router.push(`/qms/incoming-inspection/${row.id}`)
   notify(`已生成检验合格入库预备 ${outcome.taskIds?.length || 0} 条`)
-}
-
-function postInventory() {
-  if (!detail.value) return
-  const outcome = receiveQualifiedInspectionToInventory(detail.value.id)
-  if (!outcome.success) return notify(outcome.error, 'warning')
-  refresh()
-  notify(outcome.message || `已生成 ${outcome.inventoryTransactionIds?.length || 0} 条库存流水`)
-}
-
-function postInventoryFromList(row) {
-  const outcome = receiveQualifiedInspectionToInventory(row.id)
-  if (!outcome.success) return notify(outcome.error, 'warning')
-  refresh()
-  router.push(`/qms/incoming-inspection/${row.id}`)
-  notify(outcome.message || `已生成 ${outcome.inventoryTransactionIds?.length || 0} 条库存流水`)
 }
 
 function viewInventoryTransactions() {
@@ -982,7 +1179,7 @@ watch([keyword, advancedFilters], () => {
 watch(() => route.fullPath, () => {
   refresh()
   syncDraft()
-  quickSearchVisible.value = false
+  quickSearchVisible.value = true
 }, { immediate: true })
 
 watch(detail, syncDraft)
@@ -993,6 +1190,9 @@ watch(detail, syncDraft)
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   min-height: 100%;
   padding: 22px;
   background: #f4f7fb;
@@ -1031,6 +1231,13 @@ h2 {
 
 .toolbar {
   margin-bottom: 12px;
+}
+
+.advanced-filter-toolbar {
+  padding: 10px 12px;
+  border: 1px solid #d9e4f2;
+  border-radius: 8px;
+  background: #f8fbff;
 }
 
 .batch-bar {

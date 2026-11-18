@@ -2,7 +2,7 @@ import { addOperationLog } from '../manufacturing/manufacturingFoundationStore.j
 import { listPayablePrepares, getPayablePrepareById } from './payablePrepareStore.js'
 
 const STORAGE_KEY = 'payable-check-state-v1'
-const SOURCE_READY_STATUSES = ['payableReady', 'checked']
+const SOURCE_READY_STATUSES = ['prepared', 'payableReady', 'checked']
 const DIFFERENCE_BLOCKED_MESSAGE = '差异尚未处理，不能生成发票预备。'
 
 function clone(value) {
@@ -124,9 +124,15 @@ function payableCheck(payload = {}) {
     sourcePayablePrepareNo: payload.sourcePayablePrepareNo || '',
     sourceInventoryTransactionIds: payload.sourceInventoryTransactionIds || [],
     sourceInventoryTransactionNos: payload.sourceInventoryTransactionNos || [],
+    sourceWarehouseTaskId: payload.sourceWarehouseTaskId || '',
+    sourceWarehouseTaskNo: payload.sourceWarehouseTaskNo || '',
+    sourceInspectionId: payload.sourceInspectionId || '',
     sourceInspectionNo: payload.sourceInspectionNo || '',
+    sourceReceiveId: payload.sourceReceiveId || '',
     sourceReceiveNo: payload.sourceReceiveNo || '',
+    sourcePurchaseOrderId: payload.sourcePurchaseOrderId || '',
     sourcePurchaseOrderNo: payload.sourcePurchaseOrderNo || '',
+    sourcePriceApprovalNo: payload.sourcePriceApprovalNo || '',
     rootRequestNo: payload.rootRequestNo || '',
     supplierId: payload.supplierId || '',
     supplierName: payload.supplierName || '',
@@ -166,6 +172,21 @@ function payableCheck(payload = {}) {
     invoicePreparedAt: payload.invoicePreparedAt || '',
     remark: payload.remark || '',
     lines,
+    downstreamActionCode: payload.downstreamActionCode || '',
+    downstreamObjectType: payload.downstreamObjectType || '',
+    downstreamObjectNo: payload.downstreamObjectNo || '',
+    downstreamObjectId: payload.downstreamObjectId || '',
+    downstreamGeneratedAt: payload.downstreamGeneratedAt || '',
+    flowWritebackStatus: payload.flowWritebackStatus || '',
+    nextStepReleaseStatus: payload.nextStepReleaseStatus || '',
+    sourceObjectType: payload.sourceObjectType || '',
+    sourceObjectNo: payload.sourceObjectNo || '',
+    sourceObjectId: payload.sourceObjectId || '',
+    sourceBusinessRoute: payload.sourceBusinessRoute || '',
+    createdFromActionCode: payload.createdFromActionCode || '',
+    sourceLinkStatus: payload.sourceLinkStatus || '',
+    checkedAt: payload.checkedAt || '',
+    completedAt: payload.completedAt || '',
     createdAt: payload.createdAt || stamp,
     updatedAt: payload.updatedAt || stamp,
   }
@@ -262,7 +283,7 @@ export function isPayableCheckGenerated(payablePrepareOrId) {
 
 function sourceRejectReason(prepare = {}) {
   if (!prepare?.id) return '未找到应付预备单。'
-  if (!SOURCE_READY_STATUSES.includes(prepare.payableStatus)) return '当前应付预备未达到 payableReady 或 checked，不能生成应付核对。'
+  if (!SOURCE_READY_STATUSES.includes(prepare.payableStatus)) return '当前应付预备未达到 prepared、payableReady 或 checked，不能生成应付核对。'
   if (isPayableCheckGenerated(prepare)) return '该应付预备已生成应付核对，不能重复生成。'
   if (!toNumber(prepare.totalPayableQty) || !toNumber(prepare.totalPayableAmount)) return '应付预备数量或金额为空，不能生成应付核对。'
   return ''
@@ -298,6 +319,23 @@ function buildLinesFromPrepare(prepare = {}) {
 
 export function createPayableCheckFromPayablePrepare(payablePrepareId) {
   const prepare = getPayablePrepareById(payablePrepareId)
+  const existing = prepare?.id
+    ? state.payableChecks.find((check) => String(check.sourcePayablePrepareId) === String(prepare.id))
+    : null
+  if (existing) {
+    const record = clone(existing)
+    return {
+      success: true,
+      ok: true,
+      status: 'already_exists',
+      payableCheckId: record.id,
+      payableCheckNo: record.payableCheckNo,
+      sourcePayablePrepareId: prepare.id,
+      sourcePayablePrepareNo: prepare.payablePrepareNo,
+      record,
+      payableCheck: record,
+    }
+  }
   const reason = sourceRejectReason(prepare)
   if (reason) {
     writePayableCheckLog('应付核对生成拦截', {
@@ -314,9 +352,15 @@ export function createPayableCheckFromPayablePrepare(payablePrepareId) {
     sourcePayablePrepareNo: prepare.payablePrepareNo,
     sourceInventoryTransactionIds: prepare.sourceInventoryTransactionIds || [],
     sourceInventoryTransactionNos: prepare.sourceInventoryTransactionNos || (prepare.lines || []).map((line) => line.sourceInventoryTransactionNo).filter(Boolean),
+    sourceWarehouseTaskId: prepare.sourceWarehouseTaskId,
+    sourceWarehouseTaskNo: prepare.sourceWarehouseTaskNo,
+    sourceInspectionId: prepare.sourceInspectionId,
     sourceInspectionNo: prepare.sourceInspectionNo,
+    sourceReceiveId: prepare.sourceReceiveId,
     sourceReceiveNo: prepare.sourceReceiveNo,
+    sourcePurchaseOrderId: prepare.sourcePurchaseOrderId,
     sourcePurchaseOrderNo: prepare.sourcePurchaseOrderNo,
+    sourcePriceApprovalNo: prepare.sourcePriceApprovalNo,
     rootRequestNo: prepare.rootRequestNo,
     supplierId: prepare.supplierId,
     supplierName: prepare.supplierName,
@@ -342,7 +386,18 @@ export function createPayableCheckFromPayablePrepare(payablePrepareId) {
     targetNo: check.payableCheckNo,
     result: check.totalCheckedAmount,
   })
-  return { success: true, payableCheckId: check.id, payableCheckNo: check.payableCheckNo, payableCheck: clone(check) }
+  const record = clone(check)
+  return {
+    success: true,
+    ok: true,
+    status: 'created',
+    payableCheckId: check.id,
+    payableCheckNo: check.payableCheckNo,
+    sourcePayablePrepareId: prepare.id,
+    sourcePayablePrepareNo: prepare.payablePrepareNo,
+    record,
+    payableCheck: record,
+  }
 }
 
 function batchResult(ids = [], handler, label, noGetter = (id) => id) {
@@ -382,6 +437,9 @@ function markStatus(id, status, action, patch = {}) {
   const current = byId(state.payableChecks, id)
   if (!current) return { success: false, error: '未找到应付核对单。' }
   normalizeCurrentStatus(current)
+  if (status === 'checked' && ['checked', 'matched', 'invoicePrepareReady', 'invoicePrepared'].includes(current.checkStatus)) {
+    return { success: false, alreadyCompleted: true, error: '当前采购应付核对已完成，不能重复完成。', payableCheck: clone(current) }
+  }
   if (['cancelled', 'closed', 'invoicePrepared'].includes(current.checkStatus)) return { success: false, error: '已取消、已关闭或已生成发票预备的应付核对不能继续流转。' }
   if (status === 'checked' && current.checkStatus === 'difference' && current.differenceResolved !== true) {
     writePayableCheckLog('差异未处理时拦截核对通过', { targetId: current.id, targetNo: current.payableCheckNo, result: '差异尚未处理，不能核对通过。' })
@@ -391,11 +449,14 @@ function markStatus(id, status, action, patch = {}) {
     writePayableCheckLog('差异未处理时拦截生成发票预备', { targetId: current.id, targetNo: current.payableCheckNo, result: DIFFERENCE_BLOCKED_MESSAGE })
     return { success: false, error: DIFFERENCE_BLOCKED_MESSAGE }
   }
-  Object.assign(current, patch, { checkStatus: status, updatedAt: nowText() })
+  const stamp = nowText()
+  Object.assign(current, patch, { checkStatus: status, updatedAt: stamp })
   if (status === 'checked') {
     current.checkResult = current.amountDifference || current.quantityDifference ? 'difference' : 'matched'
     current.adjustmentRequired = Boolean(current.amountDifference || current.quantityDifference)
     current.recheckRequired = false
+    current.checkedAt = current.checkedAt || stamp
+    current.completedAt = current.completedAt || stamp
     if (current.differenceResolved) current.recheckResult = 'passed'
   }
   if (status === 'difference') {

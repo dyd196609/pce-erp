@@ -1,34 +1,51 @@
 <template>
-  <section class="cockpit-shell">
-    <aside class="sidebar">
+  <section class="cockpit-shell" :class="{ 'sidebar-collapsed': !compactViewport && sidebarCollapsed }">
+    <aside class="sidebar" data-acceptance-id="main-sidebar">
       <section class="brand">
-        <strong>ProfitOS</strong>
-        <span>{{ t('Enterprise OS') }}</span>
+        <div>
+          <strong>掌云智造</strong>
+          <span>{{ t('Enterprise OS') }}</span>
+        </div>
+        <button
+          type="button"
+          class="sidebar-collapse-button"
+          :data-acceptance-id="(compactViewport ? !mobileMenuOpen : sidebarCollapsed) ? 'main-sidebar-expand-button' : 'main-sidebar-collapse-button'"
+          :title="(compactViewport ? !mobileMenuOpen : sidebarCollapsed) ? '展开主菜单' : '收起主菜单'"
+          :aria-expanded="compactViewport ? mobileMenuOpen : !sidebarCollapsed"
+          @click="compactViewport ? mobileMenuOpen = !mobileMenuOpen : sidebarCollapsed = !sidebarCollapsed"
+        >
+          {{ compactViewport ? (mobileMenuOpen ? '收起菜单' : '主菜单') : (sidebarCollapsed ? '展' : '收') }}
+        </button>
       </section>
 
       <el-menu
+        v-show="!compactViewport || mobileMenuOpen"
         :default-active="activePath"
         class="cockpit-menu"
+        :collapse="!compactViewport && sidebarCollapsed"
         @select="navigateMenu"
       >
-        <el-menu-item
-          v-for="item in navigation"
-          :key="item.key"
-          :index="item.path"
-        >
-          <el-icon>
-            <component :is="getIcon(item.icon)" />
-          </el-icon>
-          <span>{{ t(item.label) }}</span>
-        </el-menu-item>
+        <template v-for="item in navigation" :key="item.key">
+          <el-sub-menu v-if="item.children?.length" :index="item.key">
+            <template #title><el-icon><component :is="getIcon(item.icon)" /></el-icon><span :title="t(item.label)">{{ t(item.label) }}</span></template>
+            <template v-for="child in item.children" :key="child.key">
+              <el-sub-menu v-if="child.children?.length" :index="child.key">
+                <template #title><el-icon><component :is="getIcon(child.icon)" /></el-icon><span :title="t(child.label)">{{ t(child.label) }}</span></template>
+                <el-menu-item v-for="entry in child.children" :key="entry.key" :index="entry.path"><span :title="t(entry.label)">{{ t(entry.label) }}</span></el-menu-item>
+              </el-sub-menu>
+              <el-menu-item v-else :index="child.path"><span :title="t(child.label)">{{ t(child.label) }}</span></el-menu-item>
+            </template>
+          </el-sub-menu>
+          <el-menu-item v-else :index="item.path"><el-icon><component :is="getIcon(item.icon)" /></el-icon><span :title="t(item.label)">{{ t(item.label) }}</span></el-menu-item>
+        </template>
       </el-menu>
     </aside>
 
     <section class="shell-main">
       <header class="system-bar">
         <section class="system-title">
-          <p>{{ t('ProfitOS Cockpit') }}</p>
-          <h1>{{ t(currentModule) }}</h1>
+          <p>PalmCloud ERP</p>
+          <h1 v-if="!unifiedFinancePage">{{ t(currentModule) }}</h1>
         </section>
 
         <section v-if="showCockpitDiagnostics" class="system-status">
@@ -968,7 +985,10 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useCompactViewport } from '../runtime/useCompactViewport.js'
 import { useRoute, useRouter } from 'vue-router'
+import { resolvePageNameConsumption } from '../governance/pageNameConsumer.js'
+import { findFinanceProcessPage } from '../process/financeProcessPageRegistry.js'
 import {
   Box,
   Close,
@@ -984,6 +1004,7 @@ import { calculateBill } from '../billing/billingEngine.js'
 import { getSystemHealth } from '../core/monitoringLayer.js'
 import { getDemoOrder } from '../demo/demoMode.js'
 import { getCockpitNavigation } from '../navigation/cockpitRegistry.js'
+import { FOUNDATION_ROUTES, isFoundationAcceptanceRoute } from '../master-data/foundationNavigationRegistry.js'
 import { getLatestIndustryModel } from '../ai/industryModelEngine.js'
 import { evaluateDecision } from '../ai/decisionEngine.js'
 import { getExecutionHistory, getExecutionStatus } from '../ai/executionEngine.js'
@@ -1016,8 +1037,10 @@ import { getReviewControlState, runReviewControlLoop } from '../review/reviewCon
 import { generateReviewStatus } from '../review/reviewExecutionEngine.js'
 import { dataGateway } from '../runtime/dataGateway.js'
 import { translate } from '../runtime/i18nEngine.js'
-import { canAccessModule, canPerformAction, getAccessibleNavigation, hasPlanAccess } from '../runtime/permissionEngine.js'
+import { canAccessModule, canPerformAction, hasPlanAccess } from '../runtime/permissionEngine.js'
+import { getAccessibleFoundationNavigation as getAccessibleNavigation } from '../master-data/foundationNavigationRegistry.js'
 import { stateManager } from '../runtime/stateManager.js'
+import { loadPermissionProfile } from '../runtime/permissionProfileRuntime.js'
 import { getOrchestrationSnapshot } from '../orchestration/autoWorkflowConnector.js'
 import { getIntelligenceSnapshot } from '../intelligence/decisionEngine.js'
 import { getExecutionLayerSnapshot } from '../execution/executionEngine.js'
@@ -1043,9 +1066,17 @@ const route = useRoute()
 const router = useRouter()
 const runtimeState = ref(stateManager.snapshot())
 const controlTick = ref(0)
+const sidebarCollapsed = ref(false)
+const compactViewport = useCompactViewport(), mobileMenuOpen = ref(false)
+const formalPermissionProfile = ref(null)
 const navigation = computed(() => {
   controlTick.value
-  return getAccessibleNavigation(getCockpitNavigation(), runtimeState.value)
+  return getAccessibleNavigation(getCockpitNavigation(), {
+    ...runtimeState.value,
+    ...(formalPermissionProfile.value
+      ? { permissionCodes: formalPermissionProfile.value.permissionCodes || [] }
+      : {}),
+  })
 })
 const traceOpen = ref(false)
 const health = ref(getSystemHealth())
@@ -1302,6 +1333,8 @@ const cockpitMetricSchema = {
 
 const activePath = computed(() => {
   if (route.path.startsWith('/purchase/order')) return '/purchase/order'
+  if (isFoundationAcceptanceRoute(route.path)) return FOUNDATION_ROUTES.acceptanceCenter
+  if (route.path.startsWith('/foundation/master-data/')) return FOUNDATION_ROUTES.enterpriseFoundation
   return route.path
 })
 const showCockpitDiagnostics = computed(() => (
@@ -1309,9 +1342,13 @@ const showCockpitDiagnostics = computed(() => (
 ))
 
 const currentModule = computed(() => {
-  const current = navigation.value.find((item) => item.path === activePath.value)
-  return current?.label || 'Dashboard'
+  const consumed = resolvePageNameConsumption({ route: route.path })
+  if (consumed.result === 'PASS') return consumed.pageTitle
+  const flattened = navigation.value.flatMap(item => [item, ...(item.children || []).flatMap(child => [child, ...(child.children || [])])])
+  const current = flattened.find((item) => item.path === activePath.value)
+  return current?.label || '页面名称未登记'
 })
+const unifiedFinancePage = computed(() => Boolean(findFinanceProcessPage(route.path)))
 
 function normalizeMenuPath(path = '') {
   const value = String(path || '')
@@ -1323,6 +1360,7 @@ function normalizeMenuPath(path = '') {
 
 function navigateMenu(index) {
   const target = normalizeMenuPath(index)
+  if (compactViewport.value) mobileMenuOpen.value = false
 
   if (target && target !== route.path) {
     router.push(target)
@@ -1815,6 +1853,11 @@ onMounted(async () => {
     runTrace()
   })
   ensureRouteAccess()
+  try {
+    formalPermissionProfile.value = await loadPermissionProfile({ force: true })
+  } catch {
+    formalPermissionProfile.value = null
+  }
   await refreshCockpitData()
   runTrace()
 })
@@ -1822,40 +1865,96 @@ onMounted(async () => {
 
 <style scoped>
 .cockpit-shell {
-  display: grid;
-  grid-template-columns: 240px 1fr;
+  --sidebar-width: 240px;
+  display: block;
   min-height: 100vh;
   background: #eef3f8;
   color: #1f2937;
+  /* Clip the horizontal axis without creating a vertical sticky scrollport. */
+  overflow-x: clip;
+}
+
+.cockpit-shell.sidebar-collapsed {
+  --sidebar-width: 72px;
 }
 
 .sidebar {
+  position: fixed;
+  top: var(--pce-account-bookmark-height, 0px);
+  left: 0;
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--pce-account-bookmark-height, 0px));
   min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: #111827;
   color: #fff;
+  z-index: 20;
+  transition: width 0.18s ease;
 }
 
 .brand {
   height: 72px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   padding: 0 18px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.brand div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
 .brand strong {
   font-size: 20px;
+  white-space: nowrap;
 }
 
 .brand span {
   color: #aab5c4;
   font-size: 12px;
+  white-space: nowrap;
+}
+
+.sidebar-collapse-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .cockpit-menu {
   border-right: 0;
   background: transparent;
+}
+
+.cockpit-shell.sidebar-collapsed .brand {
+  padding: 0 12px;
+  justify-content: center;
+}
+
+.cockpit-shell.sidebar-collapsed .brand div {
+  display: none;
+}
+
+.cockpit-shell.sidebar-collapsed .cockpit-menu :deep(.el-menu-item) {
+  justify-content: center;
+}
+
+.cockpit-shell.sidebar-collapsed .cockpit-menu :deep(.el-menu-item span) {
+  display: none;
 }
 
 .cockpit-menu :deep(.el-menu-item) {
@@ -1872,20 +1971,35 @@ onMounted(async () => {
   min-width: 0;
   display: flex;
   flex-direction: column;
+  width: calc(100% - var(--sidebar-width));
+  max-width: calc(100% - var(--sidebar-width));
+  margin-left: var(--sidebar-width);
+  overflow-x: clip;
+  transition: width 0.18s ease, margin-left 0.18s ease;
 }
 
 .system-bar {
   position: sticky;
-  top: 0;
+  top: var(--pce-account-bookmark-height, 0px);
   z-index: 10;
-  height: 72px;
+  box-sizing: border-box;
+  min-height: 72px;
+  height: auto;
+  flex: 0 0 auto;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 0 22px;
+  padding: 12px 22px;
   background: #fff;
   border-bottom: 1px solid #dce5f2;
+}
+
+.system-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .system-title p,
@@ -1896,10 +2010,12 @@ onMounted(async () => {
 .system-title p {
   color: #64748b;
   font-size: 12px;
+  line-height: 1.5;
 }
 
 .system-title h1 {
   font-size: 22px;
+  line-height: 1.4;
 }
 
 .system-status {
@@ -2765,7 +2881,7 @@ onMounted(async () => {
 .workspace {
   min-width: 0;
   flex: 1;
-  overflow: auto;
+  overflow-x: clip;
   padding: 0 18px 18px;
 }
 
@@ -2821,12 +2937,16 @@ onMounted(async () => {
 }
 
 @media (max-width: 980px) {
-  .cockpit-shell {
-    grid-template-columns: 1fr;
-  }
-
   .sidebar {
     position: static;
+    width: 100%;
+    height: auto;
+  }
+
+  .shell-main {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
   }
 
   .kpi-strip {
@@ -3061,5 +3181,31 @@ onMounted(async () => {
   .full-autonomy-strip {
     grid-template-columns: 1fr;
   }
+}
+</style>
+
+<style scoped>
+@media(max-width:1024px){.sidebar{position:relative;width:100%;max-width:100%;height:auto}.brand{padding:12px 18px}.cockpit-menu{display:flex;flex-wrap:wrap}.shell-main{width:100%;max-width:100%;margin-left:0}.system-bar{position:sticky;top:var(--pce-account-bookmark-height,52px);z-index:15;min-width:0}.system-title{min-width:0}.system-title h1{overflow-wrap:anywhere}.main-content{min-width:0;max-width:100%}}
+@media(max-width:640px){.cockpit-menu{max-height:160px;overflow-y:auto}.system-bar{padding:10px 12px}.system-title p{margin:0}.brand strong{font-size:20px}}
+</style>
+
+<style scoped>
+@media(max-width:1024px){.sidebar{top:auto}}
+@media(max-width:900px){
+  .cockpit-shell{font-size:.875rem}
+  .sidebar{top:auto}
+  .brand{height:auto;min-height:44px;padding:4px 12px}
+  .brand strong{font-size:1rem}
+  .brand span{font-size:.6875rem;line-height:1.2}
+  .sidebar-collapse-button{min-width:64px;min-height:44px;font-size:.8125rem}
+  .system-bar{min-height:48px;gap:6px;padding:6px 12px}
+  .system-title p{font-size:.6875rem;line-height:1.2}
+  .system-title h1{font-size:1.125rem;line-height:1.3}
+  .workspace{padding:0 8px 12px}
+  .workspace :deep(.pce-list-page-shell){gap:8px}
+  .workspace :deep(.pce-compact-page-guide){padding:4px 8px;font-size:.8125rem}
+  .workspace :deep(.pce-page-action-bar){display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .workspace :deep(.pce-page-action-bar button){min-height:44px;padding:5px;font-size:.75rem;line-height:1.35;white-space:normal}
+  .workspace :deep(.pce-page-refresh-time){grid-column:1/-1;order:1;font-size:.75rem}
 }
 </style>

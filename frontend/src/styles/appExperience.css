@@ -13,6 +13,75 @@
   line-height: 1.35;
 }
 
+/* Page identity text must grow with its content in every shared/legacy header. */
+body .cockpit-shell .workspace :is(section, header, main, form, article, [id], [data-acceptance-id], .object-list) {
+  scroll-margin-top: calc(var(--pce-account-bookmark-height, 52px) + var(--pce-system-bar-height, 72px) + 16px);
+}
+
+body .workspace :is(.page-header, .pce-list-page-header, .shell-page-header, .page-hero, .hero, .planning-hero, .workspace-header) {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  height: auto;
+  flex-shrink: 0;
+}
+
+body .workspace :is(.page-header, .pce-list-page-header, .shell-page-header, .page-hero, .hero, .planning-hero, .workspace-header) > :is(div, section, dl) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+body .workspace :is(h1, .page-header h2, .hero h2, .shell-page-header h2) {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+
+body .workspace :is(.page-header, .pce-list-page-header, .shell-page-header, .page-hero, .hero, .planning-hero, .workspace-header) p {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+
+body .workspace :is(.page-hero, .hero, .planning-hero, .workspace-header) {
+  flex-wrap: wrap;
+}
+
+body .workspace :is(.planning-hero, .workspace-header) > div:first-child {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 760px) {
+  body .workspace .shell-page-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+body .workspace .pce-list-page-breadcrumb {
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
+
+.business-table-scroll-container {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.business-table-scroll-container.pce-baseline-table-shell {
+  overflow: hidden;
+}
+
+.business-table-scroll-container > .business-table-scroll-content {
+  width: 100%;
+  min-width: 100%;
+}
+
 .app-module-nav-zone {
   align-items: stretch;
   gap: 8px;
@@ -201,6 +270,169 @@
   width: 420px;
 }
 
+.global-sort-arrow .el-table__column-sorter,
+.el-table .el-table__column-sorter {
+  display: inline-flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin-left: 6px;
+}
+
+.global-sort-arrow .caret-wrapper,
+.el-table .caret-wrapper {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: 28px !important;
+  height: 18px !important;
+}
+
+.global-sort-arrow .sort-caret,
+.el-table .sort-caret {
+  display: none !important;
+  border: 0 !important;
+}
+
+.global-sort-arrow .caret-wrapper::before,
+.el-table .caret-wrapper::before {
+  content: "▲▼";
+  color: #64748b !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.global-sort-arrow .ascending .caret-wrapper::before,
+.el-table .ascending .caret-wrapper::before {
+  content: "▲";
+  color: #1d4ed8 !important;
+}
+
+.global-sort-arrow .descending .caret-wrapper::before,
+.el-table .descending .caret-wrapper::before {
+  content: "▼";
+  color: #1d4ed8 !important;
+}
+
+.el-table .business-table-selection-column,
+.el-table .payment-fixed-selection-column,
+.el-table .pce-fixed-index-column,
+.el-table .payment-fixed-index-column,
+.el-table .pce-fixed-primary-no-column,
+.el-table .payment-fixed-no-column,
+.el-table .el-table-fixed-column--left,
+.el-table .el-table-fixed-column--right,
+.el-table .el-table__cell.is-left,
+.el-table .el-table__cell.is-right {
+  background: #fff !important;
+}
+
+.el-table th.business-table-selection-column,
+.el-table th.payment-fixed-selection-column,
+.el-table th.pce-fixed-index-column,
+.el-table th.payment-fixed-index-column,
+.el-table th.pce-fixed-primary-no-column,
+.el-table th.payment-fixed-no-column,
+.el-table th.el-table__cell.is-left,
+.el-table th.el-table__cell.is-right {
+  background: #f8fafc !important;
+}
+
+.el-table .pce-fixed-primary-no-column,
+.el-table .payment-fixed-no-column {
+  box-shadow: 8px 0 12px -12px rgba(15, 23, 42, 0.45);
+}
+
+.business-table-scroll-container .el-table .payment-fixed-action-column {
+  background: #ffffff !important;
+  box-shadow: -8px 0 12px -12px rgba(15, 23, 42, 0.45);
+}
+
+.business-table-scroll-container .el-table th.payment-fixed-action-column,
+.business-table-scroll-container .el-table .el-table__header .payment-fixed-action-column {
+  background: #f8fafc !important;
+}
+
+/* One layout contract for every rendered advanced-filter panel. */
+body [data-acceptance-id="list-advanced-filter-panel"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  overflow-x: visible !important;
+}
+
+body [data-acceptance-id="list-advanced-filter-panel"][style*="display: none"] {
+  display: none !important;
+}
+
+body [data-acceptance-id="list-advanced-filter-panel"] > label,
+body [data-acceptance-id="list-advanced-filter-panel"] > .filter-item {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 6px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+body [data-acceptance-id="list-advanced-filter-panel"] > [data-filter-span="2"] {
+  grid-column: span 1;
+}
+
+body [data-acceptance-id="list-advanced-filter-panel"] :is(.el-input, .el-select, .el-date-editor, .el-input-number, input, select) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+@media (min-width: 768px) {
+  body [data-acceptance-id="list-advanced-filter-panel"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  body [data-acceptance-id="list-advanced-filter-panel"] > [data-filter-span="2"] {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  body [data-acceptance-id="list-advanced-filter-panel"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  body [data-acceptance-id="list-advanced-filter-panel"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Native business tables share the same real-grid operation-column contract. */
+.table-card > table th.operation-cell,
+.table-card > table td.operation-cell {
+  position: sticky !important;
+  right: 0 !important;
+  z-index: 8 !important;
+  box-sizing: border-box;
+  min-width: 240px;
+  background: #ffffff !important;
+  box-shadow: -8px 0 12px -12px rgba(15, 23, 42, 0.45);
+}
+
+.table-card > table th.operation-cell {
+  z-index: 9 !important;
+  background: #f8fafc !important;
+}
+
 @media (max-width: 760px) {
   .app-module-nav-zone {
     align-items: flex-start;
@@ -212,4 +444,11 @@
     justify-content: flex-start;
     min-width: 128px;
   }
+}
+
+/* Shared mobile typography: inherited16px body becomes15px only on mobile.
+   Existing explicit13px tables/12px helpers and16px inputs stay unchanged. */
+@media(max-width:760px){
+ :root{--pce-mobile-body-font-size:15px}
+ body{font-size:var(--pce-mobile-body-font-size);}
 }

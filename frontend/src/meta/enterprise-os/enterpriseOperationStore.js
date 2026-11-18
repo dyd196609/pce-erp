@@ -1,6 +1,21 @@
-import { enterpriseOperationModel, processGroups } from './enterpriseOperationModel.js'
+import { enterpriseOperationModel } from './enterpriseOperationModel.js'
+import {
+  addBusinessProcess,
+  getBusinessProcessByCode,
+  listBusinessProcesses,
+  recordBusinessProcessDesignExecution,
+  setBusinessProcessEnabled,
+  updateBusinessProcess,
+} from '../process/businessProcessRegistry.js'
 
 const STORAGE_KEY = 'enterprise-operation-state-v1'
+const MOJIBAKE_PATTERN = /(褰撳|浼佷笟|鏁版嵁|绯荤|浠樻|閲囪|搴撳|鏉ユ|瀹℃|淇濆|杩斿|鐪熷|渚涘|鑽夌|鍩虹|妯|銆|�)/
+
+const DISPLAY_TEXT_REPAIRS = {
+  褰撳墠宀椾綅: '当前岗位',
+  涓氬姟: '业务',
+  绯荤粺閰嶇疆: '系统配置',
+}
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value))
@@ -10,17 +25,6 @@ function createId(prefix) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`
 }
 
-function createDefaultProcesses() {
-  return processGroups.flatMap((group) => (
-    enterpriseOperationModel.processCenter[group.key] || []
-  ).map((process) => ({
-    ...process,
-    category: group.key,
-    categoryName: group.title,
-    enabled: process.enabled !== false,
-  })))
-}
-
 function createDefaultState() {
   return {
     company: clone(enterpriseOperationModel.organization.company),
@@ -28,7 +32,6 @@ function createDefaultState() {
     roles: clone(enterpriseOperationModel.organization.roles),
     users: clone(enterpriseOperationModel.organization.users),
     permissions: clone(enterpriseOperationModel.organization.permissions),
-    processes: createDefaultProcesses(),
     tasks: [
       ...enterpriseOperationModel.workCenter.pendingTasks.map((task) => ({ ...task, type: 'pending' })),
       ...enterpriseOperationModel.workCenter.executionTasks.map((task) => ({ ...task, type: 'execution' })),
@@ -52,14 +55,56 @@ function createDefaultState() {
 }
 
 function normalizeState(nextState = {}) {
+  const defaults = createDefaultState()
+  const { processes: _legacyProcessCopies, ...stateWithoutLegacyProcesses } = nextState
   return {
-    ...createDefaultState(),
-    ...nextState,
+    ...defaults,
+    ...stateWithoutLegacyProcesses,
     config: {
-      ...createDefaultState().config,
+      ...defaults.config,
       ...(nextState.config || {}),
     },
   }
+}
+
+function hasMojibake(value) {
+  return typeof value === 'string' && MOJIBAKE_PATTERN.test(value)
+}
+
+function repairDisplayText(value) {
+  if (!hasMojibake(value)) return value
+  return DISPLAY_TEXT_REPAIRS[value] || value
+}
+
+function repairCollectionById(collection = [], defaults = [], fields = []) {
+  const defaultMap = new Map(defaults.map((item) => [item.id, item]))
+  return collection.map((item) => {
+    const standard = defaultMap.get(item.id) || {}
+    const next = { ...item }
+    fields.forEach((field) => {
+      if (hasMojibake(next[field])) next[field] = standard[field] || repairDisplayText(next[field])
+    })
+    return next
+  })
+}
+
+function repairEnterpriseDisplayState(nextState) {
+  const defaults = createDefaultState()
+  return {
+    ...nextState,
+    tasks: repairCollectionById(nextState.tasks, defaults.tasks, ['title', 'process', 'owner', 'due', 'status']),
+    approvals: repairCollectionById(nextState.approvals, defaults.approvals, ['title', 'applicant', 'status']),
+    workflows: repairCollectionById(nextState.workflows, defaults.workflows, ['name', 'currentStep', 'progress']),
+    quickActions: repairCollectionById(nextState.quickActions, defaults.quickActions, ['name']),
+    departments: repairCollectionById(nextState.departments, defaults.departments, ['name', 'owner', 'processOwner']),
+    roles: repairCollectionById(nextState.roles, defaults.roles, ['name', 'responsibility']),
+    users: repairCollectionById(nextState.users, defaults.users, ['name', 'department', 'role']),
+    permissions: repairCollectionById(nextState.permissions, defaults.permissions, ['name', 'role', 'scope']),
+  }
+}
+
+function stateHasMojibake(nextState) {
+  return MOJIBAKE_PATTERN.test(JSON.stringify(nextState))
 }
 
 function loadState() {
@@ -67,7 +112,11 @@ function loadState() {
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? normalizeState(JSON.parse(raw)) : createDefaultState()
+    if (!raw) return createDefaultState()
+    const normalized = normalizeState(JSON.parse(raw))
+    const repaired = stateHasMojibake(normalized) ? repairEnterpriseDisplayState(normalized) : normalized
+    if (repaired !== normalized) localStorage.setItem(STORAGE_KEY, JSON.stringify(repaired))
+    return repaired
   } catch (error) {
     return createDefaultState()
   }
@@ -113,7 +162,10 @@ function findById(collection, id, matcher) {
 }
 
 export function getEnterpriseOperationState() {
-  return clone(state)
+  return clone({
+    ...state,
+    processes: listBusinessProcesses(),
+  })
 }
 
 export function getTaskById(id) {
@@ -129,9 +181,14 @@ export function getExecutionTaskById(id) {
 }
 
 export function getProcessById(id) {
-  return findById('processes', id, (item, value) => (
-    item.category === value || item.key === value || item.name === value
-  ))
+  const value = String(id || '')
+  return clone(
+    getBusinessProcessByCode(value)
+    || listBusinessProcesses().find(process => (
+      process.processName === value || process.moduleCode === value
+    ))
+    || null,
+  )
 }
 
 export function getDepartmentById(id) {
@@ -199,36 +256,39 @@ export function deletePermission(id) {
 }
 
 export function addProcess(process) {
-  return upsert('processes', {
-    enabled: true,
-    pending: 0,
-    status: '待处理',
+  const processCode = process.processCode || process.id || createId('PROCESS')
+  return addBusinessProcess({
     ...process,
+    processCode,
+    processName: process.processName || process.name || processCode,
+    processVersion: process.processVersion || process.version || 'V1.0',
+    moduleCode: process.moduleCode || String(process.category || 'SCM').toUpperCase(),
+    moduleName: process.moduleName || process.categoryName || '企业业务模块',
+    nodes: process.nodes || [],
   })
 }
 
 export function updateProcess(id, patch) {
-  update('processes', id, patch)
+  return updateBusinessProcess(String(id), {
+    ...patch,
+    processName: patch.processName || patch.name,
+    processVersion: patch.processVersion || patch.version,
+  })
 }
 
 export function deleteProcess(id) {
-  remove('processes', id)
+  return setBusinessProcessEnabled(String(id), false)
 }
 
 export function executeProcess(id, payload = {}) {
   const process = getProcessById(id)
   if (!process) return null
 
-  updateProcess(process.id, {
-    status: '执行中',
-    executionAction: payload.action || '确认执行',
-    executionResult: payload.result || '已确认执行',
-    pending: Math.max(0, Number(process.pending || 0) - 1),
-  })
+  recordBusinessProcessDesignExecution(process.processCode, payload)
 
   return addTask({
-    title: `执行${process.name}`,
-    process: process.name,
+    title: `执行${process.processName}`,
+    process: process.processName,
     owner: process.owner,
     status: '执行中',
     type: 'execution',
@@ -240,10 +300,10 @@ export function createBusinessRecord(processId, payload = {}) {
   const process = getProcessById(processId)
   const record = {
     id: createId('business-record'),
-    processId: process?.id || processId,
-    processName: process?.name || '业务流程',
+    processId: process?.processCode || processId,
+    processName: process?.processName || '业务流程',
     name: payload.name || '新建业务单',
-    type: payload.type || process?.categoryName || '业务单',
+    type: payload.type || process?.moduleName || '业务单',
     owner: payload.owner || process?.owner || '负责人',
     planDate: payload.planDate || '',
     remark: payload.remark || '',

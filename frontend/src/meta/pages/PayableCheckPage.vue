@@ -1,743 +1,1175 @@
 <template>
-  <main class="finance-flow-page">
-    <header class="page-header">
-      <section>
-        <p class="eyebrow">V1.12.4 采购应付核对</p>
-        <h1>{{ detail ? '应付核对详情' : '采购应付核对' }}</h1>
-        <p>本页根据采购应付预备生成应付核对，只核对数量、单价、金额和来源链，不生成正式应付，不生成财务凭证。</p>
-        <p class="finance-current-module-badge">当前操作模块：应付核对</p>
-      </section>
-      <nav class="page-tabs finance-flow-nav" aria-label="财务前置流程导航">
-        <span class="finance-nav-title">财务前置流程导航</span>
-        <router-link class="finance-nav-button" to="/finance/payable-prepares">应付预备</router-link>
-        <router-link class="finance-nav-button finance-nav-button-active" to="/finance/payable-checks">应付核对 <span class="finance-current-tag">当前</span></router-link>
-        <router-link class="finance-nav-button" to="/finance/invoice-prepares">发票预备</router-link>
-        <router-link class="finance-nav-button" to="/finance/ap-drafts">应付账款草稿</router-link>
-        <router-link class="finance-nav-button" to="/finance/payment-drafts">供应商付款草稿</router-link>
-        <router-link class="finance-nav-button" to="/finance/payment-prepares">正式付款单预备</router-link>
-      </nav>
-    </header>
-
-    <el-alert v-if="message" :title="message" :type="messageType" show-icon :closable="false" />
-
-    <section v-if="detail" class="operation-shell">
-      <section class="plain-flow-guide">
-        <strong>财务前置总流程：采购入库完成 -> 生成应付预备 -> 核对数量和金额 -> 准备发票信息 -> 生成应付账款草稿 -> 确认应付 -> 等待后续付款</strong>
-        <div class="plain-flow-grid">
-          <span><b>当前步骤</b>第 2 步：核对数量和金额</span>
-          <span><b>本页要做</b>核对供应商、采购订单、收货单、检验单、物料、数量、单价和金额是否一致。</span>
-          <span><b>下一步</b>核对通过后，生成发票预备，准备供应商开票或登记已收到发票。</span>
-          <span><b>本页不会做</b>不生成正式应付账款、付款单或财务凭证。</span>
-        </div>
-      </section>
-      <section class="next-step-guide">
-        <strong>下一步操作</strong>
-        <span>无差异：核对通过 -> 生成发票预备。存在差异：处理差异 -> 重新核对 -> 核对通过 -> 生成发票预备。</span>
-        <el-button type="primary" @click="router.push('/finance/invoice-prepares')">进入发票预备</el-button>
-      </section>
-      <section class="difference-guide">
-        <strong>应付核对差异处理流程：发现差异 -> 填写差异原因 -> 选择处理方式 -> 保存差异处理 -> 重新核对 -> 核对通过 -> 生成发票预备</strong>
-        <span>如果数量、单价、金额或来源单据不一致，需要先处理差异。差异未处理前，不能生成发票预备；差异处理完成后，必须重新核对，核对通过后才能生成发票预备。</span>
-      </section>
-      <section class="flow-guide">
-        <strong>作业流程：应付预备 -> 应付核对 -> 发票预备 -> 后续正式应付</strong>
-        <span>本页只核对应付预备的供应商、数量、单价、金额和来源链；核对金额为本次确认的含税金额，用于后续发票预备。本页不生成正式应付、付款或财务凭证。</span>
-      </section>
-      <el-card shadow="never">
-        <template #header>
-          <div class="card-header">
-            <div>
-              <h2>{{ detail.payableCheckNo }}</h2>
-              <span>{{ detail.sourcePayablePrepareNo || '-' }} / {{ detail.supplierName || '-' }}</span>
-            </div>
-            <div class="button-row">
-              <el-button @click="router.push('/finance/payable-checks')">返回列表</el-button>
-              <el-button @click="router.push(`/finance/payable-prepare/${detail.sourcePayablePrepareId}`)">查看应付预备</el-button>
-              <el-button v-if="getPayableCheckActions(detail).canStartChecking" type="warning" @click="markChecking(detail)">开始核对</el-button>
-              <el-button v-if="getPayableCheckActions(detail).canMarkChecked" type="success" @click="markChecked(detail)">核对通过</el-button>
-              <el-button v-if="getPayableCheckActions(detail).canMarkDifference" type="danger" @click="markDifference(detail)">标记差异</el-button>
-              <el-button v-if="getPayableCheckActions(detail).canStartDifference" type="danger" @click="startDifference(detail)">处理差异</el-button>
-              <el-button v-if="getPayableCheckActions(detail).canSaveDifference" type="primary" @click="saveDifference(detail)">保存差异处理</el-button>
-              <el-button v-if="getPayableCheckActions(detail).canCancelDifference" @click="cancelDifference(detail)">取消处理</el-button>
-              <el-button v-if="getPayableCheckActions(detail).canRecheck" type="warning" @click="recheckDifference(detail)">重新核对</el-button>
-              <el-button v-if="getPayableCheckActions(detail).canViewDifference" @click="scrollToDifferenceForm">查看差异处理</el-button>
-              <el-button v-if="getPayableCheckActions(detail).canCreateInvoice" type="primary" @click="createInvoice(detail)">生成发票预备</el-button>
-              <el-button v-if="getPayableCheckActions(detail).canViewInvoice" type="success" @click="viewInvoicePrepare(detail)">查看发票预备</el-button>
-              <el-button v-if="!['invoicePrepared', 'cancelled', 'closed'].includes(getPayableCheckNormalizedState(detail).checkStatus)" type="danger" @click="cancelCheck(detail)">取消</el-button>
-            </div>
-          </div>
-        </template>
-        <el-alert title="采购应付核对流程：应付预备 -> 应付核对 -> 发票预备 -> 后续正式应付。本页不生成正式应付或财务凭证。" type="info" show-icon :closable="false" />
-        <section class="amount-guide">
-          <strong>金额口径</strong>
-          <span>核对金额 checkedAmount = 核对数量 * 核对单价，为含税金额；核对通过后用于发票预备。未税金额不在本页混用，后续在发票预备按税率拆分。</span>
-        </section>
-        <div class="info-grid">
-          <article v-for="item in detailFields" :key="item.label">
-            <span>{{ item.label }}</span>
-            <strong>{{ item.value }}</strong>
-          </article>
-        </div>
-      </el-card>
-
-      <el-card shadow="never" v-if="getPayableCheckNormalizedState(detail).checkStatus === 'difference' || getPayableCheckNormalizedState(detail).differenceStatus !== 'none'">
-        <template #header>
-          <div class="card-header">
-            <div>
-              <h2>差异处理区</h2>
-              <span>请说明差异来源，并选择处理方式。保存后需要重新核对，核对通过后才能生成发票预备。</span>
-            </div>
-            <el-tag :type="differenceStatusType(getPayableCheckNormalizedState(detail).differenceStatus)">{{ differenceStatusLabel(getPayableCheckNormalizedState(detail).differenceStatus) }}</el-tag>
-          </div>
-        </template>
-        <section class="difference-form">
-          <p class="difference-hint wide-field">{{ differenceStatusHint(detail) }}</p>
-          <label>
-            <span>差异类型</span>
-            <el-select v-model="differenceForm.differenceType" placeholder="请选择差异类型" :disabled="!getPayableCheckActions(detail).canEditDifference">
-              <el-option v-for="item in differenceTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
-          </label>
-          <label>
-            <span>差异原因</span>
-            <el-input v-model="differenceForm.differenceReason" type="textarea" :rows="3" placeholder="请填写数量、单价、金额或来源单据不一致的原因" :disabled="!getPayableCheckActions(detail).canEditDifference" />
-          </label>
-          <label>
-            <span>处理方式</span>
-            <el-select v-model="differenceForm.differenceResolution" placeholder="请选择处理方式" :disabled="!getPayableCheckActions(detail).canEditDifference">
-              <el-option v-for="item in differenceResolutionOptions" :key="item.value" :label="item.label" :value="item.value" />
-            </el-select>
-          </label>
-          <label>
-            <span>处理人</span>
-            <el-input v-model="differenceForm.differenceHandlerName" placeholder="处理人" :disabled="!getPayableCheckActions(detail).canEditDifference" />
-          </label>
-          <label>
-            <span>处理时间</span>
-            <el-input :model-value="detail.differenceHandledAt || '-'" disabled />
-          </label>
-          <label class="wide-field">
-            <span>处理备注</span>
-            <el-input v-model="differenceForm.remark" type="textarea" :rows="3" placeholder="本轮只记录处理说明，不生成调整单，不自动退回采购、仓库或供应商流程。" :disabled="!getPayableCheckActions(detail).canEditDifference" />
-          </label>
-          <div class="difference-actions wide-field">
-            <el-button v-if="getPayableCheckActions(detail).canStartDifference" type="danger" @click="startDifference(detail)">处理差异</el-button>
-            <el-button v-if="getPayableCheckActions(detail).canSaveDifference" type="primary" @click="saveDifference(detail)">保存差异处理</el-button>
-            <el-button v-if="getPayableCheckActions(detail).canCancelDifference" @click="cancelDifference(detail)">取消处理</el-button>
-            <el-button v-if="getPayableCheckActions(detail).canRecheck" type="warning" @click="recheckDifference(detail)">重新核对</el-button>
-          </div>
-        </section>
-      </el-card>
-
-      <el-card shadow="never">
-        <template #header><h2>应付核对明细</h2></template>
-        <el-table :data="detail.lines || []" border stripe height="520">
-          <el-table-column type="index" label="序号" width="70" fixed="left" />
-          <el-table-column prop="materialCode" label="物料编码" min-width="130" />
-          <el-table-column prop="materialName" label="物料名称" min-width="160" />
-          <el-table-column prop="spec" label="规格型号" min-width="120" />
-          <el-table-column prop="unit" label="单位" width="90" />
-          <el-table-column prop="batchNo" label="批号" min-width="130" />
-          <el-table-column prop="payableQty" label="应付数量" width="110" />
-          <el-table-column prop="payablePrice" label="应付单价" width="110" />
-          <el-table-column prop="payableAmount" label="应付金额" width="120" />
-          <el-table-column prop="checkedQty" label="核对数量" width="110" />
-          <el-table-column prop="checkedPrice" label="核对单价" width="110" />
-          <el-table-column prop="checkedAmount" label="核对金额" width="120" />
-          <el-table-column prop="quantityDifference" label="数量差异" width="110" />
-          <el-table-column prop="amountDifference" label="金额差异" width="110" />
-          <el-table-column prop="sourcePurchaseOrderNo" label="采购订单" min-width="150" />
-          <el-table-column prop="sourceReceiveNo" label="收货单" min-width="150" />
-          <el-table-column prop="sourceInspectionNo" label="检验单" min-width="150" />
-          <el-table-column prop="rootRequestNo" label="原始请购单" min-width="150" />
-          <el-table-column prop="differenceReason" label="差异原因" min-width="180" />
-        </el-table>
-      </el-card>
+  <main class="payable-page">
+    <section class="page-heading">
+      <div v-if="!embeddedInCommonShell">
+        <p class="eyebrow">{{ VERSION }} · Finance</p>
+        <h2>{{ payableCheckCanonicalName }}</h2>
+        <p class="page-note">
+          本页只承接采购应付预备到应付核对的当前步骤。仅在用户点击“执行应付核对”或“批量完成应付核对”后写入应付核对 Store；
+          不自动执行、不自动进入下一步、不写总账、不核销、不生成付款或银行流水。
+        </p>
+      </div>
+      <el-button
+        plain
+        data-acceptance-id="toggle-acceptance-panel"
+        @click="acceptanceVisible = !acceptanceVisible"
+      >
+        {{ acceptanceVisible ? '隐藏验收信息' : '显示验收信息' }}
+      </el-button>
     </section>
 
-    <section v-else class="operation-shell">
-      <section class="plain-flow-guide">
-        <strong>财务前置总流程：采购入库完成 -> 生成应付预备 -> 核对数量和金额 -> 准备发票信息 -> 生成应付账款草稿 -> 确认应付 -> 等待后续付款</strong>
-        <div class="plain-flow-grid">
-          <span><b>当前步骤</b>第 2 步：核对数量和金额</span>
-          <span><b>本页要做</b>核对供应商、采购订单、收货单、检验单、物料、数量、单价和金额是否一致。</span>
-          <span><b>下一步</b>核对通过后，进入“发票预备”。</span>
-          <span><b>本页不会做</b>不生成正式应付账款、付款单或财务凭证。</span>
+    <section v-if="detailRecord" class="table-card payable-check-detail" data-pce-section="payable-check-detail">
+      <div class="toolbar-title">
+        <div>
+          <p class="eyebrow">{{ VERSION }} · Finance</p>
+          <h3 data-testid="payable-check-detail-title">采购应付核对</h3>
         </div>
-      </section>
-      <section class="next-step-guide">
-        <strong>下一步操作</strong>
-        <span>无差异：核对通过 -> 生成发票预备。存在差异：处理差异 -> 重新核对 -> 核对通过 -> 生成发票预备。</span>
-        <el-button type="primary" @click="router.push('/finance/invoice-prepares')">进入发票预备</el-button>
-      </section>
-      <section class="difference-guide">
-        <strong>应付核对差异处理流程：发现差异 -> 填写差异原因 -> 选择处理方式 -> 保存差异处理 -> 重新核对 -> 核对通过 -> 生成发票预备</strong>
-        <span>差异未处理前，不能生成发票预备；差异处理完成后显示“重新核对”，重新核对通过后才显示“生成发票预备”。</span>
-      </section>
-      <section class="flow-guide">
-        <strong>作业流程：应付预备 -> 应付核对 -> 发票预备 -> 后续正式应付</strong>
-        <span>本页只做应付预备核对，不生成正式应付、付款或财务凭证；核对通过后再生成发票预备。</span>
-      </section>
-      <el-card shadow="never">
-        <template #header>
-          <div class="card-header">
-            <div>
-              <h2>应付核对来源</h2>
-              <span>来源为 checked / payableReady 状态的采购应付预备。</span>
-            </div>
-            <div class="button-row">
-              <el-button type="primary" @click="refresh">刷新来源</el-button>
-              <el-button @click="router.push('/finance/payable-prepares')">查看应付预备</el-button>
-            </div>
-          </div>
-        </template>
-        <div class="batch-bar">
-          <span>已选择 {{ selectedSourceRows.length }} 条</span>
-          <span>可生成 {{ sourceBatchCounts.create }} 条</span>
-          <span>跳过 {{ selectedSourceRows.length - sourceBatchCounts.create }} 条</span>
-          <span class="sort-help">排序：点击表格表头字段可升序/降序排序；点击“清除排序”恢复默认顺序。</span>
-          <span class="sort-help">{{ sourceSortText }}</span>
-          <el-button size="small" @click="resetSourceSorting">清除排序</el-button>
-          <el-button size="small" @click="clearSourceSelection">清空选择</el-button>
-          <span class="batch-action-title">当前模块操作（立即生效）</span>
-          <span class="batch-action-tip">以下按钮会立即修改所选记录状态，请确认选择无误后再执行。</span>
-          <el-button size="small" type="success" :disabled="!sourceBatchCounts.create" @click="runBatchCreateChecks">批量生成应付核对</el-button>
-        </div>
-        <BatchResult v-if="sourceBatchResult" :result="sourceBatchResult" :type="sourceBatchResultType" @close="sourceBatchResult = null" />
-        <el-table ref="sourceTableRef" :data="sortedSourceRows" border stripe height="460" @selection-change="handleSourceSelectionChange" @sort-change="handleSourceSortChange">
-          <el-table-column type="selection" width="48" fixed="left" :selectable="sourceSelectable" />
-          <el-table-column type="expand" width="44" fixed="left">
-            <template #default="{ row }">{{ row.sourceRejectReason || '可生成应付核对' }}</template>
-          </el-table-column>
-          <el-table-column type="index" label="序号" width="70" fixed="left" />
-          <el-table-column prop="payablePrepareNo" label="应付预备单号" min-width="170" sortable="custom" />
-          <el-table-column prop="supplierName" label="供应商" min-width="150" sortable="custom" />
-          <el-table-column prop="sourcePurchaseOrderNo" label="采购订单" min-width="150" sortable="custom" />
-          <el-table-column prop="sourceReceiveNo" label="收货单" min-width="150" />
-          <el-table-column prop="sourceInspectionNo" label="检验单" min-width="150" />
-          <el-table-column prop="rootRequestNo" label="原始请购单" min-width="150" />
-          <el-table-column prop="totalPayableQty" label="应付预备数量" width="130" sortable="custom" />
-          <el-table-column prop="totalPayableAmount" label="应付预备金额" width="130" sortable="custom" />
-          <el-table-column prop="payableStatus" label="状态" width="120" sortable="custom">
-            <template #default="{ row }"><el-tag :type="prepareStatusType(row.payableStatus)">{{ prepareStatusLabel(row.payableStatus) }}</el-tag></template>
-          </el-table-column>
-          <el-table-column label="是否已生成" width="120">
-            <template #default="{ row }"><el-tag :type="row.payableCheckGenerated ? 'success' : 'info'">{{ row.payableCheckGeneratedText }}</el-tag></template>
-          </el-table-column>
-          <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(['查看应付预备', '生成核对'])">
-            <template #default="{ row }">
-              <div class="app-action-cell">
-                <el-button size="small" class="app-action-button-md" @click="router.push(`/finance/payable-prepare/${row.id}`)">查看应付预备</el-button>
-                <el-button v-if="!row.payableCheckGenerated" size="small" class="app-action-button-sm" type="success" :disabled="!row.canCreatePayableCheck" @click="createCheck(row)">生成核对</el-button>
-              </div>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-card>
+        <el-button plain @click="router.push('/finance/payable-checks')">返回采购应付核对列表</el-button>
+      </div>
+      <dl class="detail-grid">
+        <div><dt>采购应付核对编号</dt><dd data-testid="payable-check-detail-no">{{ detailRecord.payableCheckNo }}</dd></div>
+        <div><dt>来源采购应付预备</dt><dd data-testid="payable-check-detail-prepare-no">{{ detailRecord.sourcePayablePrepareNo }}</dd></div>
+        <div><dt>来源库存流水</dt><dd data-testid="payable-check-detail-transaction-no">{{ detailRecord.sourceInventoryTransactionNos?.[0] || '-' }}</dd></div>
+        <div><dt>来源采购订单</dt><dd data-testid="payable-check-detail-order-no">{{ detailRecord.sourcePurchaseOrderNo }}</dd></div>
+        <div><dt>供应商</dt><dd data-testid="payable-check-detail-supplier">{{ detailRecord.supplierName }}</dd></div>
+        <div><dt>物料</dt><dd data-testid="payable-check-detail-material">{{ detailRecord.lines?.[0]?.materialCode }} / {{ detailRecord.lines?.[0]?.materialName }}</dd></div>
+        <div><dt>数量</dt><dd data-testid="payable-check-detail-quantity">{{ detailRecord.totalPayableQty }} {{ detailRecord.lines?.[0]?.unit }}</dd></div>
+        <div><dt>应付金额</dt><dd data-testid="payable-check-detail-payable-amount">{{ formatAmount(detailRecord.totalPayableAmount) }}</dd></div>
+        <div><dt>核对金额</dt><dd data-testid="payable-check-detail-checked-amount">{{ formatAmount(detailRecord.totalCheckedAmount) }}</dd></div>
+        <div><dt>差异金额</dt><dd data-testid="payable-check-detail-difference-amount">{{ formatAmount(detailRecord.amountDifference) }}</dd></div>
+        <div><dt>当前状态</dt><dd data-testid="payable-check-detail-status">{{ statusTextMap[detailRecord.checkStatus] || detailRecord.checkStatus }}</dd></div>
+        <div><dt>供应商结算</dt><dd data-testid="payable-check-detail-settlement-status">尚未生成</dd></div>
+      </dl>
+      <PceBusinessActionBar
+        current-module="payable-check"
+        :current-status="detailRecord.checkStatus"
+        :selected-rows="[detailRecord]"
+        :batch-enabled="false"
+        :show-unavailable="true"
+        @execute="executeRegistryAction"
+      />
+    </section>
 
-      <el-card shadow="never">
-        <template #header><h2>应付核对列表</h2></template>
-        <div class="batch-bar">
-          <span>已选择 {{ selectedCheckRows.length }} 条</span>
-          <span class="sort-help">排序：点击表格表头字段可升序/降序排序；点击“清除排序”恢复默认顺序。</span>
-          <span class="sort-help">{{ checkSortText }}</span>
-          <el-button size="small" @click="resetCheckSorting">清除排序</el-button>
-          <el-button size="small" @click="clearCheckSelection">清空选择</el-button>
-          <span class="batch-action-title">当前模块操作（立即生效）</span>
-          <span class="batch-action-tip">以下按钮会立即修改所选记录状态，请确认选择无误后再执行。</span>
-          <el-button size="small" type="warning" :disabled="!selectedCheckRows.length" @click="runBatchChecking">批量开始核对</el-button>
-          <el-button size="small" type="success" :disabled="!selectedCheckRows.length" @click="runBatchChecked">批量核对通过</el-button>
-          <el-button size="small" type="danger" :disabled="!selectedCheckRows.length" @click="runBatchDifference">批量标记差异</el-button>
-          <el-button size="small" type="success" :disabled="!selectedCheckRows.length" @click="runBatchReady">批量准备生成发票预备</el-button>
-          <span class="sort-help">批量核对通过和批量生成发票预备会跳过未处理差异记录。</span>
+    <PceBusinessActionBar
+      current-module="payable-check"
+      :selected-rows="selectedRows"
+      :show-unavailable="selectedRows.length === 0"
+      @execute="executeRegistryAction"
+    />
+
+    <section
+      v-if="canaryOperationEnabled"
+      class="table-card canary-operation-facts"
+      data-acceptance-id="payable-check-canary-operation-strict-facts"
+    >
+      <header class="list-section-title">
+        <div>
+          <p class="eyebrow">{{ canaryStrictFacts.contractVersion }}</p>
+          <h3>采购应付核对可操作金丝雀池</h3>
         </div>
-        <BatchResult v-if="checkBatchResult" :result="checkBatchResult" :type="checkBatchResultType" @close="checkBatchResult = null" />
-        <el-table ref="checkTableRef" :data="sortedCheckRows" border stripe height="520" @selection-change="handleCheckSelectionChange" @sort-change="handleCheckSortChange">
-          <el-table-column type="selection" width="48" fixed="left" />
-          <el-table-column type="expand" width="44" fixed="left">
-            <template #default="{ row }">差异原因：{{ row.differenceReason || '-' }}；来源：{{ row.sourcePayablePrepareNo }}</template>
+        <strong>{{ canaryStrictFacts.operationPoolConsistent ? '一致' : '阻断' }}</strong>
+      </header>
+      <div class="acceptance-grid">
+        <article><span>当前状态来源</span><strong>{{ canaryStrictFacts.currentStateSource }}</strong></article>
+        <article><span>对象总数</span><strong>{{ canaryStrictFacts.objectCount }}</strong></article>
+        <article><span>未核对池</span><strong>{{ canaryStrictFacts.pendingCheckCount }}</strong></article>
+        <article><span>已核对池</span><strong>{{ canaryStrictFacts.checkedCount }}</strong></article>
+        <article><span>混合选择</span><strong>{{ canaryStrictFacts.mixedSelectionSupported }}</strong></article>
+        <article><span>保持目的</span><strong>{{ canaryStrictFacts.preservePurpose }}</strong></article>
+      </div>
+    </section>
+
+    <section class="table-card">
+      <header class="list-section-title">
+        <div>
+          <h3 data-acceptance-id="page-internal-subject-title">{{ payableCheckCanonicalName }}</h3>
+          <span>表格操作工具栏紧邻数据表格；高级筛选默认收起。</span>
+        </div>
+      </header>
+
+      <div class="standard-list-toolbar" data-acceptance-id="standard-list-toolbar" data-pce-page-id="payable-check" data-pce-toolbar-for="payable-check-main">
+        <span class="toolbar-search-wrapper" data-acceptance-id="list-fuzzy-search-input">
+        <el-input
+          v-model="quickSearch"
+          class="toolbar-search"
+          clearable
+          placeholder="输入编号、来源单号、供应商或关键字"
+          @keyup.enter="applyFilters"
+          @clear="applyFilters"
+        />
+        </span>
+        <el-button type="primary" plain data-acceptance-id="list-fuzzy-search-button" @click="applyFilters">
+          搜索
+        </el-button>
+        <el-button plain data-acceptance-id="list-advanced-filter-toggle" data-pce-filter-toggle-for="payable-check-main" :aria-expanded="String(advancedFilterVisible)" @click="advancedFilterVisible = !advancedFilterVisible">
+          {{ advancedFilterVisible ? '收起高级筛选' : '展开高级筛选' }}
+        </el-button>
+        <el-button plain data-acceptance-id="list-clear-filter-button" @click="clearFilters">清空筛选</el-button>
+        <el-button plain data-acceptance-id="list-clear-sort-button" @click="clearSort">清除排序</el-button>
+        <el-button
+          type="success"
+          plain
+          data-acceptance-id="list-export-selected-records-button"
+          :disabled="selectedRows.length === 0"
+          :title="selectedRows.length === 0 ? '请先选择要导出的应付核对记录。' : ''"
+          @click="exportSelectedRows"
+        >
+          导出已选记录
+        </el-button>
+        <el-button
+          type="primary"
+          plain
+          data-acceptance-id="list-export-current-result-button"
+          data-pce-export-for="payable-check-main"
+          :disabled="filteredSortedRows.length === 0"
+          :title="filteredSortedRows.length === 0 ? '当前筛选结果为空，无法导出。' : ''"
+          @click="exportCurrentRows"
+        >
+          导出当前结果
+        </el-button>
+        <span data-acceptance-id="list-result-count-visible">当前结果 {{ filteredSortedRows.length }} 条</span>
+        <span data-acceptance-id="business-flow-selected-count">已选择 {{ selectedRows.length }} 条</span>
+        <span>生效筛选 {{ activeFilterCount }} 项</span>
+        <span>排序：{{ sortStateLabel }}</span>
+        <el-button plain :disabled="selectedRows.length === 0" @click="clearSelection">清空选择</el-button>
+      </div>
+
+      <section
+        v-show="advancedFilterVisible"
+        class="advanced-filter-panel"
+        data-acceptance-id="list-advanced-filter-panel"
+        data-pce-filter-for="payable-check-main"
+      >
+        <label>
+          应付核对单号
+          <PceResultFilterSelect v-model="advancedFilters.payableCheckNo" :rows="rows" :fields="['payableCheckNo']" />
+        </label>
+        <label>
+          来源应付预备编号
+          <PceResultFilterSelect v-model="advancedFilters.sourcePayablePrepareNo" :rows="rows" :fields="['sourcePayablePrepareNo']" />
+        </label>
+        <label>
+          供应商
+          <PceResultFilterSelect v-model="advancedFilters.supplierName" :rows="rows" :fields="['supplierName']" />
+        </label>
+        <label>
+          采购订单号
+          <PceResultFilterSelect v-model="advancedFilters.sourcePurchaseOrderNo" :rows="rows" :fields="['sourcePurchaseOrderNo']" />
+        </label>
+        <label>
+          核对状态
+          <el-select v-model="advancedFilters.checkStatus" clearable placeholder="全部">
+            <el-option label="未生成应付核对" value="not_created" />
+            <el-option label="未核对" value="draft" />
+            <el-option label="已核对" value="checked" />
+            <el-option label="存在差异" value="difference" />
+          </el-select>
+        </label>
+        <label>
+          下游对象状态
+          <el-select v-model="advancedFilters.downstreamStatus" clearable placeholder="全部">
+            <el-option label="未进入下一步" value="not_started" />
+            <el-option label="可进入供应商结算" value="ready" />
+            <el-option label="已进入供应商结算" value="created" />
+          </el-select>
+        </label>
+        <label>
+          来源回写状态
+          <el-select v-model="advancedFilters.flowWritebackStatus" clearable placeholder="全部">
+            <el-option label="未回写" value="" />
+            <el-option label="待回写" value="pending" />
+            <el-option label="已回写" value="written" />
+            <el-option label="回写失败" value="failed" />
+          </el-select>
+        </label>
+        <label>
+          核对日期起
+          <el-date-picker v-model="advancedFilters.checkedDateFrom" type="date" value-format="YYYY-MM-DD" placeholder="开始日期" />
+        </label>
+        <label>
+          核对日期止
+          <el-date-picker v-model="advancedFilters.checkedDateTo" type="date" value-format="YYYY-MM-DD" placeholder="结束日期" />
+        </label>
+        <label>
+          金额下限
+          <el-input v-model="advancedFilters.amountMin" clearable type="number" />
+        </label>
+        <label>
+          金额上限
+          <el-input v-model="advancedFilters.amountMax" clearable type="number" />
+        </label>
+      </section>
+
+      <div v-if="lastBatchResult" class="batch-result" data-acceptance-id="payable-check-batch-result">
+        <strong>批量执行结果：</strong>
+        成功 {{ lastBatchResult.successCount }} 条，失败 {{ lastBatchResult.failedCount }} 条，跳过 {{ lastBatchResult.skippedCount }} 条。
+        <span v-if="lastBatchResult.reasons.length">原因：{{ lastBatchResult.reasons.join('；') }}</span>
+        <span data-testid="batch-selected-record-nos">selectedRecordNos={{ lastBatchResult.selectedRecordNos.join(',') }}</span>
+        <span data-testid="batch-processed-record-nos">processedRecordNos={{ lastBatchResult.processedRecordNos.join(',') }}</span>
+        <span data-testid="batch-unselected-record-nos">unselectedRecordNos={{ lastBatchResult.unselectedRecordNos.join(',') }}</span>
+        <span data-testid="batch-success-record-nos">successRecordNos={{ lastBatchResult.successRecordNos.join(',') }}</span>
+        <span data-testid="batch-failed-record-nos">failedRecordNos={{ lastBatchResult.failedRecordNos.join(',') }}</span>
+      </div>
+
+      <BusinessTableScrollContainer class="pce-baseline-table-shell" acceptance-id="business-table-scroll-payable-check-main" page-id="payable-check" table-id="payable-check-main" min-width="2600px">
+        <el-table
+          ref="payableCheckTableRef"
+          class="pce-baseline-table-shell global-sort-arrow"
+          :data="filteredSortedRows"
+          border
+          stripe
+          height="520"
+          scrollbar-always-on
+          row-key="rowKey"
+          @selection-change="handleSelectionChange"
+          @sort-change="handleSortChange"
+        >
+          <el-table-column
+            type="selection"
+            width="52"
+            fixed="left"
+            :reserve-selection="true"
+            :selectable="(row) => !row.formalAuthority"
+            class-name="business-table-selection-column"
+            label-class-name="business-table-selection-column"
+          />
+          <el-table-column
+            type="index"
+            label="序号"
+            width="70"
+            fixed="left"
+            class-name="pce-fixed-index-column"
+            label-class-name="pce-fixed-index-column"
+          >
+            <template #default="{ $index }">{{ $index + 1 }}</template>
           </el-table-column>
-          <el-table-column type="index" label="序号" width="70" fixed="left" />
-          <el-table-column prop="payableCheckNo" label="应付核对单号" min-width="170" sortable="custom" />
-          <el-table-column prop="sourcePayablePrepareNo" label="来源应付预备" min-width="170" sortable="custom" />
-          <el-table-column prop="supplierName" label="供应商" min-width="150" sortable="custom" />
-          <el-table-column prop="sourcePurchaseOrderNo" label="采购订单" min-width="150" sortable="custom" />
-          <el-table-column prop="sourceReceiveNo" label="收货单" min-width="150" />
-          <el-table-column prop="sourceInspectionNo" label="检验单" min-width="150" />
-          <el-table-column prop="totalCheckedQty" label="核对数量" width="110" sortable="custom" />
-          <el-table-column prop="totalCheckedAmount" label="核对金额" width="120" sortable="custom" />
-          <el-table-column prop="amountDifference" label="差异金额" width="110" sortable="custom" />
-          <el-table-column prop="checkStatus" label="状态" width="140" sortable="custom">
-            <template #default="{ row }"><el-tag :type="checkStatusType(getPayableCheckNormalizedState(row).checkStatus)">{{ checkStatusLabel(getPayableCheckNormalizedState(row).checkStatus) }}</el-tag></template>
-          </el-table-column>
-          <el-table-column prop="differenceStatus" label="差异处理" width="120" sortable="custom">
-            <template #default="{ row }"><el-tag :type="differenceStatusType(getPayableCheckNormalizedState(row).differenceStatus)">{{ differenceStatusLabel(getPayableCheckNormalizedState(row).differenceStatus) }}</el-tag></template>
-          </el-table-column>
-          <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(['查看详情', '保存差异处理', '生成发票预备'])">
+          <el-table-column prop="scenarioCode" label="金丝雀场景编码" width="250" />
+          <el-table-column prop="objectState" label="操作池状态" width="130">
             <template #default="{ row }">
-              <div class="app-action-cell">
-                <el-button size="small" class="app-action-button-sm" @click="router.push(`/finance/payable-check/${row.id}`)">查看详情</el-button>
-                <el-button v-if="getPayableCheckActions(row).canStartChecking" size="small" class="app-action-button-sm" type="warning" @click="markChecking(row)">开始核对</el-button>
-                <el-button v-if="getPayableCheckActions(row).canMarkChecked" size="small" class="app-action-button-sm" type="success" @click="markChecked(row)">核对通过</el-button>
-                <el-button v-if="getPayableCheckActions(row).canMarkDifference" size="small" class="app-action-button-sm" type="danger" @click="markDifference(row)">标记差异</el-button>
-                <el-button v-if="getPayableCheckActions(row).canStartDifference" size="small" class="app-action-button-sm" type="danger" @click="startDifference(row)">处理差异</el-button>
-                <el-button v-if="getPayableCheckActions(row).canSaveDifference" size="small" class="app-action-button-md" type="primary" @click="router.push(`/finance/payable-check/${row.id}`)">保存差异处理</el-button>
-                <el-button v-if="getPayableCheckActions(row).canCancelDifference" size="small" class="app-action-button-sm" @click="cancelDifference(row)">取消处理</el-button>
-                <el-button v-if="getPayableCheckActions(row).canRecheck" size="small" class="app-action-button-sm" type="warning" @click="recheckDifference(row)">重新核对</el-button>
-                <el-button v-if="getPayableCheckActions(row).canViewDifference" size="small" class="app-action-button-md" @click="router.push(`/finance/payable-check/${row.id}`)">查看差异处理</el-button>
-                <el-button v-if="getPayableCheckActions(row).canCreateInvoice" size="small" class="app-action-button-md" type="primary" @click="createInvoice(row)">生成发票预备</el-button>
-                <el-button v-if="getPayableCheckActions(row).canViewInvoice" size="small" class="app-action-button-md" type="success" @click="viewInvoicePrepare(row)">查看发票预备</el-button>
+              {{ row.objectState === 'pending_check' ? '未核对' : (row.objectState === 'checked' ? '已核对' : '-') }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="primaryBusinessNo"
+            label="主业务编号 / 来源编号"
+            width="260"
+            fixed="left"
+            sortable="custom"
+            class-name="pce-fixed-primary-no-column"
+            label-class-name="pce-fixed-primary-no-column"
+          >
+            <template #default="{ row }">
+              <div class="primary-no-cell">
+                <span>{{ row.primaryBusinessNoLabel }}</span>
+                <strong>{{ displayNo(row.primaryBusinessNo) }}</strong>
               </div>
             </template>
           </el-table-column>
+          <el-table-column prop="payableCheckNo" label="应付核对单号" width="190" sortable="custom">
+            <template #default="{ row }">{{ displayNo(row.payableCheckNo) }}</template>
+          </el-table-column>
+          <el-table-column prop="sourcePayablePrepareNo" label="来源应付预备单号" width="200" sortable="custom">
+            <template #default="{ row }">{{ displayNo(row.sourcePayablePrepareNo) }}</template>
+          </el-table-column>
+          <el-table-column prop="supplierName" label="供应商" width="180" sortable="custom">
+            <template #default="{ row }">{{ row.supplierName || '-' }}</template>
+          </el-table-column>
+          <el-table-column prop="sourcePurchaseOrderNo" label="采购订单号" width="180" sortable="custom">
+            <template #default="{ row }">{{ displayNo(row.sourcePurchaseOrderNo) }}</template>
+          </el-table-column>
+          <el-table-column prop="totalCheckedQty" label="核对数量" width="130" sortable="custom" />
+          <el-table-column prop="totalCheckedAmount" label="核对金额" width="140" sortable="custom">
+            <template #default="{ row }">{{ formatAmount(row.totalCheckedAmount) }}</template>
+          </el-table-column>
+          <el-table-column prop="amountDifference" label="差异金额" width="130" sortable="custom">
+            <template #default="{ row }">{{ formatAmount(row.amountDifference) }}</template>
+          </el-table-column>
+          <el-table-column prop="checkStatusText" label="核对状态" width="150" sortable="custom" />
+          <el-table-column prop="downstreamStatusText" label="下游对象状态" width="160" sortable="custom" />
+          <el-table-column prop="flowWritebackStatusText" label="来源回写状态" width="170" sortable="custom" />
+          <el-table-column prop="checkedAt" label="核对日期" width="150" sortable="custom">
+            <template #default="{ row }">{{ row.checkedDateText }}</template>
+          </el-table-column>
+          <el-table-column
+            prop="operation"
+            label="操作"
+            width="330"
+            fixed="right"
+            class-name="payment-fixed-action-column"
+            header-class-name="payment-fixed-action-column"
+            label-class-name="payment-fixed-action-column"
+          >
+            <template #default="{ row }">
+              <div class="row-actions">
+                <el-button
+                  v-if="row.rowType === 'payablePrepareSource'"
+                  type="primary"
+                  size="small"
+                  :disabled="!row.canExecutePayableCheck"
+                  :title="!row.canExecutePayableCheck ? row.executeBlockedReason : ''"
+                  @click="createPayableCheck(row)"
+                >
+                  {{ pceBusinessActionLabel('generate-payable-check') }}
+                </el-button>
+                <el-button
+                  v-else-if="!row.formalAuthority && !isPayableChecked(row)"
+                  type="primary"
+                  size="small"
+                  @click="completePayableCheck(row)"
+                >
+                  {{ pceBusinessActionLabel('complete-payable-check') }}
+                </el-button>
+                <el-button v-else type="success" size="small" plain @click="viewPayableCheckResult(row)">
+                  查看应付核对结果
+                </el-button>
+                <el-button size="small" plain @click="goSourcePayablePrepare(row)">查看来源应付预备</el-button>
+                <el-button
+                  v-if="isPayableChecked(row)"
+                  data-acceptance-id="go-supplier-settlement-row-button"
+                  type="primary"
+                  size="small"
+                  plain
+                  :disabled="Boolean(payableCheckSettlementBlockedReason(row))"
+                  :title="payableCheckSettlementBlockedReason(row)"
+                  @click="goSupplierSettlement(row)"
+                >
+                  {{ pceBusinessActionLabel('enter-supplier-settlement') }}
+                </el-button>
+              </div>
+              <p v-if="!row.canExecutePayableCheck && !isPayableChecked(row)" class="blocked-reason">
+                {{ row.executeBlockedReason }}
+              </p>
+            </template>
+          </el-table-column>
         </el-table>
-      </el-card>
+      </BusinessTableScrollContainer>
+
+      <footer class="table-footer">
+        <span>当前页码：1</span>
+        <span>每页数量：{{ filteredSortedRows.length }}</span>
+        <span>当前结果总数：{{ filteredSortedRows.length }}</span>
+        <span>已选择数量：{{ selectedRows.length }}</span>
+      </footer>
+    </section>
+
+    <section
+      v-if="acceptanceVisible"
+      class="development-acceptance-panel"
+      data-acceptance-id="development-acceptance-panel"
+    >
+      <header>
+        <div>
+          <h3>开发验收信息</h3>
+          <p>本区域默认收起，仅用于验收定位和复制诊断，不触发任何业务动作。</p>
+        </div>
+        <el-button type="success" plain data-acceptance-id="copy-diagnostic-data-button" @click="copyDiagnostics">
+          复制诊断数据
+        </el-button>
+      </header>
+      <div class="acceptance-grid">
+        <article>
+          <span>Ctrl+F 搜索词</span>
+          <strong>应付核对列表 / 表格操作工具栏 / 开发验收信息</strong>
+        </article>
+        <article>
+          <span>表格基线</span>
+          <strong>选择列、序号列、主业务编号列左侧冻结；操作列右侧冻结。</strong>
+        </article>
+        <article>
+          <span>保护结论</span>
+          <strong>不自动执行、不自动进入下一步、不写总账、不核销、不生成银行流水。</strong>
+        </article>
+      </div>
     </section>
   </main>
 </template>
 
 <script setup>
-import { computed, defineComponent, h, ref, watch } from 'vue'
+const { embeddedInCommonShell = false } = defineProps({
+  embeddedInCommonShell: { type: Boolean, default: false },
+})
+import { computed, nextTick, onMounted, reactive, ref } from 'vue'
+import PceResultFilterSelect from '../components/PceResultFilterSelect.vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import BusinessTableScrollContainer from '../components/BusinessTableScrollContainer.vue'
+import PceBusinessActionBar from '../components/PceBusinessActionBar.vue'
 import {
-  batchCreatePayableChecksFromPayablePrepares,
-  batchMarkInvoicePrepareReady,
-  batchMarkPayableCheckChecked,
-  batchMarkPayableCheckChecking,
-  batchMarkPayableCheckDifference,
-  cancelPayableCheck,
-  cancelPayableCheckDifferenceHandling,
   createPayableCheckFromPayablePrepare,
-  getPayableCheckById,
+  batchMarkPayableCheckChecked,
   getPayableCheckSourcesFromPayablePrepares,
   listPayableChecks,
-  markInvoicePrepareReady,
   markPayableCheckChecked,
-  markPayableCheckChecking,
-  markPayableCheckDifference,
-  recheckPayableCheckAfterDifference,
-  savePayableCheckDifferenceHandling,
-  startPayableCheckDifferenceHandling,
 } from '../finance/payableCheckStore.js'
-import { createInvoicePrepareFromPayableCheck, listInvoicePrepares } from '../finance/invoicePrepareStore.js'
-import { getActionColumnWidth } from '../runtime/tableActionColumnEngine.js'
-import { sortRecords } from '../runtime/tableSortEngine.js'
+import { formatBusinessNo, formatBusinessStatus } from '../runtime/businessDisplayValueFormatter.js'
+import { BUSINESS_TABLE_EXPORT_SCOPES, downloadBusinessTableCsv } from '../runtime/businessTableExport.js'
+import { resolvePageNameConsumption } from '../governance/pageNameConsumer.js'
+import {
+  buildSupplierSettlementRoute,
+  payableCheckSettlementBlockedReason,
+  resolveSupplierSettlementSelection,
+} from '../finance/payableCheckSelectionContext.js'
+import {
+  capturePceBusinessTableState,
+  pceBusinessActionLabel,
+  restorePceBusinessTableState,
+} from '../runtime/pceBusinessActionRegistry.js'
+import { getCanaryOperationData } from '../../api/purchaseCanary.js'
+import { formalExecutionApi } from '@/api/formalExecution.js'
 
-const BatchResult = defineComponent({
-  props: { result: { type: Object, required: true }, type: { type: String, default: 'success' } },
-  emits: ['close'],
-  setup(props, { emit }) {
-    return () => h('div', { class: ['batch-result', props.type] }, [
-      h('button', { type: 'button', onClick: () => emit('close') }, '关闭'),
-      h('strong', '批量操作完成'),
-      h('span', `操作名称：${props.result.operationName}`),
-      h('span', `已选择：${props.result.total} 条`),
-      h('span', `成功：${props.result.successCount} 条`),
-      props.result.writeBackCount != null ? h('span', `已回写状态：${props.result.writeBackCount} 条`) : null,
-      h('span', `失败/跳过：${props.result.failedCount} 条`),
-      props.result.failedReason?.length ? h('ol', props.result.failedReason.map((reason) => h('li', { key: reason }, reason))) : null,
-      props.result.failedReason?.length ? h('span', `下一步建议：${props.result.nextSuggestion}`) : null,
-    ])
-  },
+const VERSION = 'V1.14.2.8.4.7.57.1'
+const payableCheckCanonicalName = resolvePageNameConsumption({ pageCode: 'payable-check', route: '/finance/payable-checks' }).pageTitle
+onMounted(async () => {
+  await refreshRows()
+  if (String(route.query.canaryOperation || '') === '1') await loadCanaryOperationData()
 })
-
-const route = useRoute()
 const router = useRouter()
-const sourceRows = ref([])
-const checkRows = ref([])
-const selectedSourceRows = ref([])
-const selectedCheckRows = ref([])
-const sourceSortState = ref({ key: '', direction: 'asc' })
-const checkSortState = ref({ key: '', direction: 'asc' })
-const sourceTableRef = ref(null)
-const checkTableRef = ref(null)
-const message = ref('')
-const messageType = ref('success')
-const sourceBatchResult = ref(null)
-const sourceBatchResultType = ref('success')
-const checkBatchResult = ref(null)
-const checkBatchResultType = ref('success')
-const refreshVersion = ref(0)
-const invoicePrepareRows = ref([])
-const differenceForm = ref({
-  differenceType: '',
-  differenceReason: '',
-  differenceResolution: '',
-  differenceHandlerName: '当前处理人',
-  remark: '',
+const route = useRoute()
+const payableChecks = ref([])
+const payableCheckSources = ref([])
+const canaryOperationRows = ref([])
+const canaryOperationEnabled = ref(false)
+const canaryStrictFacts = reactive({
+  contractVersion: 'PCE-CANARY-OPERATION-DATA-V1.0',
+  version: VERSION,
+  moduleCode: 'payable-check',
+  currentStateSource: 'server',
+  objectCount: null,
+  pendingCheckCount: null,
+  checkedCount: null,
+  mixedSelectionSupported: false,
+  operationPoolConsistent: false,
+  preservePurpose: '',
+  businessWriteRequestCount: 0,
+  factsHash: '',
+})
+const selectedRows = ref([])
+const lastBatchResult = ref(null)
+const lastCanaryActionResult = ref(null)
+const payableCheckTableRef = ref(null)
+const acceptanceVisible = ref(false)
+const advancedFilterVisible = ref(false)
+const quickSearch = ref('')
+const sortState = ref({ prop: '', order: '' })
+const advancedFilters = reactive({
+  payableCheckNo: '',
+  sourcePayablePrepareNo: '',
+  supplierName: '',
+  sourcePurchaseOrderNo: '',
+  checkStatus: '',
+  downstreamStatus: '',
+  flowWritebackStatus: '',
+  checkedDateFrom: '',
+  checkedDateTo: '',
+  amountMin: '',
+  amountMax: '',
 })
 
-const detail = computed(() => {
-  refreshVersion.value
-  return route.params.id ? getPayableCheckById(route.params.id) : null
+const statusTextMap = {
+  not_created: '未生成应付核对',
+  draft: '未核对',
+  checking: '核对中',
+  checked: '已核对',
+  matched: '已核对',
+  difference: '存在差异',
+  invoicePrepareReady: '已核对',
+  invoicePrepared: '已生成发票准备',
+  cancelled: '已取消',
+  closed: '已关闭',
+}
+
+const writebackStatusTextMap = {
+  '': '未回写',
+  pending: '待回写',
+  written: '已回写',
+  failed: '回写失败',
+}
+
+async function refreshRows() {
+  const response = await formalExecutionApi.payableCheckFacts()
+  if (!response?.success) {
+    payableChecks.value = []
+    payableCheckSources.value = []
+    ElMessage.error(response?.error?.message || '正式采购应付核对事实读取失败')
+    return
+  }
+  payableChecks.value = (response.data?.payableChecks || []).map((row) => ({
+    ...row,
+    formalAuthority: true,
+    authoritySource: 'reconciliation.PayableCheckAuthorityRecord',
+  }))
+  payableCheckSources.value = []
+}
+
+const checkByPrepareId = computed(() => new Map(
+  payableChecks.value
+    .filter((item) => item.sourcePayablePrepareId)
+    .map((item) => [String(item.sourcePayablePrepareId), item]),
+))
+
+const existingCheckRows = computed(() => payableChecks.value.map((row) => normalizeCheckRow(row)))
+
+const sourceRows = computed(() => payableCheckSources.value
+  .filter((source) => !checkByPrepareId.value.has(String(source.id)))
+  .map((source) => normalizeSourceRow(source)))
+
+const rows = computed(() => (
+  canaryOperationEnabled.value
+    ? canaryOperationRows.value
+    : [...existingCheckRows.value, ...sourceRows.value]
+))
+const detailRecord = computed(() => {
+  const id = String(route.params.id || '')
+  return id ? payableChecks.value.find((item) => String(item.id) === id) || null : null
 })
-const sourceIds = computed(() => selectedSourceRows.value.map((row) => row.id).filter(Boolean))
-const checkIds = computed(() => selectedCheckRows.value.map((row) => row.id).filter(Boolean))
-const sourceSortColumns = [
-  { key: 'payablePrepareNo', sortType: 'string' },
-  { key: 'supplierName', sortType: 'string' },
-  { key: 'sourcePurchaseOrderNo', sortType: 'string' },
-  { key: 'totalPayableQty', sortType: 'number' },
-  { key: 'totalPayableAmount', sortType: 'amount' },
-  { key: 'payableStatus', sortType: 'status' },
-]
-const checkSortColumns = [
-  { key: 'payableCheckNo', sortType: 'string' },
-  { key: 'sourcePayablePrepareNo', sortType: 'string' },
-  { key: 'supplierName', sortType: 'string' },
-  { key: 'sourcePurchaseOrderNo', sortType: 'string' },
-  { key: 'totalCheckedQty', sortType: 'number' },
-  { key: 'totalCheckedAmount', sortType: 'amount' },
-  { key: 'amountDifference', sortType: 'amount' },
-  { key: 'checkStatus', sortType: 'status' },
-  { key: 'differenceStatus', sortType: 'status' },
-]
-const sortedSourceRows = computed(() => sortRecords(sourceRows.value, sourceSortState.value, sourceSortColumns))
-const sortedCheckRows = computed(() => sortRecords(checkRows.value, checkSortState.value, checkSortColumns))
-const sourceBatchCounts = computed(() => ({ create: selectedSourceRows.value.filter((row) => row.canCreatePayableCheck).length }))
-const sourceSortText = computed(() => currentSortText(sourceSortState.value, {
-  payablePrepareNo: '应付预备单号',
-  supplierName: '供应商',
-  sourcePurchaseOrderNo: '采购订单',
-  totalPayableQty: '应付预备数量',
-  totalPayableAmount: '应付预备金额',
-  payableStatus: '状态',
-}))
-const checkSortText = computed(() => currentSortText(checkSortState.value, {
-  payableCheckNo: '应付核对单号',
-  sourcePayablePrepareNo: '来源应付预备',
-  supplierName: '供应商',
-  sourcePurchaseOrderNo: '采购订单',
-  totalCheckedQty: '核对数量',
-  totalCheckedAmount: '核对金额',
-  amountDifference: '差异金额',
-  checkStatus: '状态',
-  differenceStatus: '差异处理',
-}))
-const differenceTypeOptions = [
-  { label: '数量差异', value: 'quantity' },
-  { label: '单价差异', value: 'price' },
-  { label: '金额差异', value: 'amount' },
-  { label: '供应商差异', value: 'supplier' },
-  { label: '来源单据差异', value: 'sourceDocument' },
-  { label: '其他差异', value: 'other' },
-]
-const differenceResolutionOptions = [
-  { label: '按应付预备数据调整', value: 'adjustToPayablePrepare' },
-  { label: '按发票/核对数据调整', value: 'adjustToInvoice' },
-  { label: '记录调整说明', value: 'createAdjustmentNote' },
-  { label: '退回采购处理', value: 'returnToPurchase' },
-  { label: '退回仓库处理', value: 'returnToWarehouse' },
-  { label: '退回供应商处理', value: 'returnToSupplier' },
-  { label: '人工确认无误', value: 'manualConfirmed' },
-  { label: '取消本次核对', value: 'cancelPayableCheck' },
-  { label: '其他', value: 'other' },
-]
-const detailFields = computed(() => detail.value ? [
-  { label: '应付核对单号', value: detail.value.payableCheckNo },
-  { label: '来源应付预备', value: detail.value.sourcePayablePrepareNo || '-' },
-  { label: '采购订单', value: detail.value.sourcePurchaseOrderNo || '-' },
-  { label: '收货单', value: detail.value.sourceReceiveNo || '-' },
-  { label: '检验单', value: detail.value.sourceInspectionNo || '-' },
-  { label: '原始请购单', value: detail.value.rootRequestNo || '-' },
-  { label: '供应商', value: detail.value.supplierName || '-' },
-  { label: '核对数量', value: detail.value.totalCheckedQty },
-  { label: '核对金额', value: detail.value.totalCheckedAmount },
-  { label: '数量差异', value: detail.value.quantityDifference },
-  { label: '金额差异', value: detail.value.amountDifference },
-  { label: '状态', value: checkStatusLabel(getPayableCheckNormalizedState(detail.value).checkStatus) },
-  { label: '差异处理', value: differenceStatusLabel(getPayableCheckNormalizedState(detail.value).differenceStatus) },
-  { label: '处理方式', value: differenceResolutionLabel(detail.value.differenceResolution) },
-  { label: '目标发票预备', value: generatedInvoicePrepare(detail.value)?.invoicePrepareNo || detail.value.targetInvoicePrepareNo || '-' },
-] : [])
 
-function refresh() {
-  sourceRows.value = getPayableCheckSourcesFromPayablePrepares()
-  checkRows.value = listPayableChecks()
-  invoicePrepareRows.value = listInvoicePrepares()
-  refreshVersion.value += 1
-}
+const activeFilterCount = computed(() => {
+  const advancedCount = Object.values(advancedFilters).filter((value) => String(value ?? '').trim()).length
+  return advancedCount + (quickSearch.value.trim() ? 1 : 0)
+})
 
-function notify(text, type = 'success') {
-  message.value = text
-  messageType.value = type
-  window.clearTimeout(notify.timer)
-  notify.timer = window.setTimeout(() => { message.value = '' }, 2400)
-}
+const filteredRows = computed(() => rows.value.filter(rowMatchesFilters))
 
-function currentSortText(state = {}, labels = {}) {
-  if (!state.key) return '当前排序：默认顺序'
-  return `当前排序：${labels[state.key] || state.key} / ${state.direction === 'desc' ? '降序' : '升序'}`
-}
+const filteredSortedRows = computed(() => {
+  const list = [...filteredRows.value]
+  const { prop, order } = sortState.value
+  if (!prop || !order) return list
+  const factor = order === 'ascending' ? 1 : -1
+  return list.sort((a, b) => compareValues(a[prop], b[prop]) * factor)
+})
 
-function handleSourceSelectionChange(rows) { selectedSourceRows.value = rows || [] }
-function handleCheckSelectionChange(rows) { selectedCheckRows.value = rows || [] }
-function clearSourceSelection() { selectedSourceRows.value = []; sourceTableRef.value?.clearSelection?.() }
-function clearCheckSelection() { selectedCheckRows.value = []; checkTableRef.value?.clearSelection?.() }
-function sourceSelectable(row) { return row.canCreatePayableCheck }
+const supplierSettlementSelection = computed(() => resolveSupplierSettlementSelection(selectedRows.value))
 
-function handleSourceSortChange({ prop, order }) {
-  sourceSortState.value = { key: prop || '', direction: order === 'descending' ? 'desc' : 'asc' }
-  clearSourceSelection()
-}
+const sortStateLabel = computed(() => {
+  if (!sortState.value.prop || !sortState.value.order) return '默认业务顺序'
+  return `${sortState.value.prop} ${sortState.value.order === 'ascending' ? '升序' : '降序'}`
+})
 
-function handleCheckSortChange({ prop, order }) {
-  checkSortState.value = { key: prop || '', direction: order === 'descending' ? 'desc' : 'asc' }
-  clearCheckSelection()
-}
-
-function resetSourceSorting() { sourceSortState.value = { key: '', direction: 'asc' }; clearSourceSelection() }
-function resetCheckSorting() { checkSortState.value = { key: '', direction: 'asc' }; clearCheckSelection() }
-
-function nextBatchSuggestion(reasons = []) {
-  const text = reasons.join('；')
-  if (text.includes('重复') || text.includes('已生成')) return '建议查看已生成单据，避免重复生成。'
-  if (text.includes('状态')) return '建议检查来源状态是否已达到可生成条件。'
-  if (text.includes('差异')) return '建议先处理差异，再重新标记为已核对或可生成发票预备。'
-  return '请按失败原因处理后重新执行。'
-}
-
-function normalizeBatchResult(result = {}, operationName = '批量操作') {
-  const failedReason = result.failedReason || []
+function normalizeCheckRow(row = {}) {
+  const checkStatus = row.checkStatus || 'draft'
+  const downstreamStatus = isPayableChecked({ checkStatus }) ? (row.linkedSettlementNo ? 'created' : 'ready') : 'not_started'
   return {
-    operationName,
-    total: result.total ?? 0,
-    successCount: result.successCount || 0,
-    failedCount: result.failedCount || 0,
-    writeBackCount: result.writeBackCount,
-    failedReason,
-    nextSuggestion: nextBatchSuggestion(failedReason),
+    ...row,
+    rowKey: `check-${row.id || row.payableCheckNo}`,
+    rowType: 'payableCheck',
+    primaryBusinessNo: row.payableCheckNo,
+    primaryBusinessNoLabel: '应付核对单号',
+    checkStatus,
+    checkStatusText: statusTextMap[checkStatus] || formatBusinessStatus(checkStatus, '未核对'),
+    downstreamStatus,
+    downstreamStatusText: downstreamStatus === 'created' ? '已进入供应商结算' : (downstreamStatus === 'ready' ? '可进入供应商结算' : '未进入下一步'),
+    flowWritebackStatusText: writebackStatusTextMap[row.flowWritebackStatus || ''] || formatBusinessStatus(row.flowWritebackStatus, '未回写'),
+    checkedDateText: formatDate(row.checkedAt || row.updatedAt || row.createdAt),
+    canExecutePayableCheck: !['checked', 'matched', 'invoicePrepareReady', 'invoicePrepared', 'closed', 'cancelled'].includes(checkStatus),
+    executeBlockedReason: '',
   }
 }
 
-function showSourceBatchResult(result, operationName) {
-  refresh()
-  clearSourceSelection()
-  sourceBatchResult.value = normalizeBatchResult(result, operationName)
-  sourceBatchResultType.value = result?.failedCount ? (result.successCount ? 'warning' : 'error') : 'success'
+function normalizeSourceRow(source = {}) {
+  return {
+    ...source,
+    rowKey: `source-${source.id || source.payablePrepareNo}`,
+    rowType: 'payablePrepareSource',
+    payableCheckNo: '',
+    sourcePayablePrepareId: source.id,
+    sourcePayablePrepareNo: source.payablePrepareNo,
+    primaryBusinessNo: source.payablePrepareNo,
+    primaryBusinessNoLabel: '来源应付预备单号',
+    totalCheckedQty: source.totalPayableQty || 0,
+    totalCheckedAmount: source.totalPayableAmount || 0,
+    amountDifference: 0,
+    checkStatus: 'not_created',
+    checkStatusText: '未生成应付核对',
+    downstreamStatus: 'not_started',
+    downstreamStatusText: '未进入下一步',
+    flowWritebackStatus: '',
+    flowWritebackStatusText: '未回写',
+    checkedAt: '',
+    checkedDateText: '-',
+    canExecutePayableCheck: Boolean(source.canCreatePayableCheck),
+    executeBlockedReason: source.canCreatePayableCheck ? '' : '来源应付预备未达到生成应付核对条件，或已存在应付核对记录。',
+  }
 }
 
-function showCheckBatchResult(result, operationName) {
-  refresh()
-  clearCheckSelection()
-  checkBatchResult.value = normalizeBatchResult(result, operationName)
-  checkBatchResultType.value = result?.failedCount ? (result.successCount ? 'warning' : 'error') : 'success'
+function normalizeCanaryOperationRow(row = {}) {
+  const checkStatus = row.registryStatus
+  return {
+    ...row,
+    rowKey: `canary-operation-${row.id}`,
+    rowType: 'canaryOperationData',
+    payableCheckNo: row.objectNo,
+    sourcePayablePrepareId: '',
+    sourcePayablePrepareNo: row.sourceObjectNo,
+    primaryBusinessNo: row.objectNo,
+    primaryBusinessNoLabel: '应付核对金丝雀编号',
+    checkStatus,
+    status: checkStatus,
+    checkStatusText: checkStatus === 'checked' ? '已核对' : '未核对',
+    downstreamStatus: checkStatus === 'checked' ? 'ready' : 'not_started',
+    downstreamStatusText: checkStatus === 'checked' ? '可进入供应商结算' : '未进入下一步',
+    flowWritebackStatus: '',
+    flowWritebackStatusText: '验收数据不回写',
+    checkedAt: checkStatus === 'checked' ? '2026-07-27' : '',
+    checkedDateText: checkStatus === 'checked' ? '2026-07-27' : '-',
+    canExecutePayableCheck: checkStatus === 'draft',
+    executeBlockedReason: checkStatus === 'draft' ? '' : '已核对对象只允许进入供应商结算。',
+  }
 }
 
-function runBatchCreateChecks() {
-  if (!sourceIds.value.length) return notify('请先选择可生成应付核对的应付预备', 'warning')
-  showSourceBatchResult(batchCreatePayableChecksFromPayablePrepares(sourceIds.value), '批量生成应付核对')
+async function loadCanaryOperationData() {
+  const response = await getCanaryOperationData({ moduleCode: 'payable-check' })
+  const payload = response?.data
+  if (
+    response?.success !== true
+    || payload?.result !== 'passed'
+    || payload?.strictFacts?.operationPoolConsistent !== true
+  ) {
+    canaryOperationEnabled.value = false
+    return
+  }
+  canaryOperationRows.value = (payload.results || []).map(normalizeCanaryOperationRow)
+  Object.assign(canaryStrictFacts, payload.strictFacts)
+  canaryOperationEnabled.value = true
 }
 
-function runBatchChecking() { showCheckBatchResult(batchMarkPayableCheckChecking(checkIds.value), '批量开始核对') }
-function runBatchChecked() { showCheckBatchResult(batchMarkPayableCheckChecked(checkIds.value), '批量核对通过') }
-function runBatchDifference() { showCheckBatchResult(batchMarkPayableCheckDifference(checkIds.value), '批量标记差异') }
-function runBatchReady() { showCheckBatchResult(batchMarkInvoicePrepareReady(checkIds.value), '批量准备生成发票预备') }
+function rowMatchesFilters(row = {}) {
+  const q = quickSearch.value.trim().toLowerCase()
+  if (q) {
+    const haystack = [
+      row.payableCheckNo,
+      row.sourcePayablePrepareNo,
+      row.supplierName,
+      row.sourcePurchaseOrderNo,
+      row.primaryBusinessNo,
+      row.checkStatusText,
+      row.downstreamStatusText,
+      row.flowWritebackStatusText,
+    ].join(' ').toLowerCase()
+    if (!haystack.includes(q)) return false
+  }
 
-function getPayableCheckNormalizedState(row = {}) {
-  const generated = generatedInvoicePrepare(row)
-  const hasGeneratedInvoice = row.checkStatus === 'invoicePrepared'
-    || row.invoicePrepareGenerated
-    || row.targetInvoicePrepareId
-    || row.targetInvoicePrepareNo
-    || generated
-  const differenceStatus = row.differenceStatus || (row.checkStatus === 'difference' ? 'pending' : 'none')
-  let checkStatus = row.checkStatus || ''
-  if (hasGeneratedInvoice) {
-    return {
-      ...row,
-      checkStatus: 'invoicePrepared',
-      differenceStatus,
-      invoicePrepareGenerated: true,
-      targetInvoicePrepareId: row.targetInvoicePrepareId || generated?.id || '',
-      targetInvoicePrepareNo: row.targetInvoicePrepareNo || generated?.invoicePrepareNo || '',
+  const contains = (key, value) => {
+    const expected = String(value || '').trim().toLowerCase()
+    if (!expected) return true
+    return String(row[key] || '').toLowerCase().includes(expected)
+  }
+
+  if (!contains('payableCheckNo', advancedFilters.payableCheckNo)) return false
+  if (!contains('sourcePayablePrepareNo', advancedFilters.sourcePayablePrepareNo)) return false
+  if (!contains('supplierName', advancedFilters.supplierName)) return false
+  if (!contains('sourcePurchaseOrderNo', advancedFilters.sourcePurchaseOrderNo)) return false
+  if (advancedFilters.checkStatus && row.checkStatus !== advancedFilters.checkStatus) return false
+  if (advancedFilters.downstreamStatus && row.downstreamStatus !== advancedFilters.downstreamStatus) return false
+  if (advancedFilters.flowWritebackStatus && (row.flowWritebackStatus || '') !== advancedFilters.flowWritebackStatus) return false
+  if (!dateInRange(row.checkedAt || row.updatedAt || row.createdAt)) return false
+  const amount = Number(row.totalCheckedAmount || 0)
+  if (advancedFilters.amountMin !== '' && amount < Number(advancedFilters.amountMin)) return false
+  if (advancedFilters.amountMax !== '' && amount > Number(advancedFilters.amountMax)) return false
+  return true
+}
+
+function dateInRange(value) {
+  if (!advancedFilters.checkedDateFrom && !advancedFilters.checkedDateTo) return true
+  const dateText = formatDate(value)
+  if (dateText === '-') return false
+  if (advancedFilters.checkedDateFrom && dateText < advancedFilters.checkedDateFrom) return false
+  if (advancedFilters.checkedDateTo && dateText > advancedFilters.checkedDateTo) return false
+  return true
+}
+
+function compareValues(a, b) {
+  const na = Number(a)
+  const nb = Number(b)
+  if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb
+  return String(a ?? '').localeCompare(String(b ?? ''), 'zh-CN')
+}
+
+function applyFilters() {
+  clearSelection()
+}
+
+function clearFilters() {
+  quickSearch.value = ''
+  Object.keys(advancedFilters).forEach((key) => {
+    advancedFilters[key] = ''
+  })
+  clearSelection()
+}
+
+function handleSortChange({ prop, order }) {
+  sortState.value = { prop: prop || '', order: order || '' }
+}
+
+function clearSort() {
+  sortState.value = { prop: '', order: '' }
+  payableCheckTableRef.value?.clearSort?.()
+}
+
+function displayNo(value) {
+  return formatBusinessNo(value)
+}
+
+function formatDate(value) {
+  if (!value) return '-'
+  return String(value).slice(0, 10)
+}
+
+function formatAmount(value) {
+  const amount = Number(value)
+  return Number.isFinite(amount) ? amount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'
+}
+
+function isPayableChecked(row = {}) {
+  return ['checked', 'matched', 'invoicePrepareReady', 'invoicePrepared'].includes(row.checkStatus)
+}
+
+function handleSelectionChange(selection) {
+  selectedRows.value = selection
+}
+
+function clearSelection() {
+  payableCheckTableRef.value?.clearSelection?.()
+  selectedRows.value = []
+}
+
+function createPayableCheck(row, silent = false) {
+  if (!row?.canExecutePayableCheck) {
+    const reason = row?.executeBlockedReason || '当前记录不满足应付核对条件。'
+    if (!silent) ElMessage.warning(reason)
+    return { success: false, skipped: true, reason }
+  }
+
+  const createResult = createPayableCheckFromPayablePrepare(row.sourcePayablePrepareId || row.id)
+  refreshRows()
+  if (!createResult.ok) {
+    const reason = createResult.error || '生成采购应付核对失败。'
+    if (!silent) ElMessage.warning(reason)
+    return { success: false, reason }
+  }
+  if (!silent) ElMessage.success(`已生成采购应付核对：${createResult.payableCheckNo}`)
+  return { success: true, no: createResult.payableCheckNo, record: createResult.record }
+}
+
+function completePayableCheck(row, silent = false) {
+  const result = markPayableCheckChecked(row?.id)
+  refreshRows()
+  if (!result.success) {
+    const reason = result.error || '采购应付核对状态更新失败。'
+    if (!silent) ElMessage.warning(reason)
+    return { success: false, reason, alreadyCompleted: Boolean(result.alreadyCompleted) }
+  }
+  if (!silent) ElMessage.success(`采购应付核对完成：${result.payableCheck?.payableCheckNo || row?.payableCheckNo || '-'}`)
+  return { success: true, no: result.payableCheck?.payableCheckNo || row?.payableCheckNo || '' }
+}
+
+function batchExecutePayableCheck() {
+  const scrollElement = document.querySelector(
+    '[data-acceptance-id="business-table-scroll-payable-check-main"] .el-scrollbar__wrap',
+  )
+  const uiSnapshot = capturePceBusinessTableState({
+    selectedRows: selectedRows.value,
+    sortState: sortState.value,
+    scrollElement,
+  })
+  const selectedRecordNos = selectedRows.value.map((row) => row.payableCheckNo || row.primaryBusinessNo).filter(Boolean)
+  const allRecordNos = rows.value.map((row) => row.payableCheckNo || row.primaryBusinessNo).filter(Boolean)
+  const result = {
+    successCount: 0,
+    failedCount: 0,
+    skippedCount: 0,
+    reasons: [],
+    selectedRecordNos,
+    processedRecordNos: [],
+    unselectedRecordNos: allRecordNos.filter((no) => !selectedRecordNos.includes(no)),
+    successRecordNos: [],
+    failedRecordNos: [],
+  }
+  const checkRows = selectedRows.value.filter((row) => row.rowType === 'payableCheck' && row.id)
+  const batch = batchMarkPayableCheckChecked(checkRows.map((row) => row.id))
+  const noById = new Map(checkRows.map((row) => [String(row.id), row.payableCheckNo || row.primaryBusinessNo || '-']))
+  result.processedRecordNos.push(...checkRows.map((row) => row.payableCheckNo || row.primaryBusinessNo || '-'))
+  result.successCount = batch.successCount
+  result.failedCount = batch.failedCount
+  result.successRecordNos.push(...batch.successItems.map((item) => noById.get(String(item.id)) || item.no))
+  result.failedRecordNos.push(...batch.failedItems.map((item) => noById.get(String(item.id)) || item.no))
+  result.reasons.push(...batch.failedItems.map((item) => `${noById.get(String(item.id)) || item.no} ${item.reason}`))
+  selectedRows.value.filter((row) => row.rowType !== 'payableCheck' || !row.id).forEach((row) => {
+    const no = row.payableCheckNo || row.primaryBusinessNo || '-'
+    result.processedRecordNos.push(no)
+    result.failedRecordNos.push(no)
+    result.failedCount += 1
+    result.reasons.push(`${no} 请先生成采购应付核对，再执行批量完成。`)
+  })
+  refreshRows()
+  lastBatchResult.value = result
+  if (result.failedCount > 0) {
+    nextTick(() => {
+      selectedRows.value = restorePceBusinessTableState({
+        snapshot: uiSnapshot,
+        rows: filteredSortedRows.value,
+        tableRef: payableCheckTableRef.value,
+        scrollElement,
+      })
+    })
+    ElMessage.warning(`批量执行存在 ${result.failedCount} 条失败；表格、选择、排序和滚动状态已保留。`)
+    return
+  }
+  clearSelection()
+  ElMessage.success(`批量完成：成功 ${result.successCount} 条，失败 ${result.failedCount} 条，跳过 ${result.skippedCount} 条。`)
+}
+
+function executeRegistryAction(action) {
+  if (
+    action.selectedRows?.length
+    && action.selectedRows.every((row) => row.rowType === 'canaryOperationData')
+  ) {
+    lastCanaryActionResult.value = {
+      actionCode: action.actionCode,
+      selectedScenarioCodes: action.selectedRows.map((row) => row.scenarioCode),
+      currentStateSource: 'server',
+      eligibilityValidated: true,
+      businessWriteRequestCount: 0,
     }
+    ElMessage.success('金丝雀操作资格验证通过；未执行正式业务写入。')
+    return
   }
-  if (['pending', 'processing'].includes(differenceStatus) && ['checked', 'invoicePrepared', 'invoicePrepareReady'].includes(checkStatus)) {
-    checkStatus = 'difference'
-  }
-  if (checkStatus === 'checked' && row.recheckRequired === true) {
-    checkStatus = row.differenceResolved ? 'difference' : checkStatus
-  }
-  return { ...row, checkStatus, differenceStatus }
-}
-
-function getPayableCheckActions(row = {}) {
-  const normalized = getPayableCheckNormalizedState(row)
-  const checkStatus = normalized.checkStatus || ''
-  const differenceStatus = normalized.differenceStatus
-  return {
-    canStartChecking: checkStatus === 'draft',
-    canMarkChecked: ['draft', 'checking'].includes(checkStatus),
-    canMarkDifference: ['draft', 'checking'].includes(checkStatus),
-    canStartDifference: checkStatus === 'difference' && differenceStatus === 'pending',
-    canSaveDifference: checkStatus === 'difference' && differenceStatus === 'processing',
-    canCancelDifference: checkStatus === 'difference' && differenceStatus === 'processing',
-    canEditDifference: checkStatus === 'difference' && differenceStatus === 'processing',
-    canRecheck: checkStatus === 'difference' && differenceStatus === 'resolved',
-    canViewDifference: checkStatus === 'difference' && differenceStatus === 'resolved',
-    canCreateInvoice: ['checked', 'invoicePrepareReady'].includes(checkStatus),
-    canViewInvoice: checkStatus === 'invoicePrepared',
+  if (['complete-payable-check', 'batch-complete-payable-check'].includes(action.actionId)) {
+    if (
+      action.actionId === 'complete-payable-check'
+      && detailRecord.value
+      && action.selectedRows?.[0]?.id === detailRecord.value.id
+    ) {
+      completePayableCheck(detailRecord.value)
+      return
+    }
+    batchExecutePayableCheck()
   }
 }
 
-function generatedInvoicePrepare(row = {}) {
-  if (!row?.id) return null
-  return invoicePrepareRows.value.find((prepare) => String(prepare.sourcePayableCheckId) === String(row.id)) || null
+function viewPayableCheckResult(row) {
+  if (!row?.id) {
+    ElMessage.warning('未找到采购应付核对记录。')
+    return
+  }
+  router.push({ path: `/finance/payable-check/${row.id}` })
 }
 
-function createCheck(row) {
-  const outcome = createPayableCheckFromPayablePrepare(row.id)
-  if (!outcome.success) return notify(outcome.error, 'warning')
-  refresh()
-  notify(`已生成应付核对 ${outcome.payableCheckNo}`)
+function goSourcePayablePrepare(row) {
+  router.push({ path: '/finance/payable-prepares', query: { sourcePayablePrepareNo: row.sourcePayablePrepareNo || '' } })
 }
 
-function markChecking(row) { const outcome = markPayableCheckChecking(row.id); if (!outcome.success) return notify(outcome.error, 'warning'); refresh(); notify('已开始核对') }
-function markChecked(row) { const outcome = markPayableCheckChecked(row.id); if (!outcome.success) return notify(outcome.error, 'warning'); refresh(); notify('核对已通过') }
-function markDifference(row) { const outcome = markPayableCheckDifference(row.id); if (!outcome.success) return notify(outcome.error, 'warning'); refresh(); notify('已标记差异') }
-function markReady(row) { const outcome = markInvoicePrepareReady(row.id); if (!outcome.success) return notify(outcome.error, 'warning'); refresh(); notify('已准备生成发票预备') }
-function cancelCheck(row) { const outcome = cancelPayableCheck(row.id); if (!outcome.success) return notify(outcome.error, 'warning'); refresh(); notify('应付核对已取消') }
-
-function syncDifferenceForm(row = {}) {
-  differenceForm.value = {
-    differenceType: row.differenceType || '',
-    differenceReason: row.differenceReason || '',
-    differenceResolution: row.differenceResolution || '',
-    differenceHandlerName: row.differenceHandlerName || '当前处理人',
-    remark: row.remark || '',
+function goSupplierSettlement(row) {
+  try {
+    router.push(buildSupplierSettlementRoute(row))
+  } catch (error) {
+    ElMessage.warning(error?.message || '当前记录不能进入供应商结算。')
   }
 }
 
-function differenceStatusHint(row = {}) {
-  const normalized = getPayableCheckNormalizedState(row)
-  if (normalized.checkStatus === 'checked') return '核对已通过，可以生成发票预备。'
-  const differenceStatus = normalized.differenceStatus
-  if (differenceStatus === 'processing') return '当前差异处理中，请填写差异原因和处理方式。保存差异处理后，需要点击“重新核对”；重新核对通过后，才能生成发票预备。'
-  if (differenceStatus === 'pending') return '请先点击“处理差异”，进入差异处理。'
-  if (differenceStatus === 'resolved') return '差异已处理，请点击“重新核对”。'
-  return '无差异时，核对通过后可以生成发票预备。'
+function goSelectedSupplierSettlement() {
+  const context = supplierSettlementSelection.value
+  if (!context.allowed || !context.record) {
+    ElMessage.warning(context.reason)
+    return
+  }
+  goSupplierSettlement(context.record)
 }
 
-function scrollToDifferenceForm() {
-  document.querySelector('.difference-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+const exportColumns = [
+  { label: '主业务编号类型', key: 'primaryBusinessNoLabel' },
+  { label: '主业务编号', key: 'primaryBusinessNo' },
+  { label: '应付核对单号', key: 'payableCheckNo' },
+  { label: '来源应付预备单号', key: 'sourcePayablePrepareNo' },
+  { label: '供应商', key: 'supplierName' },
+  { label: '采购订单号', key: 'sourcePurchaseOrderNo' },
+  { label: '核对数量', key: 'totalCheckedQty' },
+  { label: '核对金额', key: 'totalCheckedAmount' },
+  { label: '差异金额', key: 'amountDifference' },
+  { label: '核对状态', key: 'checkStatusText' },
+  { label: '下游对象状态', key: 'downstreamStatusText' },
+  { label: '来源回写状态', key: 'flowWritebackStatusText' },
+  { label: '核对日期', key: 'checkedDateText' },
+]
+
+function exportRows(scope) {
+  const result = downloadBusinessTableCsv({
+    scope,
+    selectedRows: selectedRows.value,
+    sortedRows: filteredSortedRows.value,
+    columns: exportColumns,
+    canonicalName: payableCheckCanonicalName,
+  })
+  ElMessage.success(`已导出${scope === BUSINESS_TABLE_EXPORT_SCOPES.selected ? '已选记录' : '当前结果'} ${result.rowCount} 条。`)
 }
 
-function startDifference(row) {
-  const outcome = startPayableCheckDifferenceHandling(row.id)
-  if (!outcome.success) return notify(outcome.error, 'warning')
-  syncDifferenceForm(outcome.payableCheck)
-  refresh()
-  if (!route.params.id) router.push(`/finance/payable-check/${row.id}`)
-  notify('已进入差异处理，请填写差异原因和处理方式')
+function exportSelectedRows() {
+  if (!selectedRows.value.length) return
+  exportRows(BUSINESS_TABLE_EXPORT_SCOPES.selected)
 }
 
-function saveDifference(row) {
-  const outcome = savePayableCheckDifferenceHandling(row.id, differenceForm.value)
-  if (!outcome.success) return notify(outcome.error, 'warning')
-  syncDifferenceForm(outcome.payableCheck)
-  refresh()
-  notify('差异处理已保存，请重新核对')
+function exportCurrentRows() {
+  if (!filteredSortedRows.value.length) return
+  exportRows(BUSINESS_TABLE_EXPORT_SCOPES.currentResult)
 }
 
-function cancelDifference(row) {
-  const outcome = cancelPayableCheckDifferenceHandling(row.id)
-  if (!outcome.success) return notify(outcome.error, 'warning')
-  syncDifferenceForm(outcome.payableCheck)
-  refresh()
-  notify('已取消差异处理')
+async function copyDiagnostics() {
+  const diagnostics = {
+    page: 'PayableCheckPage',
+    version: VERSION,
+    quickSearch: quickSearch.value,
+    advancedFilterVisible: advancedFilterVisible.value,
+    filterState: { ...advancedFilters },
+    activeFilterCount: activeFilterCount.value,
+    sortState: { ...sortState.value },
+    resultCount: filteredSortedRows.value.length,
+    sourceRowCount: rows.value.length,
+    selectedCount: selectedRows.value.length,
+    currentStateSource: canaryOperationEnabled.value ? 'server' : 'legacy_client_store',
+    strictFacts: canaryOperationEnabled.value ? { ...canaryStrictFacts } : null,
+    canaryOperationData: canaryOperationEnabled.value
+      ? canaryOperationRows.value.map((row) => ({
+          moduleCode: row.moduleCode,
+          scenarioCode: row.scenarioCode,
+          objectState: row.objectState,
+          availableActions: row.availableActions,
+          expectedAction: row.expectedAction,
+          preservePurpose: row.preservePurpose,
+        }))
+      : [],
+    selectedSupplierSettlementContext: {
+      allowed: supplierSettlementSelection.value.allowed,
+      reason: supplierSettlementSelection.value.reason,
+      selectedPayableCheckNo: supplierSettlementSelection.value.record?.payableCheckNo || '',
+    },
+    exportScopes: ['selected', 'current_result'],
+    payableCheckCount: payableChecks.value.length,
+    sourceCandidateCount: payableCheckSources.value.length,
+    executableSourceCount: sourceRows.value.filter((row) => row.canExecutePayableCheck).length,
+    checkedCount: filteredSortedRows.value.filter(isPayableChecked).length,
+    batchResult: lastBatchResult.value,
+    canaryActionResult: lastCanaryActionResult.value,
+    developmentAcceptancePanelCollapsedByDefault: !acceptanceVisible.value,
+    listToolbarBaseline: {
+      fuzzySearch: true,
+      advancedFilter: true,
+      clearFilter: true,
+      clearSort: true,
+      exportCurrentResult: true,
+      resultCountVisible: true,
+      selectedCountVisible: true,
+      toolbarAdjacentToTable: true,
+    },
+    tableBaseline: {
+      selectionColumn: true,
+      indexColumn: true,
+      primaryBusinessNoFixedLeft: true,
+      operationColumnFixedRight: true,
+      scrollOwner: 'ElementPlusTableInnerScrollbar',
+      fixedCoordinateMustBeVerifiedByPlaywright: true,
+    },
+    actionReachability: {
+      executePayableCheckVisible: true,
+      viewSourcePayablePrepareVisible: true,
+      goSupplierSettlementAfterCheckedVisible: true,
+      batchExecuteVisible: true,
+    },
+    protectionFlags: {
+      writeBusinessDataScope: 'only_payable_check_store_by_user_action',
+      autoExecutePayableCheck: false,
+      forceEnableNextStep: false,
+      modifyPurchaseOrder: false,
+      modifyReceipt: false,
+      modifyInspection: false,
+      modifyInventory: false,
+      modifyPayablePrepareAmount: false,
+      modifyPayment: false,
+      writeLedger: false,
+      writeOffPayment: false,
+      generateBankFlow: false,
+    },
+    timestamp: new Date().toISOString(),
+  }
+  await navigator.clipboard.writeText(JSON.stringify(diagnostics, null, 2))
+  ElMessage.success('诊断数据已复制')
 }
-
-function recheckDifference(row) {
-  const outcome = recheckPayableCheckAfterDifference(row.id)
-  if (!outcome.success) return notify(outcome.error, 'warning')
-  refresh()
-  notify('已重新进入核对，请核对通过后生成发票预备')
-}
-
-function createInvoice(row) {
-  const outcome = createInvoicePrepareFromPayableCheck(row.id)
-  if (!outcome.success) return notify(outcome.error, 'warning')
-  refresh()
-  notify(`已生成发票预备 ${outcome.invoicePrepareNo}`)
-  router.push(`/finance/invoice-prepare/${outcome.invoicePrepareId}`)
-}
-
-function viewInvoicePrepare(row) {
-  const normalized = getPayableCheckNormalizedState(row)
-  const targetId = normalized.targetInvoicePrepareId
-  const targetNo = normalized.targetInvoicePrepareNo
-  if (targetId) return router.push(`/finance/invoice-prepare/${targetId}`)
-  notify(targetNo ? `已生成发票预备 ${targetNo}，请在列表中查看。` : '已生成发票预备，请在列表中查看。')
-  router.push('/finance/invoice-prepares')
-}
-
-function prepareStatusLabel(status) {
-  return { prepared: '已预备', checking: '核对中', checked: '已核对', payableReady: '可生成应付', cancelled: '取消', closed: '关闭' }[status] || status || '-'
-}
-function prepareStatusType(status) {
-  return { prepared: 'primary', checking: 'warning', checked: 'success', payableReady: 'success', cancelled: 'info', closed: 'info' }[status] || 'info'
-}
-function checkStatusLabel(status) {
-  return { draft: '草稿', checking: '核对中', checked: '可生成发票预备', difference: '存在差异', invoicePrepareReady: '可生成发票预备', invoicePrepared: '已生成发票预备', cancelled: '取消', closed: '关闭' }[status] || status || '-'
-}
-function checkStatusType(status) {
-  return { draft: 'info', checking: 'warning', checked: 'success', difference: 'danger', invoicePrepareReady: 'success', invoicePrepared: 'success', cancelled: 'info', closed: 'info' }[status] || 'info'
-}
-
-function differenceStatusLabel(status) {
-  return { none: '无差异', pending: '待处理', processing: '处理中', resolved: '已处理', rejected: '无法处理' }[status] || status || '无差异'
-}
-function differenceStatusType(status) {
-  return { none: 'info', pending: 'danger', processing: 'warning', resolved: 'success', rejected: 'danger' }[status] || 'info'
-}
-function differenceResolutionLabel(status) {
-  return differenceResolutionOptions.find((item) => item.value === status)?.label || status || '-'
-}
-
-watch(() => route.fullPath, refresh, { immediate: true })
-watch(detail, (row) => syncDifferenceForm(row || {}), { immediate: true })
 </script>
 
 <style scoped>
-.finance-flow-page { display: flex; flex-direction: column; gap: 16px; min-height: 100%; padding: 22px; background: #f5f7fb; color: #172033; }
-.page-header, .card-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.eyebrow, .card-header span, .info-grid span { color: #64748b; font-size: 13px; }
-h1, h2 { margin: 0; }
-.page-tabs, .button-row, .batch-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.finance-flow-nav { align-items: stretch; border: 1px solid #dbeafe; border-radius: 8px; padding: 10px; background: #f8fbff; }
-.finance-nav-title { display: flex; align-items: center; color: #475467; font-size: 13px; font-weight: 700; margin-right: 4px; }
-.page-tabs a, .finance-nav-button { border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px 12px; background: #fff; color: #1d4ed8; font-weight: 700; text-decoration: none; white-space: nowrap; }
-.page-tabs a.finance-nav-button-active { border-color: #0f766e; background: #0f766e; color: #fff; box-shadow: 0 6px 14px rgba(15, 118, 110, 0.18); }
-.finance-current-tag { display: inline-flex; align-items: center; margin-left: 6px; border-radius: 999px; padding: 2px 7px; background: rgba(255, 255, 255, 0.22); color: inherit; font-size: 12px; }
-.finance-current-module-badge { display: inline-flex; width: fit-content; border: 1px solid #99f6e4; border-radius: 999px; padding: 5px 10px; background: #ecfdf5; color: #0f766e !important; font-weight: 800; }
-.operation-shell { display: flex; flex-direction: column; gap: 16px; }
-.plain-flow-guide, .next-step-guide { display: grid; gap: 10px; border: 1px solid #a7f3d0; border-radius: 8px; padding: 14px; background: #ecfdf5; color: #064e3b; line-height: 1.6; }
-.next-step-guide { grid-template-columns: auto 1fr auto; align-items: center; border-color: #fde68a; background: #fffbeb; color: #78350f; }
-.plain-flow-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.plain-flow-grid span { display: grid; gap: 4px; border: 1px solid rgba(6, 78, 59, 0.14); border-radius: 8px; padding: 10px; background: #fff; }
-.flow-guide, .amount-guide, .difference-guide { display: grid; gap: 6px; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; background: #eff6ff; color: #1e3a8a; line-height: 1.6; }
-.amount-guide { margin-top: 12px; border-color: #dbe3ef; background: #f8fafc; color: #334155; }
-.difference-guide { border-color: #fecaca; background: #fff7ed; color: #7c2d12; }
-.difference-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.difference-form label { display: grid; gap: 6px; color: #475569; font-size: 13px; font-weight: 700; }
-.wide-field { grid-column: 1 / -1; }
-.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 14px; }
-.info-grid article { border: 1px solid #dbe3ef; border-radius: 8px; padding: 12px; background: #fff; }
-.info-grid strong { display: block; margin-top: 4px; }
-.batch-bar { border: 1px solid #dbe3ef; border-radius: 8px; padding: 10px; margin-bottom: 12px; background: #f8fafc; }
-.button-row .el-button, .batch-bar .el-button { min-width: 96px; white-space: nowrap; }
-.button-row .el-button--small, .batch-bar .el-button--small { min-width: 86px; }
-.button-row .el-button--primary, .button-row .el-button--success, .button-row .el-button--warning,
-.batch-bar .el-button--primary, .batch-bar .el-button--success, .batch-bar .el-button--warning { min-width: 132px; }
-.button-row .el-button--danger, .batch-bar .el-button--danger { min-width: 86px; }
-.sort-help { color: #64748b; font-size: 13px; }
-.batch-result { position: relative; display: grid; gap: 6px; margin-bottom: 12px; border-radius: 8px; padding: 12px; background: #ecfdf5; color: #065f46; }
-.batch-result.warning { background: #fffbeb; color: #92400e; }
-.batch-result.error { background: #fef2f2; color: #991b1b; }
-.batch-result button { position: absolute; top: 8px; right: 8px; border: 0; background: transparent; color: inherit; cursor: pointer; }
-@media (max-width: 900px) {
-  .plain-flow-grid, .next-step-guide { grid-template-columns: 1fr; }
-  .difference-form { grid-template-columns: 1fr; }
+.payable-page {
+  display: grid;
+  gap: 12px;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.page-heading,
+.current-action-panel,
+.table-card,
+.development-acceptance-panel {
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  background: #fff;
+  padding: 14px;
+}
+
+.page-heading,
+.current-action-panel,
+.list-section-title,
+.development-acceptance-panel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.page-heading h2,
+.page-heading p,
+.list-section-title h3,
+.list-section-title span,
+.development-acceptance-panel p {
+  margin: 0;
+}
+
+.current-action-panel div {
+  display: grid;
+  gap: 4px;
+}
+
+.current-action-panel span,
+.list-section-title span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.page-note {
+  margin-top: 6px;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.eyebrow {
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.table-card {
+  display: grid;
+  gap: 10px;
+}
+
+.standard-list-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.toolbar-search-wrapper,
+.toolbar-search {
+  width: min(360px, 100%);
+}
+
+.standard-list-toolbar span {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.advanced-filter-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.advanced-filter-panel label {
+  display: grid;
+  gap: 5px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.batch-result {
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  border-radius: 8px;
+  padding: 10px 12px;
+  line-height: 1.6;
+}
+
+.primary-no-cell {
+  display: grid;
+  gap: 2px;
+}
+
+.primary-no-cell span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.primary-no-cell strong {
+  color: #0f172a;
+  font-size: 13px;
+  word-break: break-all;
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.blocked-reason {
+  margin: 6px 0 0;
+  color: #b45309;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.table-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #475569;
+  font-size: 13px;
+}
+
+.development-acceptance-panel {
+  display: grid;
+  gap: 12px;
+  border-color: #bfdbfe;
+  background: #f8fbff;
+}
+
+.acceptance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.acceptance-grid article {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.acceptance-grid span {
+  color: #64748b;
+  font-size: 12px;
 }
 </style>

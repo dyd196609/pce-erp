@@ -23,6 +23,13 @@ import {
 } from './scmDocumentRules.js'
 import { generateScmMockState } from './scmMockDataGenerator.js'
 import { getNextApprovalStatus } from '../workflow/approvalFlowConfigStore.js'
+import {
+  buildPurchaseOrderCreationEligibility,
+  markPurchaseOrderEligibilityConverted,
+} from './purchaseOrderCreationEligibility.js'
+import { getScmDocumentStateRule } from '../schema/scm/scmStateRuleRegistry.js'
+import { assertPurchaseOrderCreationGuardV114284262 } from
+  '../domain/scm/purchaseOrder/gate/purchaseOrderCreationGuardV114284262.js'
 
 const STORAGE_KEY = 'scm-state-v1'
 
@@ -193,6 +200,23 @@ function writeFlowLog(action, payload = {}) {
 
 function defaultState() {
   return normalizeState(generateScmMockState()).state
+}
+
+function upsertPurchaseOrderCreationEligibility(inquiryId, { persistState = true } = {}) {
+  const inquiry = byId(state.purchaseInquiries, inquiryId)
+  if (!inquiry) return null
+  const existing = (state.purchaseOrderCreationEligibilities || [])
+    .find((item) => String(item.sourceInquiryId) === String(inquiryId)) || null
+  const next = buildPurchaseOrderCreationEligibility({
+    inquiry,
+    inquiryItems: getPurchaseInquiryItems(inquiryId),
+    existing,
+    now: nowText(),
+  })
+  if (existing) Object.assign(existing, next)
+  else state.purchaseOrderCreationEligibilities.unshift({ ...next })
+  if (persistState) persist()
+  return clone(next)
 }
 
 function legacyDefaultState() {
@@ -520,9 +544,36 @@ function buildPriceApprovalItem(patch = {}) {
 function purchaseOrderHeader(patch = {}) {
   const stamp = nowText()
   const planDate = patch.earliestArrivalDate || patch.planDeliveryDate || patch.plannedArrivalDate || patch.expectedDeliveryDate || ''
+  const canonicalObjectNo = patch.objectNo || createNo('PO')
+  const governedFields = patch.classification === 'GATE_CREATED' || patch.objectType === 'PurchaseOrder'
+    ? {
+        objectType: 'PurchaseOrder',
+        classification: 'GATE_CREATED',
+        lifecycleStatus: patch.lifecycleStatus || patch.status || 'draft',
+        sourceGateId: patch.sourceGateId || '',
+        sourceRecommendationId: patch.sourceRecommendationId || '',
+        sourceInquiryId: patch.sourceInquiryId || '',
+        sourcePriceApprovalId: patch.sourcePriceApprovalId || '',
+        sourceQuoteComparisonId: patch.sourceQuoteComparisonId || '',
+        confirmedBy: patch.confirmedBy || '',
+        confirmedAt: patch.confirmedAt || '',
+        confirmationSource: patch.confirmationSource || '',
+        quoteEvidence: clone(patch.quoteEvidence || []),
+        priceEvidence: clone(patch.priceEvidence || []),
+        qualificationEvidence: clone(patch.qualificationEvidence || []),
+        gateSourceSignature: patch.gateSourceSignature || '',
+        admissionResultId: patch.admissionResultId || '',
+        creationActionCode: patch.creationActionCode || '',
+        createdBy: patch.createdBy || '',
+        approvalOpinion: patch.approvalOpinion || '',
+        supplierPurchaseDraftId: patch.supplierPurchaseDraftId || '',
+        manualDataVersion: toNumber(patch.manualDataVersion || 0),
+      } : {}
   return {
     id: patch.id || createId('po'),
-    poNo: patch.poNo || createNo('PO'),
+    objectNo: canonicalObjectNo,
+    purchaseOrderNo: canonicalObjectNo,
+    poNo: canonicalObjectNo,
     orderDate: patch.orderDate || today(),
     supplierId: patch.supplierId || firstId(getEnabledSuppliers()),
     buyerId: patch.buyerId || firstId(getEmployeeOptions()),
@@ -530,6 +581,7 @@ function purchaseOrderHeader(patch = {}) {
     earliestArrivalDate: planDate,
     totalAmount: toNumber(patch.totalAmount || 0),
     status: patch.status || 'draft',
+    ...governedFields,
     sourceType: patch.sourceType || 'manual',
     sourceId: patch.sourceId || '',
     sourceModule: patch.sourceModule || '',
@@ -594,6 +646,40 @@ function buildPurchaseOrderItem(patch = {}) {
     || (snapshot.defaultLocationId && locations.some((item) => String(item.id) === String(snapshot.defaultLocationId)) ? snapshot.defaultLocationId : '')
     || firstId(locations)
   const planDate = lineDemandDate(patch)
+  const governedFields = patch.sourceGateId ? {
+    sourceGateId: patch.sourceGateId,
+    sourceRecommendationId: patch.sourceRecommendationId || '',
+    sourcePurchaseRequestIds: Array.isArray(patch.sourcePurchaseRequestIds)
+      ? clone(patch.sourcePurchaseRequestIds) : [],
+    sourcePurchaseRequestId: patch.sourcePurchaseRequestId || '',
+    sourceInquiryId: patch.sourceInquiryId || '',
+    sourceQuoteComparisonId: patch.sourceQuoteComparisonId || '',
+    sourcePriceApprovalId: patch.sourcePriceApprovalId || '',
+    requestedQuantity: toNumber(patch.requestedQuantity || 0),
+    availableQuantity: patch.availableQuantity === null ? null : toNumber(patch.availableQuantity || 0),
+    orderedQuantity: patch.orderedQuantity === null ? null : toNumber(patch.orderedQuantity || 0),
+    remainingQuantity: toNumber(patch.remainingQuantity || 0),
+    confirmedQuantity: toNumber(patch.confirmedQuantity ?? patch.quantity ?? 0),
+    itemDraftStatus: patch.itemDraftStatus || 'included',
+    itemDraftStatusLabel: patch.itemDraftStatusLabel || '纳入采购订单',
+    originalSuggestedQuantity: toNumber(patch.originalSuggestedQuantity || 0),
+    quantityAdjustmentReason: patch.quantityAdjustmentReason || '',
+    quantityAdjustedBy: patch.quantityAdjustedBy || '',
+    quantityAdjustedAt: patch.quantityAdjustedAt || '',
+    quantityAdjustmentHistory: Array.isArray(patch.quantityAdjustmentHistory)
+      ? clone(patch.quantityAdjustmentHistory) : [],
+    supplierAllocationSource: patch.supplierAllocationSource || '',
+    quotedPrice: toNumber(patch.quotedPrice || 0),
+    approvedPrice: toNumber(patch.approvedPrice || 0),
+    confirmedPrice: toNumber(patch.confirmedPrice ?? patch.planPrice ?? patch.price ?? 0),
+    requestedDate: patch.requestedDate || '',
+    supplierDeliveryDate: patch.supplierDeliveryDate || '',
+    confirmedDeliveryDate: patch.confirmedDeliveryDate || patch.plannedArrivalDate || '',
+    confirmedBy: patch.confirmedBy || '',
+    confirmedAt: patch.confirmedAt || '',
+    confirmationSource: patch.confirmationSource || '',
+    manualDataVersion: toNumber(patch.manualDataVersion || 0),
+  } : {}
   return {
     id: patch.id || createId('poi'),
     poId: patch.poId || '',
@@ -612,6 +698,11 @@ function buildPurchaseOrderItem(patch = {}) {
     rootRequestDate: patch.rootRequestDate || '',
     rootRequestLineId: patch.rootRequestLineId || patch.sourceLineId || patch.sourceItemId || '',
     ...snapshot,
+    materialId: patch.materialId || snapshot.materialId || '',
+    materialCode: patch.materialCode || snapshot.materialCode || '',
+    materialName: patch.materialName || snapshot.materialName || '',
+    specification: patch.specification || snapshot.specification || '',
+    unit: patch.unit || snapshot.unit || '',
     quantity,
     price,
     amount: Number((quantity * price).toFixed(2)),
@@ -636,6 +727,7 @@ function buildPurchaseOrderItem(patch = {}) {
     planDeliveryDate: patch.planDeliveryDate || patch.plannedArrivalDate || planDate,
     plannedArrivalDate: patch.plannedArrivalDate || patch.planDeliveryDate || planDate,
     remark: patch.remark || '',
+    ...governedFields,
   }
 }
 
@@ -825,6 +917,7 @@ function normalizeState(raw) {
     priceApprovalItems: [],
     purchaseOrders: [],
     purchaseOrderItems: [],
+    purchaseOrderCreationEligibilities: [],
     pendingActions: [],
     ...(raw || {}),
   }
@@ -837,6 +930,15 @@ function normalizeState(raw) {
   state.priceApprovalItems = state.priceApprovalItems.map((item) => buildPriceApprovalItem(item))
   state.purchaseOrders = state.purchaseOrders.map((item) => purchaseOrderHeader(item))
   state.purchaseOrderItems = state.purchaseOrderItems.map((item) => buildPurchaseOrderItem(item))
+  state.purchaseOrderCreationEligibilities = (state.purchaseOrderCreationEligibilities || []).map((item) => ({
+    id: item.id || `po-eligibility-${item.sourceInquiryId || 'unknown'}`,
+    sourceInquiryId: item.sourceInquiryId || '',
+    eligibilityStatus: item.eligibilityStatus || 'pending',
+    reason: item.reason || '',
+    createdAt: item.createdAt || '',
+    updatedAt: item.updatedAt || item.createdAt || '',
+    convertedPurchaseOrderIds: [...(item.convertedPurchaseOrderIds || [])],
+  }))
   state.pendingActions = (state.pendingActions || []).map((item) => pendingAction(item))
   migrated = repairSourceFields(state) || migrated
   state.purchaseOrders.forEach((order) => {
@@ -1165,6 +1267,13 @@ export function getScmPurchaseOrderItems(poId) { return clone(normalizeLines(sta
 export function getPendingActions(status = '') {
   return clone((state.pendingActions || []).filter((item) => !status || item.status === status))
 }
+export function listPurchaseOrderCreationEligibilities() {
+  return clone(state.purchaseOrderCreationEligibilities || [])
+}
+export function getPurchaseOrderCreationEligibility(sourceInquiryId) {
+  return clone((state.purchaseOrderCreationEligibilities || [])
+    .find((item) => String(item.sourceInquiryId) === String(sourceInquiryId)) || null)
+}
 export function cancelPendingAction(id) {
   const action = byId(state.pendingActions, id)
   if (!action) return result(false, '未找到待处理流程')
@@ -1379,7 +1488,13 @@ export function confirmInquiryItemQuote(inquiryId, itemId) {
 }
 
 export function approvePurchaseInquiry(id) {
-  return advanceApproval('purchaseInquiry', id)
+  const outcome = advanceApproval('purchaseInquiry', id)
+  const inquiry = byId(state.purchaseInquiries, id)
+  if (outcome.success && inquiry?.status === 'approved') {
+    const eligibility = upsertPurchaseOrderCreationEligibility(id)
+    return { ...outcome, purchaseOrderCreationEligibility: eligibility }
+  }
+  return outcome
 }
 
 export function closePurchaseInquiry(id) {
@@ -1484,12 +1599,96 @@ export function rejectPriceApproval(id) {
   return result(true)
 }
 
-export function createScmPurchaseOrder(patch = {}) {
+export function createScmPurchaseOrder(patch = {}, { creationContext = {} } = {}) {
+  const admission = assertPurchaseOrderCreationGuardV114284262(creationContext)
+  if (!admission.success) return admission
   const item = purchaseOrderHeader(patch)
   state.purchaseOrders.unshift(item)
   persist()
   writeLog('新增采购订单', 'purchaseOrder', item.id, item.poNo)
   return item.id
+}
+
+export function createGateGovernedPurchaseOrders(purchaseOrderPackages = [], {
+  creationContext = {},
+} = {}) {
+  const admission = assertPurchaseOrderCreationGuardV114284262(creationContext)
+  if (!admission.success) return admission
+  if (!Array.isArray(purchaseOrderPackages) || !purchaseOrderPackages.length) {
+    return { success: false, result: 'BLOCKED', error: 'FORMAL_PURCHASE_ORDER_DATA_INCOMPLETE',
+      businessWriteCount: 0, productionDataWritten: false, purchaseOrderCreated: false }
+  }
+  const materialOwners = new Map()
+  for (const entry of purchaseOrderPackages) {
+    const purchaseOrder = entry?.purchaseOrder || {}
+    const orderLines = entry?.orderLines || []
+    const gateId = String(purchaseOrder.sourceGateId || '').trim()
+    const supplierId = String(purchaseOrder.supplierId || '').trim()
+    if (purchaseOrder.objectType !== 'PurchaseOrder' || !gateId || !supplierId
+      || purchaseOrder.classification !== 'GATE_CREATED' || purchaseOrder.status !== 'draft'
+      || !Array.isArray(orderLines) || !orderLines.length
+      || orderLines.some(line => !String(line.materialCode || '').trim()
+        || String(line.supplierId || '').trim() !== supplierId
+        || !String(line.sourcePurchaseRequestId || '').trim()
+        || !String(line.sourceInquiryId || '').trim()
+        || !String(line.sourceQuoteComparisonId || '').trim()
+        || !String(line.sourcePriceApprovalId || '').trim()
+        || String(line.sourceGateId || '').trim() !== gateId
+        || toNumber(line.confirmedQuantity ?? line.quantity) <= 0
+        || toNumber(line.confirmedPrice ?? line.planPrice ?? line.price) < 0)) {
+      return { success: false, result: 'BLOCKED', error: 'FORMAL_PURCHASE_ORDER_DATA_INCOMPLETE',
+        businessWriteCount: 0, productionDataWritten: false, purchaseOrderCreated: false }
+    }
+    for (const line of orderLines) {
+      const materialCode = String(line.materialCode || '').trim()
+      const prior = materialOwners.get(materialCode)
+      if (prior && prior !== supplierId) {
+        return { success: false, result: 'BLOCKED',
+          error: 'PURCHASE_ORDER_ITEM_MULTI_SUPPLIER_ALLOCATION', businessWriteCount: 0,
+          productionDataWritten: false, purchaseOrderCreated: false }
+      }
+      materialOwners.set(materialCode, supplierId)
+    }
+  }
+  const purchaseOrders = []
+  const allOrderLines = []
+  let businessWriteCount = 0
+  for (const entry of purchaseOrderPackages) {
+    const purchaseOrder = entry.purchaseOrder
+    const orderLines = entry.orderLines
+    const gateId = String(purchaseOrder.sourceGateId || '').trim()
+    const supplierId = String(purchaseOrder.supplierId || '').trim()
+    const existing = state.purchaseOrders.find(item => item.classification === 'GATE_CREATED'
+      && item.sourceGateId === gateId && String(item.supplierId || '').trim() === supplierId)
+    if (existing) {
+      purchaseOrders.push(clone(existing))
+      allOrderLines.push(...getScmPurchaseOrderItems(existing.id))
+      continue
+    }
+    const header = purchaseOrderHeader(purchaseOrder)
+    const lines = orderLines.map((line, index) => buildPurchaseOrderItem({
+      ...line, id: line.id || `${header.id}-line-${index + 1}`, poId: header.id,
+      lineNo: index + 1, supplierId: header.supplierId, supplierName: header.supplierName,
+    }))
+    header.totalAmount = Number(lines.reduce((sum, line) =>
+      sum + Number(line.planAmount || 0), 0).toFixed(2))
+    header.planAmount = header.totalAmount
+    state.purchaseOrders.unshift(header)
+    state.purchaseOrderItems.push(...lines)
+    purchaseOrders.push(clone(header))
+    allOrderLines.push(...clone(lines))
+    businessWriteCount += 1
+    writeLog('Gate人工创建正式采购订单', 'purchaseOrder', header.id, header.poNo)
+  }
+  persist()
+  return { success: true, result: businessWriteCount ? 'CREATED' : 'EXISTING',
+    purchaseOrder: purchaseOrders[0] || null, purchaseOrders: clone(purchaseOrders),
+    orderLines: clone(allOrderLines), businessWriteCount, productionDataWritten: false,
+    purchaseOrderCreated: businessWriteCount > 0 }
+}
+
+export function createGateGovernedPurchaseOrder(purchaseOrder = {}, orderLines = [], options = {}) {
+  return createGateGovernedPurchaseOrders([{ purchaseOrder, orderLines }], options)
 }
 
 export function updateScmPurchaseOrder(id, patch = {}) {
@@ -1701,7 +1900,11 @@ export function createInquiryFromRequest(requestId) {
 
 export function createPriceApprovalFromInquiry(inquiryId) {
   const inquiry = byId(state.purchaseInquiries, inquiryId)
-  if (!inquiry || !['approved', 'completed', 'sent', 'quoted'].includes(inquiry.status)) return null
+  if (!inquiry || !getScmDocumentStateRule('purchaseInquiry', inquiry.status)?.mayCreatePriceApproval) return null
+  const eligibility = upsertPurchaseOrderCreationEligibility(inquiryId)
+  if (!eligibility || eligibility.eligibilityStatus !== 'eligible') {
+    return { success: false, error: eligibility?.reason || '询价尚未具备采购订单生成资格。' }
+  }
   const existing = existingTarget('purchaseInquiry', inquiryId, 'priceApprovals')
   if (existing) return { success: false, error: `该单据已生成下一单 ${existing.approvalNo}，不能重复生成。`, targetPath: `/scm/price-approval/${existing.id}` }
   const quotedItems = getPurchaseInquiryItems(inquiryId).filter((item) => toNumber(item.quotedPrice) > 0)
@@ -1767,10 +1970,16 @@ export function createPriceApprovalFromInquiry(inquiryId) {
 }
 
 export function createPurchaseOrderFromPriceApproval(approvalId) {
+  return result(false, '采购核价不得直接创建采购订单；请先完成供应商推荐、PurchaseOrderGate和准入检查。')
+  /* c8 ignore next 91 -- legacy conversion body retained read-only for traceability */
   const approval = byId(state.priceApprovals, approvalId)
-  if (!approval || approval.status !== 'approved') return null
+  if (!approval || !getScmDocumentStateRule('priceApproval', approval.status)?.mayCreatePurchaseOrder) return null
   const existing = existingTarget('priceApproval', approvalId, 'purchaseOrders')
   if (existing) return { success: false, error: `该单据已生成下一单 ${existing.poNo}，不能重复生成。`, targetPath: `/scm/purchase-order/${existing.id}` }
+  const eligibility = upsertPurchaseOrderCreationEligibility(approval.inquiryId)
+  if (!eligibility || eligibility.eligibilityStatus !== 'eligible') {
+    return { success: false, error: eligibility?.reason || '未找到可用的采购订单生成资格。' }
+  }
   const approvalItems = getPriceApprovalItems(approvalId)
   if (!approvalItems.length) return null
   const firstItem = approvalItems[0]
@@ -1834,6 +2043,10 @@ export function createPurchaseOrderFromPriceApproval(approvalId) {
   }
   recalculateScmPurchaseOrderAmount(poId)
   markTarget('priceApproval', approvalId, 'purchaseOrder', poId, po?.poNo || poId)
+  const eligibilityRecord = (state.purchaseOrderCreationEligibilities || [])
+    .find((item) => String(item.sourceInquiryId) === String(approval.inquiryId))
+  if (eligibilityRecord) Object.assign(eligibilityRecord, markPurchaseOrderEligibilityConverted(eligibilityRecord, [poId], nowText()))
+  persist()
   writeFlowLog('生成采购订单', {
     sourceModule: 'priceApproval',
     sourceOrderId: approvalId,

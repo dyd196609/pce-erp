@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <main class="enterprise-os-page">
     <header class="page-header">
       <section>
@@ -8,6 +8,7 @@
       </section>
       <nav class="page-tabs app-module-nav-zone">
         <span class="app-nav-zone-title">企业操作模块导航</span>
+        <router-link class="app-nav-button" to="/home">本人首页</router-link>
         <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isEnterpriseNavActive('/work-center') }" to="/work-center">
           {{ t('Work Center') }}
           <span v-if="isEnterpriseNavActive('/work-center')" class="app-current-tag">当前</span>
@@ -16,6 +17,7 @@
           {{ t('Process Center') }}
           <span v-if="isEnterpriseNavActive('/process-center')" class="app-current-tag">当前</span>
         </router-link>
+        <router-link class="app-nav-button" to="/process-designer">流程设计中心</router-link>
         <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isEnterpriseNavActive('/organization') }" to="/organization">
           {{ t('Organization') }}
           <span v-if="isEnterpriseNavActive('/organization')" class="app-current-tag">当前</span>
@@ -32,21 +34,9 @@
           {{ t('Admin') }}
           <span v-if="isEnterpriseNavActive('/admin')" class="app-current-tag">当前</span>
         </router-link>
-        <router-link class="app-nav-button" to="/manufacturing/modules">制造业13大核心模块</router-link>
-        <router-link class="app-nav-button" to="/foundation">第一期基础资料</router-link>
-        <router-link class="app-nav-button" to="/foundation/business-partners">业务伙伴档案</router-link>
+        <router-link class="app-nav-button" to="/manufacturing/modules">PCE制造数字化能力地图</router-link>
+        <router-link class="app-nav-button" to="/foundation">基础资料维护</router-link>
         <router-link class="app-nav-button" to="/reference">数据引用中心</router-link>
-        <router-link class="app-nav-button" to="/scm">SCM采购管理</router-link>
-        <router-link class="app-nav-button" to="/wms">WMS库存管理</router-link>
-        <router-link class="app-nav-button" to="/qms">QMS来料检验</router-link>
-        <router-link class="app-nav-button" to="/finance/payable-prepares">采购应付预备</router-link>
-        <router-link class="app-nav-button" to="/finance/payable-checks">采购应付核对</router-link>
-        <router-link class="app-nav-button" to="/finance/invoice-prepares">采购发票预备</router-link>
-        <router-link class="app-nav-button" to="/finance/ap-drafts">采购应付账款草稿</router-link>
-        <router-link class="app-nav-button" to="/finance/payment-drafts">供应商付款草稿</router-link>
-        <router-link class="app-nav-button" to="/finance/payment-prepares">正式付款单预备</router-link>
-        <router-link class="app-nav-button" to="/finance/payment-order-drafts">正式付款单草稿</router-link>
-        <router-link class="app-nav-button" to="/finance/payment-risk-reviews">真实付款风险评审</router-link>
         <router-link class="app-nav-button" to="/admin/approval-flow-config">审批流配置</router-link>
       </nav>
     </header>
@@ -105,75 +95,6 @@
           <div class="button-row">
             <button type="button" @click="finishExecution">完成执行</button>
             <button type="button" @click="goBack">返回个人工作台</button>
-          </div>
-        </div>
-
-        <div v-else-if="route.name === 'ProcessDetail'" class="detail-layout">
-          <section class="info-box">
-            <h3>流程信息</h3>
-            <p>流程详情：{{ selectedProcess?.name || '流程不存在' }}</p>
-            <p>流程步骤：提交 / 审批 / 执行 / 完成</p>
-            <p>当前状态：{{ selectedProcess?.status || '-' }}</p>
-            <p>负责人：{{ selectedProcess?.owner || '-' }}</p>
-            <p>关联任务：{{ relatedTasks.length }} 项</p>
-          </section>
-          <div class="button-row">
-            <button type="button" @click="router.push(`/process-center/process/${route.params.id}/create`)">新建业务单</button>
-            <button type="button" @click="router.push(`/process-center/process/${route.params.id}/edit`)">编辑流程</button>
-            <button type="button" @click="router.push(`/process-center/process/${route.params.id}/execute`)">执行流程</button>
-            <button type="button" @click="goBack">返回流程中心</button>
-          </div>
-        </div>
-
-        <div v-else-if="route.name === 'ProcessCreate'" class="detail-layout">
-          <section class="info-box">
-            <h3>新建业务单表单</h3>
-            <p>所属流程：{{ selectedProcess?.name || route.params.id }}</p>
-          </section>
-          <div class="form-grid">
-            <label>名称<input v-model="businessForm.name" /></label>
-            <label>类型<input v-model="businessForm.type" /></label>
-            <label>负责人<input v-model="businessForm.owner" /></label>
-            <label>计划日期<input v-model="businessForm.planDate" type="date" /></label>
-            <label>备注<textarea v-model="businessForm.remark" /></label>
-          </div>
-          <div class="button-row">
-            <button type="button" @click="saveBusinessRecord">保存</button>
-            <button type="button" @click="goBack">取消</button>
-          </div>
-        </div>
-
-        <div v-else-if="route.name === 'ProcessEdit'" class="detail-layout">
-          <section class="info-box">
-            <h3>编辑流程表单</h3>
-            <p>流程信息保存后返回业务流程中心。</p>
-          </section>
-          <div class="form-grid">
-            <label>流程名称<input v-model="processForm.name" /></label>
-            <label>所属分类<select v-model="processForm.category">
-              <option v-for="group in processGroups" :key="group.key" :value="group.key">{{ group.title }}</option>
-            </select></label>
-            <label>负责人岗位<input v-model="processForm.owner" /></label>
-            <label>当前状态<input v-model="processForm.status" /></label>
-            <label>待处理数量<input v-model.number="processForm.pending" type="number" min="0" /></label>
-          </div>
-          <div class="button-row">
-            <button type="button" @click="saveProcessEdit">保存</button>
-            <button type="button" @click="goBack">取消</button>
-          </div>
-        </div>
-
-        <div v-else-if="route.name === 'ProcessExecute'" class="detail-layout">
-          <section class="info-box">
-            <h3>流程执行页面</h3>
-            <p>流程：{{ selectedProcess?.name || route.params.id }}</p>
-            <p>当前状态：{{ selectedProcess?.status || '-' }}</p>
-          </section>
-          <label>执行动作<input v-model="processExecuteForm.action" /></label>
-          <label>执行结果<textarea v-model="processExecuteForm.result" /></label>
-          <div class="button-row">
-            <button type="button" @click="confirmProcessExecution">确认执行</button>
-            <button type="button" @click="goBack">返回流程中心</button>
           </div>
         </div>
 
@@ -301,94 +222,120 @@
       </section>
     </section>
 
-    <section v-else-if="currentPath === '/process-center'" class="operation-shell">
+    <section
+      v-else-if="currentPath === '/process-center'"
+      class="operation-shell"
+      data-acceptance-id="pce-business-process-center"
+      data-page-version="V1.14.2.8.4.8.5.2"
+      data-page-name="业务流程中心"
+      data-page-module="Business Process Center"
+      data-fact-source="ProcessCenterRuntime"
+      data-runtime-code="ProcessCenterRuntime"
+      data-runtime-model="ProcessCenterRuntimeModel"
+      data-danger-action-count="0"
+      data-detail-display-mode="process-node-track"
+      data-master-data-maintenance="false"
+      data-isolated-business-shortcut-count="0"
+      data-navigation-hierarchy="module-process-node-page"
+      data-acceptance-status="PASS"
+    >
       <section class="panel primary-panel">
         <header>
           <div>
             <h2>业务流程中心</h2>
-            <span>操作优先</span>
-          </div>
-          <div class="button-row">
-            <button type="button" @click="router.push('/manufacturing/modules')">掌云智造模块蓝图</button>
-            <button type="button" @click="router.push('/foundation')">第一期基础资料</button>
-            <button type="button" @click="router.push('/foundation/business-partners')">业务伙伴档案</button>
-            <button type="button" @click="router.push('/foundation/suppliers')">供应商档案</button>
-            <button type="button" @click="router.push('/foundation/company-bank-accounts')">企业银行账户</button>
-            <button type="button" @click="router.push('/foundation/sample-data')">样例数据管理</button>
-            <button type="button" @click="router.push('/foundation/erp/supplier-material-prices')">供应商物料价格</button>
-            <button type="button" @click="router.push('/foundation/erp/material-suppliers')">物料供应商关系</button>
-            <button type="button" @click="router.push('/foundation/manufacturing/processes')">工序资料</button>
-            <button type="button" @click="router.push('/foundation/manufacturing/routings')">工艺路线</button>
-            <button type="button" @click="router.push('/foundation/manufacturing/equipment')">设备资料</button>
-            <button type="button" @click="router.push('/foundation/pfm/employees')">PFM人员档案</button>
-            <button type="button" @click="router.push('/foundation/erp/materials')">ERP主数据</button>
-            <button type="button" @click="router.push('/foundation/security/permissions')">权限与日志</button>
-            <button type="button" @click="router.push('/foundation/warnings/rules')">预警引擎基础</button>
-            <button type="button" @click="router.push('/reference')">数据引用中心</button>
-            <button type="button" @click="router.push('/reference/check')">基础资料检查</button>
-            <button type="button" @click="router.push('/foundation/review-check')">基础资料评审检查</button>
-            <button type="button" @click="router.push('/foundation/import-records')">基础资料导入记录</button>
-            <button type="button" @click="router.push('/scm')">SCM采购管理</button>
-            <button type="button" @click="router.push('/scm')">SCM待处理流程</button>
-            <button type="button" @click="router.push('/wms')">WMS库存管理</button>
-            <button type="button" @click="router.push('/wms/inventory-balances')">库存余额</button>
-            <button type="button" @click="router.push('/wms/inventory-transactions')">库存流水</button>
-            <button type="button" @click="router.push('/wms/warehouse-tasks')">仓库任务</button>
-            <button type="button" @click="router.push('/wms/stock-warnings')">库存预警</button>
-            <button type="button" @click="router.push('/wms/purchase-receive-preview')">采购到货预备</button>
-            <button type="button" @click="router.push('/wms/purchase-receives')">采购收货预备</button>
-            <button type="button" @click="router.push('/qms')">QMS来料检验预备</button>
-            <button type="button" @click="router.push('/finance/payable-prepares')">采购应付预备</button>
-            <button type="button" @click="router.push('/finance/payable-checks')">采购应付核对</button>
-            <button type="button" @click="router.push('/finance/invoice-prepares')">采购发票预备</button>
-            <button type="button" @click="router.push('/finance/ap-drafts')">采购应付账款草稿</button>
-            <button type="button" @click="router.push('/finance/payment-drafts')">供应商付款草稿</button>
-            <button type="button" @click="router.push('/finance/payment-prepares')">正式付款单预备</button>
-            <button type="button" @click="router.push('/finance/payment-order-drafts')">正式付款单草稿</button>
-            <button type="button" @click="router.push('/admin/approval-flow-config')">审批流配置</button>
-            <button type="button" @click="startCreateProcess">新建流程</button>
+            <span>企业业务流程导航与页面质量状态</span>
           </div>
         </header>
-        <p class="platform-note">
-          当前软件定位为制造企业数字化集成平台，V1.11.0 已接入 ERP、CRM、SCM、WMS、MRP、MPS、APS、MES、QMS、BI、FDM、PFM、KPI 13 大模块蓝图。
-        </p>
-        <div class="process-grid">
-          <article v-for="process in state.processes" :key="process.id" class="business-card">
-            <span>{{ categoryLabel(process.category) }}</span>
-            <strong>{{ process.name }}</strong>
-            <p>当前状态：{{ process.status }}</p>
-            <p>负责人/岗位：{{ process.owner }}</p>
-            <p>待处理数量：{{ process.pending }}</p>
-            <p>状态：{{ process.enabled ? '已启用' : '已停用' }}</p>
-            <div class="button-row">
-              <button type="button" @click="router.push(`/process-center/process/${process.id}`)">查看</button>
-              <button type="button" @click="router.push(`/process-center/process/${process.id}/create`)">新建</button>
-              <button type="button" @click="router.push(`/process-center/process/${process.id}/edit`)">编辑</button>
-              <button type="button" @click="router.push(`/process-center/process/${process.id}/execute`)">执行</button>
-              <button type="button" @click="router.push(`/process-center/process/${process.id}`)">查看流程</button>
-              <button type="button" @click="toggleProcess(process)">
-                {{ process.enabled ? '停用' : '启用' }}
-              </button>
+        <p class="platform-note">本中心只显示企业业务流程；主数据维护、引用关系分析和产品能力架构分别由对应中心负责。</p>
+        <section
+          class="process-catalog"
+          data-acceptance-id="business-process-center-v1"
+          data-process-registry-version="V1.14.2.8.4.10.4"
+          :data-process-count="enterpriseProcesses.length"
+        >
+          <header class="process-catalog-header">
+            <div>
+              <h3>企业业务流程目录</h3>
+              <p>按业务模块查看流程、节点、页面版本与自动验收状态。</p>
             </div>
-          </article>
-        </div>
-      </section>
+            <span class="registry-badge">统一流程 {{ enterpriseProcesses.length }} 个</span>
+          </header>
 
-      <section v-if="processFormOpen" class="panel editor-panel">
-        <header>
-          <h2>{{ editingProcessId ? '编辑流程' : '新增流程' }}</h2>
-          <button type="button" @click="closeForms">取消</button>
-        </header>
-        <div class="form-grid">
-          <label>流程名称<input v-model="processForm.name" /></label>
-          <label>所属分类<select v-model="processForm.category">
-            <option v-for="group in processGroups" :key="group.key" :value="group.key">{{ group.title }}</option>
-          </select></label>
-          <label>负责人岗位<input v-model="processForm.owner" /></label>
-          <label>当前状态<input v-model="processForm.status" /></label>
-          <label>待处理数量<input v-model.number="processForm.pending" type="number" min="0" /></label>
-        </div>
-        <button type="button" @click="saveProcess">保存流程</button>
+          <nav class="process-module-navigation" aria-label="业务模块导航" data-acceptance-id="business-module-navigation">
+            <button
+              v-for="module in processCenterModules"
+              :key="module.moduleCode"
+              type="button"
+              class="process-module-button"
+              :class="{ active: selectedProcessModule === module.moduleCode }"
+              :data-process-module="module.moduleCode"
+              @click="selectProcessModule(module.moduleCode)"
+            >
+              <strong>{{ module.moduleCode }}</strong>
+              <span>{{ module.moduleName }}</span>
+            </button>
+          </nav>
+
+          <section
+            v-if="selectedFormalProcess"
+            class="scm-purchase-process"
+            data-acceptance-id="selected-module-formal-process"
+            data-process-visual-contract="PROCESS-VISUAL-001"
+            :data-process-module="selectedProcessModule"
+            :data-process-code="selectedFormalProcess.processCode"
+            :data-formal-root-count="selectedModuleProcesses.length"
+          >
+            <header>
+              <div>
+                <h3>{{ selectedFormalProcess.processName }}</h3>
+                <p><strong>{{ selectedModuleName }}</strong></p>
+                <p>共 {{ selectedFormalProcessNodes.length }} 个节点，已挂接 {{ selectedBoundPageCount }} 个业务页面。</p>
+              </div>
+              <span class="registry-badge success">{{ selectedFormalProcess.processCode === 'MES_TEST_PRODUCTION_EXECUTION' ? '按正式与TEST原生来源分别核验 · 待人工验收' : '唯一正式流程' }}</span>
+            </header>
+            <div
+              class="process-node-track"
+              data-process-layout="card-flow"
+              data-horizontal-scroll-owner="process-region"
+            >
+              <template v-for="(node, index) in selectedFormalProcessNodes" :key="node.nodeCode">
+                <ProcessNodeNavigation
+                  :node="node"
+                  :selected="selectedProcessNode?.nodeCode === node.nodeCode"
+                  @inspect="inspectProcessNode"
+                  @opened="handleProcessNodeOpened"
+                />
+                <span v-if="index < selectedFormalProcessNodes.length - 1" class="process-arrow" aria-hidden="true">→</span>
+              </template>
+            </div>
+            <p v-if="selectedProcessModule === 'PDE' && pdeScmRelationship" class="platform-note">
+              {{ pdeScmRelationship.businessChain.join(' → ') }}
+            </p>
+          </section>
+
+          <section v-else class="process-module-empty" data-acceptance-id="module-formal-process-empty">
+            <strong>{{ selectedProcessModule }}</strong>
+            <p>本模块尚未配置正式运作流程</p>
+          </section>
+
+          <aside
+            v-if="selectedProcessNode"
+            class="process-node-inspector"
+            data-acceptance-id="process-node-inspector"
+          >
+            <div>
+              <span>当前查看节点</span>
+              <strong>{{ selectedProcessNode.nodeName }}</strong>
+            </div>
+            <dl>
+              <div><dt>模块</dt><dd>{{ selectedProcessNode.moduleCode }}</dd></div>
+              <div><dt>页面编码</dt><dd>{{ selectedProcessNode.pageCode }}</dd></div>
+              <div><dt>页面地址</dt><dd>{{ selectedProcessNode.pageRoute || selectedProcessNode.pageUrl }}</dd></div>
+              <div><dt>状态说明</dt><dd>{{ selectedProcessNode.statusDescription }}</dd></div>
+              <div><dt>导航方式</dt><dd>新标签打开，流程中心保持</dd></div>
+            </dl>
+          </aside>
+        </section>
       </section>
     </section>
 
@@ -485,7 +432,7 @@
       <section class="panel primary-panel">
         <header>
           <h2>{{ currentPath === '/dashboard' ? '仪表盘' : '分析中心' }}</h2>
-          <span>指标与分析只在此处显示</span>
+          <span>指标与分析只在此处展示</span>
         </header>
         <div class="metric-grid">
           <article>
@@ -507,6 +454,34 @@
             <span>风险状态</span>
             <strong>{{ model.dashboard.kpis.riskIndex }}</strong>
             <p>风险指标不进入操作页主区域。</p>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <section v-if="currentPath === '/analytics'" class="operation-shell">
+      <section class="panel primary-panel">
+        <header>
+          <div>
+            <h2>企业数据智能分析平台</h2>
+            <span>用于业务链追踪、数据一致性验证、风险闭环和后续经营分析。</span>
+          </div>
+        </header>
+        <p class="platform-relation-note">业务链追踪 → 数据一致性验证 → 风险闭环处理，当前 P2P 验证与闭环在同一页面完成。</p>
+        <p class="platform-relation-note">当前平台已进入数据健康评分模型设计阶段，评分仅用于管理分析，不作为正式 KPI。</p>
+        <p class="platform-relation-note">企业数据智能分析平台是平台级管理辅助能力；财务执行页面保留在 Finance / ERP 导航中，不作为分析中心主入口。</p>
+        <div class="metric-grid">
+          <article>
+            <span>企业业务追踪中心</span>
+            <strong>业务链追踪</strong>
+            <p>从请购、采购订单、收货、检验、库存、应付、付款等业务节点追踪完整业务链。</p>
+            <button type="button" @click="router.push('/business-trace')">进入业务追踪中心</button>
+          </article>
+          <article>
+            <span>P2P业务数据验证与闭环中心</span>
+            <strong>只读验证 + 风险闭环</strong>
+            <p>检查 P2P 业务链数据是否完整，发现数据断点、一致性问题和金额核对问题；风险确认、处理、解决、关闭和历史追踪均在本中心内完成。</p>
+            <button type="button" @click="router.push('/finance/p2p-validation-center')">进入验证与闭环中心</button>
           </article>
         </div>
       </section>
@@ -536,7 +511,7 @@
             <span>流程界面</span>
             <select v-model="adminForm.processUI">
               <option value="ACTIVE">已启用</option>
-              <option value="DISABLED">已禁用</option>
+              <option value="DISABLED">已停用</option>
             </select>
             <p>企业业务从业务流程中心开始。</p>
           </article>
@@ -544,7 +519,7 @@
             <span>组织界面</span>
             <select v-model="adminForm.organizationUI">
               <option value="ACTIVE">已启用</option>
-              <option value="DISABLED">已禁用</option>
+              <option value="DISABLED">已停用</option>
             </select>
             <p>角色、用户和权限在此处管理。</p>
           </article>
@@ -578,6 +553,12 @@
             <strong>已保存</strong>
             <button type="button" @click="router.push('/admin/tenant-setting')">进入配置</button>
           </article>
+          <article data-system-config-module="enterprise-foundation">
+            <span>企业基础资料</span>
+            <strong>正式维护与人工验收</strong>
+            <p>保留原系统配置模块，在原页面内增加企业基础资料入口。</p>
+            <button type="button" @click="router.push('/foundation')">进入企业基础资料</button>
+          </article>
         </div>
       </section>
     </section>
@@ -587,29 +568,25 @@
 <script setup>
 import { computed, defineComponent, h, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import ProcessNodeNavigation from '../components/ProcessNodeNavigation.vue'
 import { getEnterpriseOSModel } from '../enterprise-os/enterpriseOSModel.js'
-import { processGroups } from '../enterprise-os/enterpriseOperationModel.js'
 import {
   addDepartment,
   addPermission,
-  addProcess,
   addRole,
   addTask,
   addUser,
   approveTask,
   completeTask,
-  createBusinessRecord,
   deleteDepartment,
   deletePermission,
   deleteRole,
   deleteUser,
-  executeProcess as storeExecuteProcess,
   getApprovalById,
   getDepartmentById,
   getEnterpriseOperationState,
   getExecutionTaskById,
   getPermissionById,
-  getProcessById,
   getRoleById,
   getTaskById,
   getUserById,
@@ -619,12 +596,17 @@ import {
   updateConfig,
   updateDepartment,
   updatePermission,
-  updateProcess,
   updateRole,
   updateTask,
   updateUser,
 } from '../enterprise-os/enterpriseOperationStore.js'
 import { translate } from '../runtime/i18nEngine.js'
+import { loadProcessCenterRuntimeModel } from '../runtime/processCenterRuntime.js'
+
+const processCenterRuntimeModel = loadProcessCenterRuntimeModel()
+const processCenterModules = processCenterRuntimeModel.modules
+const enterpriseProcesses = processCenterRuntimeModel.processes
+const pdeScmRelationship = processCenterRuntimeModel.relationships[0]
 
 const EditableList = defineComponent({
   props: {
@@ -662,9 +644,64 @@ const EditableList = defineComponent({
 
 const route = useRoute()
 const router = useRouter()
+const canonicalProcessModuleCode = (value) => {
+  const normalized = String(value || '').trim().toUpperCase()
+  return processCenterModules.find(module => module.moduleCode.toUpperCase() === normalized)?.moduleCode || ''
+}
+const requestedProcessModule = canonicalProcessModuleCode(route.query.module)
+const selectedProcessModule = ref(
+  requestedProcessModule || 'SCM',
+)
+function selectProcessModule(moduleCode) {
+  const canonical = canonicalProcessModuleCode(moduleCode)
+  if (!canonical) return
+  selectedProcessModule.value = canonical
+  selectedProcessNode.value = null
+  if (route.path.startsWith('/process-center') && route.query.module !== canonical) {
+    router.push({
+      path: '/process-center',
+      query: { ...route.query, module: canonical },
+    })
+  }
+}
+watch(
+  () => route.query.module,
+  (moduleCode) => {
+    const canonical = canonicalProcessModuleCode(moduleCode) || 'SCM'
+    if (selectedProcessModule.value !== canonical) {
+      selectedProcessModule.value = canonical
+      selectedProcessNode.value = null
+    }
+  },
+)
+const selectedModuleProcesses = computed(() => (
+  enterpriseProcesses.filter(process => process.moduleCode === selectedProcessModule.value)
+))
+const selectedFormalProcess = computed(() => selectedModuleProcesses.value[0] || null)
+const selectedFormalProcessNodes = computed(() => selectedFormalProcess.value?.nodes || [])
+const selectedBoundPageCount = computed(() => selectedFormalProcessNodes.value.filter(node => node.pageUrl).length)
+const selectedModuleName = computed(() => (
+  processCenterModules.find(module => module.moduleCode === selectedProcessModule.value)?.moduleName
+  || selectedFormalProcess.value?.moduleName
+  || selectedProcessModule.value
+))
 const model = computed(() => getEnterpriseOSModel())
 const state = ref(getEnterpriseOperationState())
 const message = ref('')
+const selectedProcessNode = ref(null)
+
+function inspectProcessNode(node) {
+  selectedProcessNode.value = node
+  message.value = `${node.nodeName}节点信息已显示；流程中心保持打开。`
+}
+
+function handleProcessNodeOpened(result) {
+  if (result.opened) {
+    message.value = result.target === '_self' ? `${result.node.nodeName}已在当前标签页打开。` : `${result.node.nodeName}已在新标签打开；流程中心保持打开。`
+    return
+  }
+  message.value = `${result.node.nodeName}新标签打开失败，请检查浏览器弹窗权限。`
+}
 
 const pageMap = {
   '/dashboard': '仪表盘',
@@ -674,7 +711,6 @@ const pageMap = {
   '/analytics': '分析中心',
   '/admin': '系统配置',
 }
-
 const currentPath = computed(() => {
   if (route.path.startsWith('/work-center')) return '/work-center'
   if (route.path.startsWith('/process-center')) return '/process-center'
@@ -703,15 +739,9 @@ const executionTasks = computed(() => state.value.tasks.filter((task) => task.ty
 const selectedTask = computed(() => getTaskById(route.params.id))
 const selectedApproval = computed(() => getApprovalById(route.params.id))
 const selectedExecutionTask = computed(() => getExecutionTaskById(route.params.id))
-const selectedProcess = computed(() => getProcessById(route.params.id))
-const relatedTasks = computed(() => state.value.tasks.filter((task) => task.process === selectedProcess.value?.name))
 const workTaskPage = computed(() => route.name === 'WorkTaskAction')
 const approvalPage = computed(() => route.name === 'ApprovalAction')
 const executionPage = computed(() => route.name === 'ExecutionAction')
-const processDetailPage = computed(() => route.name === 'ProcessDetail')
-const processCreatePage = computed(() => route.name === 'ProcessCreate')
-const processEditPage = computed(() => route.name === 'ProcessEdit')
-const processExecutePage = computed(() => route.name === 'ProcessExecute')
 
 const departmentFields = [
   { key: 'name', label: '部门名称' },
@@ -778,18 +808,13 @@ const entityMap = {
 const companyForm = reactive({})
 const adminForm = reactive({})
 const entityForm = reactive({})
-const processForm = reactive({})
 const taskForm = reactive({ opinion: '' })
 const approvalForm = reactive({ opinion: '' })
 const executionForm = reactive({ result: '' })
-const businessForm = reactive({})
-const processExecuteForm = reactive({})
 const organizationForm = reactive({})
 const adminActionForm = reactive({})
 const entityFormOpen = ref(false)
-const processFormOpen = ref(false)
 const editingEntity = ref({ type: '', id: '' })
-const editingProcessId = ref('')
 
 const activeFields = computed(() => entityMap[editingEntity.value.type]?.fields || [])
 const entityFormTitle = computed(() => {
@@ -802,14 +827,10 @@ const actionTitle = computed(() => {
     WorkTaskAction: '任务处理页',
     ApprovalAction: '审批处理页',
     ExecutionAction: '执行任务页',
-    ProcessDetail: '流程详情',
-    ProcessCreate: '新建业务单',
-    ProcessEdit: '编辑流程',
-    ProcessExecute: '流程执行',
     AdminRolePermission: '角色权限配置',
     AdminProcessTemplate: '流程模板配置',
     AdminTenantSetting: '租户参数配置',
-    AdminConfig: '系统配置项',
+    AdminConfig: '系统配置页',
   }
   if (organizationActionType.value) return `${entityMap[organizationActionType.value].title}编辑表单`
   return titleMap[route.name] || ''
@@ -859,10 +880,6 @@ function statusLabel(value) {
   })[value] || value
 }
 
-function categoryLabel(key) {
-  return processGroups.find((group) => group.key === key)?.title || key
-}
-
 function goBack() {
   if (route.path.startsWith('/work-center')) router.push('/work-center')
   else if (route.path.startsWith('/process-center')) router.push('/process-center')
@@ -872,9 +889,7 @@ function goBack() {
 
 function closeForms() {
   entityFormOpen.value = false
-  processFormOpen.value = false
   editingEntity.value = { type: '', id: '' }
-  editingProcessId.value = ''
 }
 
 function startCreate(type) {
@@ -910,36 +925,6 @@ function saveCompany() {
   updateCompany({ ...companyForm })
   refresh()
   notify('公司信息已保存')
-}
-
-function startCreateProcess() {
-  closeForms()
-  editingProcessId.value = ''
-  resetObject(processForm, {
-    name: '新流程',
-    category: 'purchase',
-    owner: '负责人岗位',
-    status: '待处理',
-    pending: 0,
-  })
-  processFormOpen.value = true
-}
-
-function saveProcess() {
-  addProcess({
-    ...processForm,
-    pending: Number(processForm.pending || 0),
-    categoryName: categoryLabel(processForm.category),
-  })
-  closeForms()
-  refresh()
-  notify('流程已新增')
-}
-
-function toggleProcess(process) {
-  updateProcess(process.id, { enabled: !process.enabled })
-  refresh()
-  notify(process.enabled ? '流程已停用' : '流程已启用')
 }
 
 function finishTask(id) {
@@ -982,33 +967,6 @@ function finishExecution() {
   completeTask(route.params.id, executionForm.result || '执行完成')
   refresh()
   notify('执行已完成')
-  goBack()
-}
-
-function saveBusinessRecord() {
-  createBusinessRecord(route.params.id, { ...businessForm })
-  refresh()
-  notify('业务单已保存')
-  goBack()
-}
-
-function saveProcessEdit() {
-  const process = selectedProcess.value
-  if (!process) return
-  updateProcess(process.id, {
-    ...processForm,
-    pending: Number(processForm.pending || 0),
-    categoryName: categoryLabel(processForm.category),
-  })
-  refresh()
-  notify('流程已保存')
-  goBack()
-}
-
-function confirmProcessExecution() {
-  storeExecuteProcess(route.params.id, { ...processExecuteForm })
-  refresh()
-  notify('流程已执行')
   goBack()
 }
 
@@ -1064,24 +1022,6 @@ function syncActionForms() {
   resetObject(taskForm, { opinion: selectedTask.value?.opinion || '' })
   resetObject(approvalForm, { opinion: selectedApproval.value?.opinion || '' })
   resetObject(executionForm, { result: selectedExecutionTask.value?.result || '' })
-  resetObject(businessForm, {
-    name: `${selectedProcess.value?.name || '业务'}单据`,
-    type: selectedProcess.value?.categoryName || '业务单',
-    owner: selectedProcess.value?.owner || '负责人',
-    planDate: '',
-    remark: '',
-  })
-  resetObject(processForm, selectedProcess.value || {
-    name: '新流程',
-    category: 'purchase',
-    owner: '负责人岗位',
-    status: '待处理',
-    pending: 0,
-  })
-  resetObject(processExecuteForm, {
-    action: '确认执行',
-    result: selectedProcess.value?.executionResult || '',
-  })
   const orgConfig = entityMap[organizationActionType.value]
   resetObject(organizationForm, orgConfig?.get(route.params.id) || orgConfig?.defaults || {})
   resetObject(adminActionForm, {
@@ -1114,6 +1054,10 @@ watch(() => route.fullPath, () => {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+}
+
+.page-header {
+  flex-wrap: wrap;
 }
 
 .eyebrow {
@@ -1206,11 +1150,217 @@ label {
   line-height: 1.6;
 }
 
+.process-catalog {
+  box-sizing: border-box;
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 0 20px;
+  padding: 18px;
+  border: 1px solid #c7d7fe;
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgb(239 246 255 / 92%), rgb(255 255 255 / 98%) 58%),
+    #fff;
+}
+
+.process-catalog-header,
+.scm-purchase-process > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page-header > section {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.page-header > section h1 {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.page-header > .page-tabs {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+.process-catalog h3 {
+  margin: 0;
+  color: #172554;
+}
+
+.registry-badge {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border: 1px solid #93c5fd;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.registry-badge.success {
+  border-color: #86efac;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.process-module-navigation {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  padding-bottom: 6px;
+}
+
+.process-module-button {
+  display: grid;
+  min-height: 66px;
+  padding: 9px 10px;
+  border: 1px solid #dbeafe;
+  border-radius: 9px;
+  background: #fff;
+  color: #334155;
+  text-align: left;
+}
+
+.process-module-button strong {
+  color: #1e3a8a;
+  font-size: 14px;
+}
+
+.process-module-button span {
+  font-size: 12px;
+}
+
+.process-module-button.active {
+  border-color: #2563eb;
+  background: #dbeafe;
+  box-shadow: inset 0 0 0 1px #2563eb;
+}
+
+.scm-purchase-process {
+  box-sizing: border-box;
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  padding: 16px;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.process-node-track {
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  padding: 3px 3px 12px;
+  scrollbar-gutter: stable;
+}
+
+.pde-primary-entry {
+  display: flex;
+  padding: 14px;
+  border: 1px solid #93c5fd;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #eff6ff, #f8fbff);
+}
+
+.process-arrow {
+  display: grid;
+  flex: 0 0 20px;
+  place-items: center;
+  color: #2563eb;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.process-node-inspector {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #93c5fd;
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.process-node-inspector > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.process-node-inspector span,
+.process-node-inspector dt {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.process-node-inspector dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.process-node-inspector dl > div {
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.process-node-inspector dd {
+  margin: 0;
+  color: #0f172a;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .process-node-inspector dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.process-module-empty {
+  padding: 18px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 9px;
+  background: #fff;
+}
+
 .operation-shell,
 .detail-layout {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .panel {
@@ -1222,6 +1372,9 @@ label {
 
 .primary-panel {
   border-color: #bfdbfe;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .panel header {
@@ -1315,6 +1468,10 @@ p {
 }
 
 @media (max-width: 1100px) {
+  .process-module-navigation {
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+  }
+
   .card-grid,
   .process-grid,
   .metric-grid,
@@ -1346,6 +1503,15 @@ p {
   .two-column,
   .three-column {
     grid-template-columns: 1fr;
+  }
+
+  .process-module-navigation {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+  }
+
+  .process-catalog-header,
+  .scm-purchase-process > header {
+    flex-direction: column;
   }
 }
 </style>

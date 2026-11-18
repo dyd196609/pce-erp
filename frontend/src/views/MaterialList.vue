@@ -337,6 +337,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import request from '../api/request';
+import { getTabAuthToken } from '@/meta/runtime/tabAuthenticationContext.js';
 
 // ========== 列表数据 ==========
 const materialList = ref([]);
@@ -507,7 +508,7 @@ const rules = {
 
 const uploadUrl = computed(() => 'http://127.0.0.1:8000/api/masterdata/materials/import_excel/');
 const uploadHeaders = computed(() => ({
-  Authorization: `Bearer ${localStorage.getItem('token')}`
+  Authorization: `Bearer ${getTabAuthToken()}`
 }));
 
 const loadCategories = async () => {
@@ -555,7 +556,7 @@ const handleCurrentChange = (page) => {
 
 // 导出Excel
 const exportData = () => {
-  const token = localStorage.getItem('token');
+  const token = getTabAuthToken();
   fetch('http://127.0.0.1:8000/api/masterdata/materials/export/', {
     method: 'GET',
     headers: {
@@ -585,7 +586,7 @@ const exportData = () => {
 
 // 下载导入模板
 const downloadTemplate = () => {
-  const token = localStorage.getItem('token');
+  const token = getTabAuthToken();
   fetch('http://127.0.0.1:8000/api/masterdata/materials/export_template/', {
     method: 'GET',
     headers: {

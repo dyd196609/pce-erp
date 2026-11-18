@@ -1,0 +1,31 @@
+{
+  "templateCode": "PCE-SCM-BUSINESS-PAGE-ACCEPTANCE-V1",
+  "extends": "PCE-ENTERPRISE-PAGE-ACCEPTANCE-MASTER-V1",
+  "commonChecklist": "PCE-ENTERPRISE-PAGE-COMMON-CHECKLIST-V1",
+  "version": "V1.14.2.8.4.20.7",
+  "moduleCode": "SCM",
+  "requiredContext": ["processCode", "nodeCode", "pageCode", "pageUrl", "businessObject", "sourceObject", "targetObject"],
+  "scmChecks": [
+    { "id": "SCM-PAGE-001", "name": "页面绑定SCM流程节点", "executionType": "automatic" },
+    { "id": "SCM-PAGE-002", "name": "SCM Business Trace可追踪", "executionType": "automatic+manual" },
+    { "id": "SCM-PAGE-003", "name": "状态动作遵守Business Action Registry", "executionType": "automatic" },
+    { "id": "SCM-PAGE-004", "name": "状态转换遵守BusinessStateTransition", "executionType": "automatic" },
+    { "id": "SCM-PAGE-005", "name": "列表符合PCE-ENTERPRISE-LIST-CONTRACT-V1.1", "executionType": "automatic+manual" },
+    { "id": "SCM-PAGE-006", "name": "正式与金丝雀运行模式互斥", "executionType": "automatic" },
+    { "id": "SCM-PAGE-007", "name": "金丝雀数据不进入正式数据库", "executionType": "automatic" },
+    { "id": "SCM-PAGE-008", "name": "付款银行发送和财务影响边界明确", "executionType": "automatic+manual" }
+  ],
+  "runtimeModes": {
+    "production": { "factSource": "server", "canaryApiCallCount": 0 },
+    "canary_acceptance": { "factSource": "server", "productionApiCallCount": 0, "readOnly": true }
+  },
+  "releaseRequirements": {
+    "automaticAcceptance": "PASS",
+    "manualAcceptance": "PASS",
+    "archiveStatus": "ARCHIVED",
+    "FAIL": 0,
+    "UNKNOWN": 0,
+    "naReasonRequired": true,
+    "productionUserDataWritten": false
+  }
+}

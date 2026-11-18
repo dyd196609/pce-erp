@@ -1,11 +1,24 @@
 <template>
-  <main class="scm-page">
-    <header class="page-header">
+  <component
+    :is="pageShellComponent"
+    class="scm-page"
+    :governance="standardPageGovernance"
+    :data-page-code="currentPageIdentity?.pageCode || ''"
+    :data-module-code="currentPageIdentity?.moduleCode || 'SCM'"
+    :data-table-id="currentTableId"
+    :data-schema="currentPageIdentity?.schema || ''"
+    :page-refresh-handler="activeType === 'order' && pageMode === 'list' ? reloadPageData : null"
+    :page-refresh-status="purchaseOrderListRefreshStatus"
+    :page-last-refresh-time="purchaseOrderListLastRefreshTime"
+  >
+    <header v-if="!standardPageGovernance" class="page-header">
       <section>
         <p class="eyebrow">V1.11.4 SCM采购前端主从单据</p>
-        <h1>{{ pageTitle }}</h1>
+        <h1 data-acceptance-id="page-business-title">{{ pageTitle }}</h1>
         <p>本轮只升级请购、询价、核价、采购订单的“单据头 + 明细行”结构，不接入收货、退货、对账、应付和WMS入库。</p>
-        <p class="app-current-module-badge">当前操作模块：{{ currentScmModuleName }}</p>
+        <p class="app-current-module-badge" data-acceptance-id="page-breadcrumb-current-title">
+          当前操作模块：<strong>{{ currentScmModuleName }}</strong>
+        </p>
       </section>
       <nav class="page-tabs app-module-nav-zone">
         <span class="app-nav-zone-title">SCM采购流程导航</span>
@@ -13,27 +26,40 @@
           SCM采购管理
           <span v-if="isScmNavActive(null)" class="app-current-tag">当前</span>
         </router-link>
-        <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isScmNavActive('request') }" to="/scm/purchase-requests">
-          请购单
+        <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isScmNavActive('request') }" to="/scm/purchase-request">
+          采购申请
           <span v-if="isScmNavActive('request')" class="app-current-tag">当前</span>
         </router-link>
         <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isScmNavActive('inquiry') }" to="/scm/purchase-inquiries">
-          询价单
+          采购询价
           <span v-if="isScmNavActive('inquiry')" class="app-current-tag">当前</span>
         </router-link>
         <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isScmNavActive('approval') }" to="/scm/price-approvals">
-          核价单
+          采购核价
           <span v-if="isScmNavActive('approval')" class="app-current-tag">当前</span>
         </router-link>
-        <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isScmNavActive('order') }" to="/scm/purchase-orders">
+        <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isScmNavActive('order') }" to="/scm/purchase-order">
           采购订单
           <span v-if="isScmNavActive('order')" class="app-current-tag">当前</span>
+        </router-link>
+        <router-link class="app-nav-button" :class="{ 'app-nav-button-active': route.path === '/scm/supplier-settlements' }" to="/scm/supplier-settlements">
+          供应商结算 / 采购对账
+          <span v-if="route.path === '/scm/supplier-settlements'" class="app-current-tag">当前</span>
         </router-link>
         <router-link class="app-nav-button" to="/reference/master-data">引用源</router-link>
       </nav>
     </header>
 
     <el-alert v-if="message" :title="message" :type="messageType" show-icon :closable="false" />
+    <el-alert
+      v-for="issue in runtimeConsistencyIssues"
+      :key="issue.code"
+      :title="issue.message"
+      type="warning"
+      show-icon
+      :closable="false"
+      :data-consistency-code="issue.code"
+    />
 
     <section v-if="route.path === '/scm'" class="operation-shell">
       <el-card shadow="never">
@@ -100,15 +126,53 @@
       </el-card>
     </section>
 
-    <section v-else-if="activeConfig && pageMode === 'list'" class="operation-shell">
+    <ScmNativeQuoteRegistrationPanel v-else-if="activeType === 'approval' && pageMode === 'list' && !(route.query.canaryBatchId && route.query.scenarioCode)" mode="preparation" />
+    <section v-else-if="activeType === 'approval' && pageMode === 'list'" class="operation-shell"
+      data-acceptance-id="price-approval-current-quote-preparation"
+      data-provider-code="SCM_PRICE_APPROVAL_PREPARATION_PROVIDER"
+      data-fact-source="current_quote_preparation_context_only">
       <el-card shadow="never">
         <template #header>
           <div class="card-header">
             <div>
-              <h2>{{ activeConfig.title }}</h2>
+              <h2>核价准备</h2>
+              <span>仅显示由报价比较承接的采购核价准备数据，不读取历史测试数据。</span>
+            </div>
+            <el-button type="primary" data-process-action="OPEN_QUOTE_COMPARISON_WORKBENCH"
+              @click="router.push('/scm/quote-comparisons')">返回报价比较</el-button>
+          </div>
+        </template>
+        <el-alert v-if="!priceApprovalPreparationFacts.resultCount" title="暂无报价比较数据"
+          type="info" :closable="false" show-icon />
+        <template v-if="priceApprovalPreparationFacts.resultCount">
+          <el-descriptions :column="4" border>
+            <el-descriptions-item label="询价编号">{{ priceApprovalPreparationFacts.current.inquiryNo }}</el-descriptions-item>
+            <el-descriptions-item label="来源采购申请">{{ priceApprovalPreparationFacts.current.sourceRequestNo || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="核价准备状态">{{ priceApprovalPreparationStatusLabel }}</el-descriptions-item>
+            <el-descriptions-item label="数据来源">报价比较</el-descriptions-item>
+          </el-descriptions>
+        </template>
+        <!-- 企业列表组件内部固定序号列契约：type="index" label="序号"；字段：询价编号、来源采购申请、供应商候选、报价准备状态。 -->
+        <ScmPriceApprovalPreparationEnterpriseList :rows="priceApprovalPreparationRows" />
+        <el-alert title="当前仅承接采购核价准备数据：未自动通过核价，未创建采购订单或财务数据。"
+          type="warning" :closable="false" show-icon />
+      </el-card>
+    </section>
+
+    <template v-else-if="activeConfig && pageMode === 'list'">
+      <ScmPurchaseOrderOperationGuideV1142842721 v-if="activeType === 'order'" />
+    <section class="operation-shell">
+      <el-card shadow="never">
+        <template #header>
+          <div class="card-header">
+            <div>
+              <h2 data-acceptance-id="page-internal-subject-title">{{ activeConfig.title }}</h2>
               <span>{{ activeConfig.subtitle }}</span>
             </div>
-            <el-button v-if="activeType === 'request'" type="primary" @click="router.push(activeConfig.createPath)">新增请购单</el-button>
+            <el-button v-if="activeType === 'request'" type="primary" @click="router.push(activeConfig.createPath)">新增采购申请</el-button>
+            <el-button v-else-if="activeType === 'order' && directPurchaseAuthorization.allowed" type="primary"
+              data-process-action="OPEN_DIRECT_PURCHASE_WORKBENCH"
+              @click="router.push(activeConfig.createPath)">新建直接采购订单</el-button>
           </div>
         </template>
 
@@ -119,7 +183,7 @@
           <span class="sort-help">快速搜索用于跨字段临时查找；精准查询请使用高级筛选。</span>
         </div>
 
-        <div v-if="quickSearchVisible" class="toolbar">
+        <div class="toolbar" data-acceptance-id="standard-list-toolbar">
           <el-autocomplete
             v-model="keyword"
             :fetch-suggestions="querySearchSuggestions"
@@ -137,11 +201,27 @@
           <el-button @click="resetSorting">清除排序</el-button>
           <span class="sort-help">排序：点击表格表头字段可升序/降序排序；点击“清除排序”恢复默认顺序。</span>
           <span class="sort-help">{{ currentSortText }}</span>
-          <el-button @click="advancedFilterVisible = !advancedFilterVisible">
+          <el-button
+            data-acceptance-id="list-advanced-filter-toggle"
+            :data-pce-filter-toggle-for="currentTableId"
+            :aria-expanded="String(advancedFilterVisible)"
+            @click="advancedFilterVisible = !advancedFilterVisible"
+          >
             {{ advancedFilterVisible ? '收起高级筛选' : '展开高级筛选' }}
           </el-button>
           <el-button type="success" @click="exportCurrentList">导出当前结果</el-button>
+          <el-button type="success" plain :disabled="!selectedRows.length" @click="exportSelectedList">导出已选记录</el-button>
+          <el-button v-if="activeType === 'order'" type="warning" plain
+            data-acceptance-id="purchase-order-import-template-button"
+            @click="downloadPurchaseOrderImportTemplate">导入模板</el-button>
+          <el-button v-if="activeType === 'order'" @click="printCurrentPurchaseOrders">打印当前结果</el-button>
+          <el-button type="primary" plain @click="copyDiagnosticData">复制诊断数据</el-button>
         </div>
+
+        <output v-if="activeType === 'order'" class="purchase-order-list-refresh-evidence"
+          aria-live="polite" data-acceptance-id="purchase-order-list-refresh-evidence">
+          {{ purchaseOrderListRefreshResult || '最近刷新时间：尚未刷新' }}
+        </output>
 
         <el-alert
           :title="scmProcessText"
@@ -153,6 +233,8 @@
         <div class="batch-bar">
           <span>已选择 {{ selectedRows.length }} 条</span>
           <el-button size="small" @click="clearSelection">清空选择</el-button>
+          <el-button v-if="activeType === 'order'" size="small" :disabled="!selectedRows.length"
+            @click="printSelectedPurchaseOrders">批量打印已选订单</el-button>
           <el-button
             v-for="action in batchActions"
             :key="action.label"
@@ -184,7 +266,7 @@
         </div>
 
         <div v-if="advancedFilterVisible" class="filter-grid">
-          <div v-for="column in listColumns" :key="column.key" class="filter-item">
+          <div v-for="column in listFilterColumns" :key="column.key" class="filter-item">
             <label>{{ column.label }}</label>
             <el-input
               v-if="columnFilterType(column) === 'text'"
@@ -224,7 +306,21 @@
           </div>
         </div>
 
-        <el-table ref="listTableRef" :data="pagedRows" border stripe height="520" @selection-change="handleSelectionChange">
+        <el-table
+          :key="activeType === 'order' ? `purchase-order-${purchaseOrderListRenderVersion}` : activeType"
+          ref="listTableRef"
+          :data="pagedRows"
+          border
+          stripe
+          height="520"
+          class="global-sort-arrow pce-compact-business-table"
+          data-pce-list-display-rule="LIST-DISPLAY-001"
+          data-pce-technical-field-separation="TECH-FIELD-SEPARATION-001"
+          data-pce-row-density="compact"
+          data-pce-long-text-mode="ellipsis-tooltip-detail"
+          :data-purchase-order-render-version="activeType === 'order' ? purchaseOrderListRenderVersion : undefined"
+          @selection-change="handleSelectionChange"
+        >
           <el-table-column type="selection" width="48" fixed="left" />
           <el-table-column type="index" label="序号" width="70" fixed="left" />
           <el-table-column
@@ -232,10 +328,20 @@
             :key="column.key"
             :label="column.label"
             :min-width="column.width || 120"
+            :fixed="column.key === activeConfig.noField ? 'left' : undefined"
+            :class-name="column.key === activeConfig.noField ? 'pce-fixed-primary-no-column' : ''"
+            :header-class-name="column.key === activeConfig.noField ? 'pce-fixed-primary-no-column' : ''"
           >
             <template #header>
-              <button class="sort-button" type="button" title="点击表头字段可升序/降序排序" @click="toggleSort(column.key)">
-                {{ column.label }} {{ sortIcon(column.key) }}
+              <button
+                class="sort-button global-sort-button"
+                :class="{ 'sort-button-active': sortState.key === column.key }"
+                type="button"
+                title="点击表头字段可升序/降序排序"
+                @click="toggleSort(column.key)"
+              >
+                <span>{{ column.label }}</span>
+                <b :class="['sort-button-icon', sortState.key === column.key ? `sort-${sortState.direction}` : 'sort-default']">{{ sortIcon(column.key) }}</b>
               </button>
             </template>
             <template #default="{ row }">
@@ -243,9 +349,25 @@
                 {{ statusLabel(row.status) }}
               </el-tag>
               <el-tag v-else-if="column.key === 'deliveryUrgency'" :type="getUrgencyTagType(row.deliveryUrgency)" :style="getUrgencyStyle(row.deliveryUrgency)">
-                {{ getUrgencyLabel(row.deliveryUrgency) }}
+                {{ purchaseOrderUrgencyLabel(row) }}
               </el-tag>
-              <span v-else>{{ formatListCell(row, column.key) }}</span>
+              <el-button v-else-if="activeType === 'order' && column.key === 'objectNo'"
+                link type="primary" class="purchase-order-number-link"
+                :aria-label="`查看采购订单 ${row.objectNo}`"
+                data-field-source="PurchaseOrderRuntimeModel.objectNo"
+                data-business-object="PurchaseOrder"
+                data-column-key="objectNo"
+                :data-row-object-no="row.objectNo"
+                data-provider-source="/api/procurement/scm-page-facts/purchase-order/"
+                @click="openDetail(row)">{{ row.objectNo }}</el-button>
+              <el-tooltip
+                v-else
+                :content="String(formatListCell(row, column.key))"
+                :disabled="!isPceLongListText(formatListCell(row, column.key))"
+                placement="top"
+              >
+                <span class="pce-list-cell-ellipsis">{{ formatListCell(row, column.key) }}</span>
+              </el-tooltip>
             </template>
           </el-table-column>
           <el-table-column label="操作" fixed="right" :width="listActionColumnWidth">
@@ -281,6 +403,7 @@
         </div>
       </el-card>
     </section>
+    </template>
 
     <section v-else-if="isBlockedCreatePage" class="operation-shell">
       <el-card shadow="never">
@@ -402,7 +525,7 @@
         </el-form>
       </el-card>
 
-      <el-card v-if="form.id || canCreateRequestDetail" shadow="never">
+      <el-card v-if="(form.id || canCreateRequestDetail) && !(activeType === 'order' && pageMode === 'detail')" shadow="never">
         <template #header>
           <div class="card-header">
             <div>
@@ -495,12 +618,18 @@
         </el-form>
       </el-card>
     </section>
-  </main>
+  </component>
 </template>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import PceListPageShell from '../components/PceListPageShell.vue'
+import ScmPriceApprovalPreparationEnterpriseList from '../components/ScmPriceApprovalPreparationEnterpriseList.vue'
+import ScmPurchaseOrderOperationGuideV1142842721 from
+  '../components/ScmPurchaseOrderOperationGuideV1142842721.vue'
+import ScmNativeQuoteRegistrationPanel from '../components/ScmNativeQuoteRegistrationPanel.vue'
+import { priceApprovalPreparationProvider } from '../providers/priceApprovalPreparationProvider.js'
 import {
   addPriceApprovalItem,
   addPurchaseInquiryItem,
@@ -595,6 +724,7 @@ import {
   exportRowsToCsv as exportRowsToCsvUtil,
 } from '../manufacturing/foundationTableUtils.js'
 import { buildMultiFieldSuggestions, filterSuggestions } from '../runtime/filterSuggestionEngine.js'
+import { isPceLongListText } from '../runtime/pceEnterpriseListContract.js'
 import {
   getSourceButtonLabel,
   goList,
@@ -608,11 +738,25 @@ import {
   getActionColumnWidthForRows,
 } from '../runtime/tableActionColumnEngine.js'
 import {
-  calculateDeliveryUrgency,
   getUrgencyLabel,
   getUrgencyTagType,
   getUrgencyStyle,
 } from '../runtime/urgencyEngine.js'
+import { resolveScmPageIdentity } from '../schema/scm/scmPageIdentityRegistry.js'
+import { resolveScmStandardPageContract } from '../schema/scm/scmStandardPageContract.js'
+import { isScmActionAllowed } from '../schema/scm/scmStateRuleRegistry.js'
+import { evaluateScmPageRuntimeConsistency } from '../scm/scmRuntimeConsistencyGuard.js'
+import { readPurchaseOrderListFactSnapshotV1142842729 } from
+  '../providers/purchaseOrderListDataProviderV1142842729.js'
+import { getScmStandardPageFacts, preparePurchaseOrderGateCreation } from '../../api/scmStandardPageFacts.js'
+import { downloadPurchaseOrderImportTemplateV11428427212 } from
+  '../runtime/purchaseOrderImportTemplateRuntimeV11428427212.js'
+import { getPurchaseOrderNumber } from
+  '../domain/scm/purchaseOrder/purchaseOrderCanonicalNumber.js'
+import { loadPurchaseOrderRuntimeCollection } from
+  '../runtime/purchaseOrderRuntimeAdapter.js'
+import { PURCHASE_ORDER_LIST_SCHEMA_COLUMNS } from
+  '../schema/purchase/purchaseOrder.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -624,7 +768,7 @@ const statusFilter = ref('')
 const message = ref('')
 const messageType = ref('success')
 const advancedFilterVisible = ref(false)
-const quickSearchVisible = ref(false)
+const quickSearchVisible = ref(true)
 const detailEditorVisible = ref(false)
 const columnFilters = reactive({})
 const sortState = reactive({ key: '', direction: 'asc' })
@@ -632,9 +776,98 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const selectedRows = ref([])
 const listTableRef = ref(null)
+const copyStatus = ref('')
 const batchResult = ref(null)
 const batchMessageType = ref('success')
 const draftRequestDetails = ref([])
+const purchaseOrderListProviderReloadCount = ref(0)
+const purchaseOrderListLastReloadAt = ref('')
+const purchaseOrderListRefreshResult = ref('')
+const purchaseOrderListRefreshStatus = ref('idle')
+const purchaseOrderListLastRefreshTime = ref('')
+const purchaseOrderListRenderVersion = ref(0)
+const purchaseOrderRuntimeModels = ref([])
+const directPurchaseAuthorization = ref({ allowed: false, reason: '尚未校验直接采购授权' })
+async function reloadDirectPurchaseAuthorization(){
+  try{const response=await preparePurchaseOrderGateCreation();directPurchaseAuthorization.value=response?.data?.authorization||{allowed:false,reason:'授权事实缺失'}}
+  catch(error){directPurchaseAuthorization.value={allowed:false,reason:error?.message||'直接采购授权校验失败'}}
+}
+const LIST_DISPLAY_STATE_PREFIX = 'pce-list-display-state:'
+
+async function reloadPageData() {
+  if (purchaseOrderListRefreshStatus.value === 'refreshing') return null
+  purchaseOrderListRefreshStatus.value = 'refreshing'
+  purchaseOrderListRefreshResult.value = '刷新中...'
+  await nextTick()
+  await new Promise(resolve => window.setTimeout(resolve, 16))
+  try {
+    const serverFacts = await readPurchaseOrderListFactSnapshotV1142842729({
+      loadServerFacts: getScmStandardPageFacts,
+    })
+    const result = loadPurchaseOrderRuntimeCollection({ loadFacts: () => serverFacts })
+    scmState.value = result.snapshot
+    purchaseOrderRuntimeModels.value = result.runtimeModels
+    purchaseOrderListProviderReloadCount.value += 1
+    purchaseOrderListLastReloadAt.value = result.providerExecutedAt
+    purchaseOrderListRenderVersion.value += 1
+    await nextTick()
+    purchaseOrderListLastRefreshTime.value = formatPurchaseOrderRefreshTime(result.providerExecutedAt)
+    purchaseOrderListRefreshStatus.value = 'success'
+    purchaseOrderListRefreshResult.value = `刷新成功；最近刷新时间：${purchaseOrderListLastRefreshTime.value}；已重新加载 ${result.resultCount} 条采购订单。`
+    notify('刷新成功')
+    return result
+  } catch (error) {
+    purchaseOrderListRefreshStatus.value = 'error'
+    purchaseOrderListRefreshResult.value = `刷新失败：${error?.message || '采购订单事实读取失败'}`
+    notify(purchaseOrderListRefreshResult.value, 'error')
+    throw error
+  }
+}
+
+function formatPurchaseOrderRefreshTime(value) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '-'
+  const part = number => String(number).padStart(2, '0')
+  return `${date.getFullYear()}-${part(date.getMonth() + 1)}-${part(date.getDate())} ${part(date.getHours())}:${part(date.getMinutes())}:${part(date.getSeconds())}`
+}
+
+
+function listDisplayStateKey(path = route.path) {
+  return `${LIST_DISPLAY_STATE_PREFIX}${path}`
+}
+
+function restoreListDisplayState(path = route.path) {
+  try {
+    const saved = JSON.parse(globalThis.sessionStorage?.getItem(listDisplayStateKey(path)) || '{}')
+    keyword.value = String(saved.keyword || '')
+    statusFilter.value = String(saved.statusFilter || '')
+    advancedFilterVisible.value = Boolean(saved.advancedFilterVisible)
+    quickSearchVisible.value = saved.quickSearchVisible !== false
+    currentPage.value = Math.max(1, Number(saved.currentPage || 1))
+    pageSize.value = [10, 20, 50, 100].includes(Number(saved.pageSize)) ? Number(saved.pageSize) : 10
+    sortState.key = String(saved.sortKey || '')
+    sortState.direction = saved.sortDirection === 'desc' ? 'desc' : 'asc'
+  } catch {
+    // Invalid presentation state is ignored; business data is never derived from this cache.
+  }
+}
+
+function persistListDisplayState(path = route.path) {
+  try {
+    globalThis.sessionStorage?.setItem(listDisplayStateKey(path), JSON.stringify({
+      keyword: keyword.value,
+      statusFilter: statusFilter.value,
+      advancedFilterVisible: advancedFilterVisible.value,
+      quickSearchVisible: quickSearchVisible.value,
+      currentPage: currentPage.value,
+      pageSize: pageSize.value,
+      sortKey: sortState.key,
+      sortDirection: sortState.direction,
+    }))
+  } catch {
+    // Presentation-state persistence is best effort and never blocks the business list.
+  }
+}
 
 function today() {
   return new Date().toISOString().slice(0, 10)
@@ -797,9 +1030,9 @@ function applyDefaultPriceToDetail() {
 
 const configs = {
   request: {
-    title: '请购单',
+    title: '采购申请',
     subtitle: '请购单列表只显示单据头和汇总信息，物料明细在详情页维护。',
-    listPath: '/scm/purchase-requests',
+    listPath: '/scm/purchase-request',
     createPath: '/scm/purchase-request/create',
     detailPath: (id) => `/scm/purchase-request/${id}`,
     collection: 'purchaseRequests',
@@ -835,6 +1068,13 @@ const configs = {
       { key: 'specification', label: '规格型号' },
       { key: 'unit', label: '单位' },
       { key: 'quantity', label: '数量' },
+      { key: 'requestedQuantity', label: '申请数量' },
+      { key: 'confirmedQuantity', label: '确认数量' },
+      { key: 'supplierName', label: '行供应商', width: 150 },
+      { key: 'supplierAllocationSource', label: '供应商分配来源', width: 190 },
+      { key: 'quotedPrice', label: '报价' },
+      { key: 'approvedPrice', label: '核准价' },
+      { key: 'confirmedPrice', label: '确认价' },
       { key: 'requiredDate', label: '需求日期' },
       { key: 'suggestedSupplierId', label: '建议供应商', width: 150 },
       { key: 'purpose', label: '用途' },
@@ -895,7 +1135,7 @@ const configs = {
     ],
   },
   inquiry: {
-    title: '询价单',
+    title: '采购询价',
     subtitle: '询价单按单据头管理供应商报价过程，报价明细在详情页维护。',
     listPath: '/scm/purchase-inquiries',
     createPath: '/scm/purchase-inquiry/create',
@@ -998,7 +1238,7 @@ const configs = {
     ],
   },
   approval: {
-    title: '核价单',
+    title: '采购核价',
     subtitle: '核价单支持多物料核价，审批后完整生成一张采购订单。',
     listPath: '/scm/price-approvals',
     createPath: '/scm/price-approval/create',
@@ -1103,32 +1343,16 @@ const configs = {
   },
   order: {
     title: '采购订单',
-    subtitle: 'SCM模拟采购订单仅作为采购前端承接单据，不改动原采购管理核心 schema。',
-    listPath: '/scm/purchase-orders',
+    subtitle: '采购订单采用原服务授权事实；通过“查看明细”逐单读取审批版本与当前资格。',
+    listPath: '/scm/purchase-order',
     createPath: '/scm/purchase-order/create',
     detailPath: (id) => `/scm/purchase-order/${id}`,
     collection: 'purchaseOrders',
-    noField: 'poNo',
+    noField: 'objectNo',
     statuses: ['draft', 'submitted', 'reviewed', 'rechecked', 'approved', 'converted', 'issued', 'released', 'ordered', 'partiallyReceived', 'receiving', 'received', 'fullyReceived', 'closed', 'cancelled'],
-    columns: [
-      { key: 'poNo', label: '采购订单号', width: 150 },
-      { key: 'orderDate', label: '订单日期' },
-      { key: 'supplierId', label: '供应商', width: 150 },
-      { key: 'rootRequestNo', label: '源请购单', width: 150 },
-      { key: 'requestDepartment', label: '请购部门', width: 130 },
-      { key: 'demandDepartment', label: '需求部门', width: 130 },
-      { key: 'buyerId', label: '采购员' },
-      { key: 'lineCount', label: '明细行数' },
-      { key: 'planAmount', label: '计划金额' },
-      { key: 'actualAmount', label: '实际金额' },
-      { key: 'earliestArrivalDate', label: '最早到货日', width: 130 },
-      { key: 'deliveryUrgency', label: '交期紧急程度', filterType: 'enum', sortType: 'urgency', width: 140 },
-      { key: 'actualArrivalDate', label: '实际到货日', width: 130 },
-      { key: 'status', label: '状态' },
-      { key: 'sourceType', label: '来源类型' },
-    ],
+    columns: PURCHASE_ORDER_LIST_SCHEMA_COLUMNS,
     headerFields: [
-      { key: 'poNo', label: '采购订单号', readonly: true },
+      { key: 'objectNo', label: '采购订单编号', readonly: true },
       { key: 'orderDate', label: '订单日期', type: 'date', required: true },
       { key: 'supplierId', label: '供应商', type: 'select', required: true, options: supplierOptions },
       { key: 'buyerId', label: '采购员', type: 'select', required: true, options: employeeOptions },
@@ -1144,6 +1368,16 @@ const configs = {
       { key: 'totalAmount', label: '总金额', type: 'number', precision: 2, readonly: true },
       { key: 'status', label: '状态', readonly: true },
       { key: 'sourceType', label: '来源类型', readonly: true },
+      { key: 'classification', label: '订单分类', readonly: true },
+      { key: 'lifecycleStatus', label: '生命周期状态', readonly: true },
+      { key: 'sourceGateId', label: '来源Gate编号', readonly: true },
+      { key: 'sourceRecommendationId', label: '来源推荐决策', readonly: true },
+      { key: 'sourceInquiryId', label: '来源询价', readonly: true },
+      { key: 'sourcePriceApprovalId', label: '来源核价', readonly: true },
+      { key: 'confirmedBy', label: 'Gate确认人', readonly: true },
+      { key: 'confirmedAt', label: 'Gate确认时间', readonly: true },
+      { key: 'confirmationSource', label: '确认来源', readonly: true },
+      { key: 'approvalOpinion', label: '审批意见', type: 'textarea' },
       { key: 'remark', label: '备注', type: 'textarea' },
     ],
     detailColumns: [
@@ -1158,10 +1392,18 @@ const configs = {
       { key: 'actualAmount', label: '实际金额' },
       { key: 'rootRequestNo', label: '源请购单', width: 150 },
       { key: 'sourceOrderNo', label: '来源核价单', width: 150 },
+      { key: 'sourcePurchaseRequestId', label: '来源采购申请', width: 160 },
+      { key: 'sourceInquiryId', label: '来源询价', width: 160 },
+      { key: 'sourceQuoteComparisonId', label: '来源报价比较', width: 180 },
+      { key: 'sourcePriceApprovalId', label: '来源核价', width: 180 },
+      { key: 'sourceGateId', label: '来源Gate', width: 220 },
       { key: 'warehouseId', label: '仓库' },
       { key: 'locationId', label: '库位' },
       { key: 'expectedDeliveryDate', label: '期望交期' },
       { key: 'plannedArrivalDate', label: '计划到货日' },
+      { key: 'requestedDate', label: '需求日期' },
+      { key: 'supplierDeliveryDate', label: '供应商交期' },
+      { key: 'confirmedDeliveryDate', label: '确认交期' },
       { key: 'actualDeliveryDate', label: '实际到货日' },
     ],
     detailFields: [
@@ -1171,6 +1413,12 @@ const configs = {
       { key: 'specification', label: '规格型号', readonly: true },
       { key: 'unit', label: '单位', readonly: true },
       { key: 'quantity', label: '数量', type: 'number', min: 1, required: true },
+      { key: 'requestedQuantity', label: '申请数量', readonly: true },
+      { key: 'confirmedQuantity', label: '确认数量', readonly: true },
+      { key: 'supplierAllocationSource', label: '供应商分配来源', readonly: true },
+      { key: 'quotedPrice', label: '报价', readonly: true },
+      { key: 'approvedPrice', label: '核准价', readonly: true },
+      { key: 'confirmedPrice', label: '确认价', readonly: true },
       { key: 'rootRequestNo', label: '源请购单', readonly: true },
       { key: 'sourceOrderNo', label: '来源核价单', readonly: true },
       { key: 'sourceLineId', label: '来源行ID', readonly: true },
@@ -1241,6 +1489,58 @@ const activeType = computed(() => {
 
 const activeConfig = computed(() => (activeType.value ? configs[activeType.value] : null))
 const pageMode = computed(() => (route.path.endsWith('/create') ? 'create' : route.params.id ? 'detail' : 'list'))
+const priceApprovalPreparationFacts = computed(() => priceApprovalPreparationProvider.load())
+const priceApprovalPreparationStatusLabels = Object.freeze({
+  quote_preparation_ready: '已进入供应商报价准备',
+  price_approval_preparation_ready: '已进入采购核价准备',
+})
+const supplierBusinessStatusLabels = Object.freeze({
+  enabled: '启用', active: '有效', disabled: '停用', inactive: '无效',
+})
+function priceApprovalPreparationStatusText(status) {
+  return priceApprovalPreparationStatusLabels[status] || '状态待确认'
+}
+function supplierBusinessStatusText(status) {
+  return supplierBusinessStatusLabels[status] || '状态待确认'
+}
+const priceApprovalPreparationStatusLabel = computed(() => priceApprovalPreparationStatusText(
+  priceApprovalPreparationFacts.value.current?.preparationStatus,
+))
+const priceApprovalPreparationRows = computed(() => priceApprovalPreparationFacts.value.contexts.flatMap(context => {
+  if (context.sourceObjectType === 'QuoteComparison') {
+    return context.supplierQuotes.map(candidate => ({
+      priceApprovalId: context.priceApprovalId || context.priceApprovalPreparationNo,
+      priceApprovalNo: context.priceApprovalNo || context.priceApprovalPreparationNo,
+      quoteComparisonId: context.quoteComparisonId,
+      inquiryNo: context.inquiryNo, sourceRequestNo: context.sourceRequestNo,
+      materialCode: context.materialCode, materialName: context.materialName,
+      specification: '', quantity: '', requiredDate: '',
+      supplierCode: candidate.supplierCode, supplierName: candidate.supplierName,
+      supplierStatusLabel: '有效', quotePrice: candidate.quotePrice,
+      priceRank: candidate.priceRank, comparisonResult: candidate.comparisonResult,
+      preparationStatus: context.preparationStatus,
+      preparationStatusLabel: priceApprovalPreparationStatusText(context.preparationStatus),
+    }))
+  }
+  return context.materialSupplierCandidates.map(candidate => {
+    const material = context.materialLines.find(line => line.materialCode === candidate.materialCode) || {}
+    return { ...candidate, inquiryNo: context.inquiryNo, sourceRequestNo: context.sourceRequestNo,
+      specification: material.specification || '', quantity: material.quantity || 0,
+      requiredDate: material.requiredDate || '',
+      preparationStatus: context.preparationStatus,
+      supplierStatusLabel: supplierBusinessStatusText(candidate.supplierStatus),
+      preparationStatusLabel: priceApprovalPreparationStatusText(context.preparationStatus) }
+  })
+}))
+const standardPageGovernance = computed(() => resolveScmStandardPageContract(route.path))
+const pageShellComponent = computed(() => standardPageGovernance.value ? PceListPageShell : 'main')
+const currentPageIdentity = computed(() => resolveScmPageIdentity(route.path))
+const currentTableId = computed(() => currentPageIdentity.value?.tableId || '')
+const runtimeConsistency = computed(() => evaluateScmPageRuntimeConsistency(
+  scmState.value,
+  standardPageGovernance.value?.pageCode || '',
+))
+const runtimeConsistencyIssues = computed(() => runtimeConsistency.value.issues)
 const isBlockedCreatePage = computed(() => pageMode.value === 'create' && activeType.value !== 'request')
 const canCreateRequestDetail = computed(() => pageMode.value === 'create' && activeType.value === 'request')
 const currentPageType = computed(() => ({
@@ -1260,6 +1560,7 @@ const currentSourceButtonLabel = computed(() => getSourceButtonLabel(currentSour
 
 const pageTitle = computed(() => {
   if (!activeConfig.value) return 'SCM采购管理'
+  if (currentPageIdentity.value?.pageCode === 'purchase-order-create') return currentPageIdentity.value.pageName
   if (isBlockedCreatePage.value) return blockedCreateTitle.value
   if (pageMode.value === 'create') return `新增${activeConfig.value.title}`
   if (pageMode.value === 'detail') return `${activeConfig.value.title}明细`
@@ -1275,7 +1576,7 @@ const blockedCreateConfig = computed(() => ({
   inquiry: {
     title: '询价单来源生成提示',
     message: '询价单必须从已审批采购申请生成，不能直接空白新增。',
-    route: '/scm/purchase-requests',
+    route: '/scm/purchase-request',
     label: '查看可生成询价的请购单',
   },
   approval: {
@@ -1345,22 +1646,23 @@ const flowPositionText = computed(() => {
 })
 
 const summaryCards = computed(() => [
-  { title: '请购单', count: scmState.value.purchaseRequests.length, desc: `${scmState.value.purchaseRequestItems.length} 行请购明细`, to: '/scm/purchase-requests' },
+  { title: '请购单', count: scmState.value.purchaseRequests.length, desc: `${scmState.value.purchaseRequestItems.length} 行请购明细`, to: '/scm/purchase-request' },
   { title: '询价单', count: scmState.value.purchaseInquiries.length, desc: `${scmState.value.purchaseInquiryItems.length} 行询价明细`, to: '/scm/purchase-inquiries' },
   { title: '核价单', count: scmState.value.priceApprovals.length, desc: `${scmState.value.priceApprovalItems.length} 行核价明细`, to: '/scm/price-approvals' },
-  { title: '采购订单', count: scmState.value.purchaseOrders.length, desc: `${scmState.value.purchaseOrderItems.length} 行订单明细`, to: '/scm/purchase-orders' },
+  { title: '采购订单', count: scmState.value.purchaseOrders.length, desc: `${scmState.value.purchaseOrderItems.length} 行订单明细`, to: '/scm/purchase-order' },
 ])
 const pendingRows = computed(() => (scmState.value.pendingActions || []).filter((item) => item.status === 'pending'))
 
 const scmOverviewCards = computed(() => [
-  { title: '请购单数量', count: scmState.value.purchaseRequests.length, desc: `${scmState.value.purchaseRequestItems.length} 行请购明细`, to: '/scm/purchase-requests' },
-  { title: '待审批请购', count: scmState.value.purchaseRequests.filter((item) => item.status === 'submitted').length, desc: '已提交但未审批的请购单', to: '/scm/purchase-requests' },
+  { title: '请购单数量', count: scmState.value.purchaseRequests.length, desc: `${scmState.value.purchaseRequestItems.length} 行请购明细`, to: '/scm/purchase-request' },
+  { title: '待审批请购', count: scmState.value.purchaseRequests.filter((item) => item.status === 'submitted').length, desc: '已提交但未审批的请购单', to: '/scm/purchase-request' },
   { title: '待建询价', count: pendingRows.value.filter((item) => item.actionType === 'createInquiry').length, desc: '请购审批后等待生成询价', to: '/scm' },
   { title: '待确认报价', count: scmState.value.purchaseInquiries.filter((item) => item.status === 'sent').length, desc: '询价已发出等待报价确认', to: '/scm/purchase-inquiries' },
   { title: '待建核价', count: pendingRows.value.filter((item) => item.actionType === 'createPriceApproval').length, desc: '报价确认后等待生成核价', to: '/scm' },
   { title: '待建采购订单', count: pendingRows.value.filter((item) => item.actionType === 'createPurchaseOrder').length, desc: '核价审批后等待生成订单', to: '/scm' },
-  { title: '已生成采购订单', count: scmState.value.purchaseOrders.length, desc: `${scmState.value.purchaseOrderItems.length} 行订单明细`, to: '/scm/purchase-orders' },
-  { title: '采购订单金额', count: scmState.value.purchaseOrders.reduce((sum, item) => sum + Number(item.totalAmount || 0), 0).toFixed(2), desc: '当前采购订单总金额', to: '/scm/purchase-orders' },
+  { title: '已生成采购订单', count: scmState.value.purchaseOrders.length, desc: `${scmState.value.purchaseOrderItems.length} 行订单明细`, to: '/scm/purchase-order' },
+  { title: '采购订单金额', count: scmState.value.purchaseOrders.reduce((sum, item) => sum + Number(item.totalAmount || 0), 0).toFixed(2), desc: '当前采购订单总金额', to: '/scm/purchase-order' },
+  { title: '供应商结算 / 采购对账', count: '基础版', desc: '核对采购、收货、检验入库、库存流水与应付预备', to: '/scm/supplier-settlements' },
 ])
 
 const detailRows = computed(() => {
@@ -1379,7 +1681,9 @@ const detailSummaryText = computed(() => {
 
 const listRows = computed(() => {
   if (!activeConfig.value) return []
-  return scmState.value[activeConfig.value.collection].map((row) => enrichListRow({ ...row, ...buildSummary(row) }))
+  if (activeType.value === 'order') return purchaseOrderRuntimeModels.value
+  return scmState.value[activeConfig.value.collection]
+    .map(row => enrichListRow({ ...row, ...buildSummary(row) }))
 })
 
 const listColumns = computed(() => {
@@ -1390,18 +1694,41 @@ const listColumns = computed(() => {
   }))
 })
 
+const purchaseOrderFilterColumns = Object.freeze([
+  { key: 'objectNo', label: '采购订单编号', filterType: 'text' },
+  { key: 'rootRequestNo', label: '采购申请编号', filterType: 'text' },
+  { key: 'requestDepartment', label: '申请部门', filterType: 'enum' },
+  { key: 'demandDepartment', label: '需求部门', filterType: 'enum' },
+  { key: 'supplierId', label: '供应商', filterType: 'enum' },
+  { key: 'buyerId', label: '采购员', filterType: 'enum' },
+  { key: 'status', label: '状态', filterType: 'enum' },
+  { key: 'orderDate', label: '采购日期', filterType: 'date' },
+  { key: 'earliestArrivalDate', label: '计划到货日期', filterType: 'date' },
+  { key: 'deliveryUrgency', label: '紧急程度', filterType: 'enum' },
+  { key: 'totalAmount', label: '金额范围', filterType: 'number' },
+  { key: 'materialSearch', label: '物料', filterType: 'text' },
+  { key: 'createdAt', label: '创建日期', filterType: 'date' },
+])
+
+const listFilterColumns = computed(() => activeType.value === 'order'
+  ? purchaseOrderFilterColumns : listColumns.value)
+
 const filteredRows = computed(() => {
   const text = keyword.value.trim().toLowerCase()
   const quickFiltered = listRows.value.filter((row) => {
     const matchStatus = !statusFilter.value || row.status === statusFilter.value
     const searchable = listColumns.value.map((column) => formatListCell(row, column.key)).join(' ')
-    const matchText = !text || `${JSON.stringify(row)} ${searchable}`.toLowerCase().includes(text)
+    const rawSearchText = activeType.value === 'order'
+      ? `${row.objectNo || ''} ${searchable}` : `${JSON.stringify(row)} ${searchable}`
+    const matchText = !text || rawSearchText.toLowerCase().includes(text)
     return matchStatus && matchText
   })
-  return applyColumnFilters(quickFiltered, columnFilters, listColumns.value)
+  return applyColumnFilters(quickFiltered, columnFilters, listFilterColumns.value)
 })
 
-const sortedRows = computed(() => applySorting(filteredRows.value, sortState, listColumns.value))
+const sortedRows = computed(() => {
+  return applySorting(filteredRows.value, sortState, listColumns.value)
+})
 const pagedRows = computed(() => applyPagination(sortedRows.value, currentPage.value, pageSize.value))
 const selectedIds = computed(() => selectedRows.value.map((row) => row.id).filter(Boolean))
 const listActionColumnWidth = computed(() => getActionColumnWidthForRows(pagedRows.value, scmListRowActions, ['查看明细', '编辑']))
@@ -1410,6 +1737,23 @@ const currentSortText = computed(() => {
   const column = listColumns.value.find((item) => item.key === sortState.key)
   return `当前排序：${column?.label || sortState.key} / ${sortState.direction === 'desc' ? '降序' : '升序'}`
 })
+const scmDiagnosticData = computed(() => ({
+  page: `scm-${activeType.value || 'list'}`,
+  version: 'V1.13.29.3.2',
+  filterState: {
+    quickSearch: keyword.value,
+    statusFilter: statusFilter.value,
+    advancedFilters: JSON.parse(JSON.stringify(columnFilters)),
+  },
+  sortState: { key: sortState.key, direction: sortState.direction },
+  resultCount: sortedRows.value.length,
+  selectedCount: selectedRows.value.length,
+  exportEnabled: true,
+  sortableColumns: listColumns.value.map((column) => column.key),
+  sortArrowStyle: 'no-tail-bold-arrow',
+  sortArrowShape: 'upright-triangle',
+  timestamp: new Date().toISOString(),
+}))
 const selectedRowsForBatch = computed(() => selectedRows.value || [])
 const scmBatchCounts = computed(() => {
   const rows = selectedRowsForBatch.value
@@ -1439,6 +1783,13 @@ const batchActions = computed(() => {
   if (activeType.value === 'order') {
     actions.push({ label: '批量下达采购订单', type: 'warning', executableCount: scmBatchCounts.value.issue, disabled: !scmBatchCounts.value.issue, disabledReason: '所选记录没有可下达采购订单。', handler: () => batchIssuePurchaseOrders(selectedIds.value) })
     actions.push({ label: '批量进入 WMS 到货预备', type: 'success', executableCount: scmBatchCounts.value.wms, disabled: !scmBatchCounts.value.wms, disabledReason: '所选记录没有已下达采购订单。', handler: batchGoToWmsReceivePreview })
+    // The native approval contract is per order/version; no batch contract was delivered.
+    for (const action of actions.filter(item => item.handler !== batchGoToWmsReceivePreview)) {
+      action.executableCount = 0
+      action.disabled = true
+      action.disabledReason = '审批须逐单读取服务端版本及资格，请通过原“查看明细”进入；当前未提供批量审批合同。'
+      action.handler = () => notify(action.disabledReason, 'warning')
+    }
   }
   return actions
 })
@@ -1482,7 +1833,7 @@ function batchGoToWmsReceivePreview() {
     failedReason: [],
   }
   selectedRows.value.forEach((row) => {
-    const no = row.poNo || row.id
+    const no = getPurchaseOrderNumber(row) || row.id
     if (row.status !== 'issued') {
       result.failedCount += 1
       result.failedItems.push({ id: row.id, no, reason: '采购订单未下达，不能进入 WMS 到货预备。' })
@@ -1497,7 +1848,7 @@ function batchGoToWmsReceivePreview() {
     action: '批量进入 WMS 到货预备',
     targetType: 'purchaseOrder',
     targetId: selectedIds.value.join(','),
-    targetNo: selectedRows.value.map((row) => row.poNo || row.id).join(','),
+    targetNo: selectedRows.value.map((row) => getPurchaseOrderNumber(row) || row.id).join(','),
     detail: `成功 ${result.successCount} 条，失败 ${result.failedCount} 条；${result.failedReason.join('；')}`,
   })
   if (result.successCount) router.push('/wms/purchase-receive-preview')
@@ -1506,12 +1857,22 @@ function batchGoToWmsReceivePreview() {
 
 function enrichListRow(row = {}) {
   if (activeType.value !== 'order') return row
-  const deliveryUrgency = calculateDeliveryUrgency({
+  const deliveryUrgency = String(row.deliveryUrgencyCode || row.deliveryUrgency || 'unknown')
+  return {
     ...row,
-    expectedDeliveryDate: row.expectedDeliveryDate || row.earliestArrivalDate,
-    planDeliveryDate: row.planDeliveryDate || row.plannedArrivalDate || row.earliestArrivalDate,
-  })
-  return { ...row, deliveryUrgency }
+    deliveryUrgency,
+    deliveryUrgencyLabel: row.deliveryUrgencyLabel || purchaseOrderUrgencyLabel({ deliveryUrgency }),
+    deliveryUrgencyCalculatedByPage: false,
+  }
+}
+
+function purchaseOrderUrgencyLabel(row = {}) {
+  const explicit = String(row.deliveryUrgencyLabel || '').trim()
+  if (explicit && /[^\x00-\x7F]/.test(explicit)) return explicit
+  return {
+    normal: '正常', general: '一般', warning: '一般', urgent: '紧急',
+    critical: '特急', overdue: '特急', unknown: '未知/待确认',
+  }[String(row.deliveryUrgencyCode || row.deliveryUrgency || 'unknown')] || '未知/待确认'
 }
 
 function displayHeaderRecord(row = {}) {
@@ -1519,7 +1880,8 @@ function displayHeaderRecord(row = {}) {
   const enriched = enrichListRow(row)
   return {
     ...enriched,
-    deliveryUrgency: getUrgencyLabel(enriched.deliveryUrgency),
+    deliveryUrgency: enriched.deliveryUrgency,
+    deliveryUrgencyLabel: purchaseOrderUrgencyLabel(enriched),
   }
 }
 
@@ -1547,6 +1909,8 @@ function buildSummary(row) {
   const approvedTotal = items.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.approvedPrice || 0), 0)
   const earliestRequiredDate = earliest(items.map((item) => item.requiredDate))
   const earliestArrivalDate = earliest(items.map((item) => item.planDeliveryDate || item.plannedArrivalDate || item.expectedDeliveryDate || item.requiredDate || item.demandDate || item.needDate || item.deliveryDate))
+  const materialSearch = items.flatMap((item) => [item.materialCode, item.materialName])
+    .filter(Boolean).join(' ')
   return {
     lineCount: items.length,
     totalQuantity,
@@ -1554,6 +1918,7 @@ function buildSummary(row) {
     approvedTotal: approvedTotal.toFixed(2),
     earliestRequiredDate,
     earliestArrivalDate,
+    materialSearch,
   }
 }
 
@@ -1617,6 +1982,7 @@ function departmentDisplayValue(value) {
 }
 
 function formatListCell(row, key) {
+  if (activeType.value === 'order' && key === 'deliveryUrgency') return purchaseOrderUrgencyLabel(row)
   if (key === 'deliveryUrgency') return getUrgencyLabel(row[key])
   if (['plannedArrivalDate', 'planDeliveryDate', 'expectedDeliveryDate', 'earliestArrivalDate'].includes(key) && !row[key]) return '未设日期'
   if (['requesterId', 'buyerId'].includes(key)) return getScmDisplayName('employee', row[key])
@@ -1663,9 +2029,28 @@ function ensureColumnFilter(key) {
 }
 
 function syncColumnFilters() {
-  listColumns.value.forEach((column) => ensureColumnFilter(column.key))
+  listFilterColumns.value.forEach((column) => ensureColumnFilter(column.key))
   Object.keys(columnFilters).forEach((key) => {
-    if (!listColumns.value.some((column) => column.key === key)) delete columnFilters[key]
+    if (!listFilterColumns.value.some((column) => column.key === key)) delete columnFilters[key]
+  })
+}
+
+function handlePurchaseOrderExportAudit(payload = {}) {
+  addOperationLog({
+    module: 'SCM采购订单',
+    action: '采购订单详情导出',
+    targetType: 'purchaseOrder',
+    targetId: form.id || '',
+    targetNo: getPurchaseOrderNumber(form),
+    detail: `${payload.templateLabel || '-'}；角色=${payload.role || '-'}；范围=当前采购订单；记录数=${Number(payload.rowCount || 0)}`,
+  })
+}
+
+function handlePurchaseOrderPrintAudit(payload = {}) {
+  addOperationLog({
+    module: 'SCM采购订单', action: '采购订单详情打印', targetType: 'purchaseOrder',
+    targetId: form.id || '', targetNo: getPurchaseOrderNumber(form),
+    detail: `角色=${payload.roleLabel || payload.role || '-'}；记录数=${Number(payload.rowCount || 0)}`,
   })
 }
 
@@ -1771,8 +2156,8 @@ function isDetailFieldDisabled(field = {}) {
 }
 
 function sortIcon(key) {
-  if (sortState.key !== key) return ''
-  return sortState.direction === 'asc' ? '↑' : '↓'
+  if (sortState.key !== key) return '▲▼'
+  return sortState.direction === 'asc' ? '▲' : '▼'
 }
 
 function globalIndex(index) {
@@ -1789,6 +2174,102 @@ function exportCurrentList() {
   })
   exportRowsToCsvUtil(exportRows, listColumns.value, `scm-${activeType.value || 'list'}-${today()}.csv`)
   logScmReference('SCM导出筛选结果', `${exportRows.length} rows`)
+}
+
+function exportSelectedList() {
+  const exportRows = selectedRows.value.map((row) => {
+    const next = { ...row }
+    listColumns.value.forEach((column) => {
+      next[column.key] = formatListCell(row, column.key)
+    })
+    return next
+  })
+  exportRowsToCsvUtil(exportRows, listColumns.value, `scm-${activeType.value || 'list'}-selected-${today()}.csv`)
+  logScmReference('SCM导出已选记录', `${exportRows.length} rows`)
+}
+
+function downloadPurchaseOrderImportTemplate() {
+  const result = downloadPurchaseOrderImportTemplateV11428427212()
+  notify(`${result.fileName} 已下载：基本信息、物料明细、字段说明，共 ${result.fieldCount} 个字段。`)
+}
+
+function escapePrintHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[character]))
+}
+
+function printPurchaseOrderRows(rows = [], scopeLabel = '当前结果') {
+  const printableRows = Array.isArray(rows) ? rows : []
+  const columns = listColumns.value
+  const tableHeader = columns.map(column => `<th>${escapePrintHtml(column.label)}</th>`).join('')
+  const tableRows = printableRows.map(row => `<tr>${columns.map(column =>
+    `<td>${escapePrintHtml(formatListCell(row, column.key))}</td>`).join('')}</tr>`).join('')
+  const html = `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><title>采购订单${escapePrintHtml(scopeLabel)}</title><style>body{font-family:Arial,"Microsoft YaHei",sans-serif;padding:24px;color:#111}h1{margin:0 0 6px}p{color:#555}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #999;padding:6px;text-align:left}th{background:#f3f4f6}@media print{body{padding:0}}</style></head><body><h1>采购订单列表</h1><p>打印范围：${escapePrintHtml(scopeLabel)}；订单数量：${printableRows.length}；订单编号与来源Gate摘要独立展示。</p><table><thead><tr>${tableHeader}</tr></thead><tbody>${tableRows}</tbody></table></body></html>`
+  const frame = document.createElement('iframe')
+  frame.setAttribute('title', '采购订单列表打印区域')
+  frame.style.position = 'fixed'
+  frame.style.width = '1px'
+  frame.style.height = '1px'
+  frame.style.opacity = '0'
+  frame.style.pointerEvents = 'none'
+  document.body.appendChild(frame)
+  const printDocument = frame.contentDocument
+  if (!printDocument || !frame.contentWindow) {
+    frame.remove()
+    notify('打印区域初始化失败，请重试。', 'error')
+    return
+  }
+  printDocument.open()
+  printDocument.write(html)
+  printDocument.close()
+  frame.contentWindow.focus()
+  frame.contentWindow.print()
+  globalThis.setTimeout(() => frame.remove(), 1000)
+  addOperationLog({ module: 'SCM采购订单', action: '采购订单列表打印',
+    targetType: 'purchaseOrder', targetId: printableRows.map(row => row.id).filter(Boolean).join(','),
+    targetNo: printableRows.map(getPurchaseOrderNumber).filter(Boolean).join(','),
+    detail: `范围=${scopeLabel}；记录数=${printableRows.length}` })
+}
+
+function printCurrentPurchaseOrders() {
+  printPurchaseOrderRows(sortedRows.value, '当前筛选结果')
+}
+
+function printSelectedPurchaseOrders() {
+  if (!selectedRows.value.length) return notify('请先选择要打印的采购订单。', 'warning')
+  printPurchaseOrderRows(selectedRows.value, '已选采购订单')
+}
+
+async function copyDiagnosticData() {
+  const text = JSON.stringify(scmDiagnosticData.value, null, 2)
+  try {
+    if (navigator?.clipboard?.writeText) await navigator.clipboard.writeText(text)
+    else fallbackCopy(text)
+    copyStatus.value = '已复制诊断数据'
+    notify('已复制诊断数据')
+  } catch (error) {
+    try {
+      fallbackCopy(text)
+      copyStatus.value = '已复制诊断数据'
+      notify('已复制诊断数据')
+    } catch (fallbackError) {
+      copyStatus.value = '复制失败，请重试'
+      notify('复制失败，请重试', 'warning')
+    }
+  }
+}
+
+function fallbackCopy(text) {
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', 'readonly')
+  textarea.style.position = 'fixed'
+  textarea.style.left = '-9999px'
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
 }
 
 function notify(text, type = 'success') {
@@ -1851,7 +2332,8 @@ function hasActiveColumnFilters() {
 function suggestionRecords() {
   const rows = (keyword.value || statusFilter.value || hasActiveColumnFilters()) ? filteredRows.value : listRows.value
   return rows.flatMap((row) => {
-    const items = activeConfig.value?.detailGet(row.id) || []
+    const items = activeType.value === 'order'
+      ? (row.items || []) : (activeConfig.value?.detailGet(row.id) || [])
     return [
       {
         no: row[activeConfig.value.noField],
@@ -1912,27 +2394,26 @@ function deleteCurrent(row) {
 function isActionAllowed(action, row = {}) {
   const status = row.status || 'draft'
   const handler = action.handler
-  const matrix = new Map([
-    [submitPurchaseRequest, ['draft', 'rejected']],
-    [approvePurchaseRequest, ['submitted', 'reviewed', 'rechecked']],
-    [convertRequest, ['approved']],
-    [closePurchaseRequest, ['draft', 'submitted', 'reviewed', 'rechecked', 'approved']],
-    [sendPurchaseInquiry, ['draft']],
-    [confirmInquiryQuote, ['sent']],
-    [convertInquiry, ['sent', 'quoted', 'approved', 'completed']],
-    [closePurchaseInquiry, ['draft', 'sent', 'quoted']],
-    [submitPriceApproval, ['draft', 'rejected']],
-    [approvePriceApproval, ['submitted', 'reviewed', 'rechecked']],
-    [rejectPriceApproval, ['submitted', 'reviewed', 'rechecked']],
-    [convertApproval, ['approved']],
-    [submitScmPurchaseOrder, ['draft']],
-    [approveScmPurchaseOrder, ['submitted', 'reviewed', 'rechecked']],
-    [issueScmPurchaseOrder, ['approved', 'converted']],
-    [goToWmsReceivePreview, ['issued', 'partiallyReceived']],
-    [closeScmPurchaseOrder, ['draft', 'submitted', 'reviewed', 'rechecked', 'approved', 'converted', 'issued']],
-  ])
-  const allowed = matrix.get(handler)
-  return !allowed || allowed.includes(status)
+  const actionCode = new Map([
+    [submitPurchaseRequest, 'submitPurchaseRequest'],
+    [approvePurchaseRequest, 'approvePurchaseRequest'],
+    [convertRequest, 'convertRequest'],
+    [closePurchaseRequest, 'closePurchaseRequest'],
+    [sendPurchaseInquiry, 'sendPurchaseInquiry'],
+    [confirmInquiryQuote, 'confirmInquiryQuote'],
+    [convertInquiry, 'convertInquiry'],
+    [closePurchaseInquiry, 'closePurchaseInquiry'],
+    [submitPriceApproval, 'submitPriceApproval'],
+    [approvePriceApproval, 'approvePriceApproval'],
+    [rejectPriceApproval, 'rejectPriceApproval'],
+    [convertApproval, 'convertApproval'],
+    [submitScmPurchaseOrder, 'submitScmPurchaseOrder'],
+    [approveScmPurchaseOrder, 'approveScmPurchaseOrder'],
+    [issueScmPurchaseOrder, 'issueScmPurchaseOrder'],
+    [goToWmsReceivePreview, 'goToWmsReceivePreview'],
+    [closeScmPurchaseOrder, 'closeScmPurchaseOrder'],
+  ]).get(handler)
+  return isScmActionAllowed(actionCode, status)
 }
 
 function actionButtonLabel(action, row = {}) {
@@ -1967,12 +2448,17 @@ function scmListRowActions(row = {}) {
 
 function visibleListActions(row) {
   const actions = activeConfig.value?.listActions || []
-  return actions.filter((action) => isActionAllowed(action, row))
+  return actions.filter((action) => !isLegacyOrderApproval(action) && isActionAllowed(action, row))
 }
 
 function visibleDetailActions(row) {
   const actions = activeConfig.value?.detailActions || []
-  return actions.filter((action) => isActionAllowed(action, row))
+  return actions.filter((action) => !isLegacyOrderApproval(action) && isActionAllowed(action, row))
+}
+
+function isLegacyOrderApproval(action) {
+  return activeType.value === 'order'
+    && [submitScmPurchaseOrder, approveScmPurchaseOrder, issueScmPurchaseOrder].includes(action.handler)
 }
 
 function validateHeader() {
@@ -2138,6 +2624,8 @@ function runAction(action, id) {
     notify('请先保存单据头', 'warning')
     return
   }
+  // Keep the original detail entry; never execute the old local-status approval path.
+  if (isLegacyOrderApproval(action)) return router.push(`/scm/purchase-order/${encodeURIComponent(id)}`)
   const row = activeConfig.value?.get(id) || form
   if (!isActionAllowed(action, row)) {
     notify('当前状态不允许执行该操作', 'warning')
@@ -2301,24 +2789,42 @@ function syncForm() {
 }
 
 watch(() => route.fullPath, () => {
-  refresh()
+  if (activeType.value === 'order' && pageMode.value === 'list') { void reloadPageData(); void reloadDirectPurchaseAuthorization() }
+  else refresh()
   syncForm()
   syncColumnFilters()
   advancedFilterVisible.value = false
-  quickSearchVisible.value = false
+  quickSearchVisible.value = true
   currentPage.value = 1
+  restoreListDisplayState(route.path)
 }, { immediate: true })
+
+watch([
+  keyword,
+  statusFilter,
+  advancedFilterVisible,
+  quickSearchVisible,
+  currentPage,
+  pageSize,
+  () => sortState.key,
+  () => sortState.direction,
+], () => persistListDisplayState(route.path))
 
 watch([filteredRows, pageSize], () => {
   const maxPage = Math.max(1, Math.ceil(filteredRows.value.length / pageSize.value))
   if (currentPage.value > maxPage) currentPage.value = maxPage
 })
+
 </script>
 
 <style scoped>
 .scm-page {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
   gap: 16px;
   min-height: 100%;
   padding: 22px;
@@ -2376,6 +2882,17 @@ h2 {
   font-size: 13px;
 }
 
+.purchase-order-list-refresh-evidence {
+  display: block;
+  margin: 10px 0;
+  padding: 9px 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1e40af;
+  font-size: 13px;
+}
+
 .batch-result {
   display: flex;
   flex-direction: column;
@@ -2425,6 +2942,9 @@ h2 {
 .operation-shell {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   gap: 14px;
 }
 
@@ -2456,6 +2976,27 @@ h2 {
   width: 260px;
 }
 
+.pce-compact-business-table :deep(.el-table__body td.el-table__cell) {
+  height: 38px;
+  padding: 4px 0;
+}
+
+.pce-list-cell-ellipsis {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pce-source-summary { color: #475569; }
+
+.pce-compact-business-table :deep(.app-action-cell) {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
 .filter-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(180px, 1fr));
@@ -2482,12 +3023,36 @@ h2 {
 }
 
 .sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 0;
   padding: 0;
   background: transparent;
   color: inherit;
   font: inherit;
+  font-weight: 700;
   cursor: pointer;
+}
+
+.sort-button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  color: #1d4ed8;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.sort-default {
+  color: #475569;
+}
+
+.sort-button-active .sort-button-icon {
+  color: #1d4ed8;
 }
 
 .pagination-row {

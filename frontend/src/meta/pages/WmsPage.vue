@@ -3,9 +3,11 @@
     <header class="page-header">
       <section>
         <p class="eyebrow">V1.12.9.1.1 WMS中文显示修复</p>
-        <h1>{{ pageTitle }}</h1>
+        <h1 data-acceptance-id="page-business-title">{{ pageTitle }}</h1>
         <p>本页维护库存余额、库存流水、仓库任务、库存预警、采购到货预备和采购收货预备；不直接生成应付、财务凭证或总账。</p>
-        <p class="app-current-module-badge">当前操作模块：{{ currentWmsModuleName }}</p>
+        <p class="app-current-module-badge" data-acceptance-id="page-breadcrumb-current-title">
+          <strong>{{ currentWmsModuleName }}</strong>
+        </p>
       </section>
       <nav class="page-tabs app-module-nav-zone">
         <span class="app-nav-zone-title">WMS库存流程导航</span>
@@ -14,7 +16,7 @@
           <span v-if="isWmsNavActive(null)" class="app-current-tag">当前</span>
         </router-link>
         <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isWmsNavActive('balances') }" to="/wms/inventory-balances">
-          库存余额
+          {{ inventoryBalanceCanonicalName }}
           <span v-if="isWmsNavActive('balances')" class="app-current-tag">当前</span>
         </router-link>
         <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isWmsNavActive('transactions') }" to="/wms/inventory-transactions">
@@ -78,7 +80,7 @@
         <div class="button-row">
           <el-button @click="router.push('/finance/payable-prepares')">采购应付预备</el-button>
           <el-button @click="router.push('/finance/payable-checks')">采购应付核对</el-button>
-          <el-button @click="router.push('/finance/invoice-prepares')">采购发票预备</el-button>
+          <el-button @click="router.push('/finance/purchase-invoice-prepares')">采购发票准备</el-button>
           <el-button @click="router.push('/finance/ap-drafts')">采购应付账款草稿</el-button>
         </div>
       </el-card>
@@ -89,7 +91,11 @@
       </el-card>
     </section>
 
-    <section v-else-if="currentDetailRecord" class="operation-shell">
+    <section
+      v-else-if="currentDetailRecord"
+      class="operation-shell"
+      :data-pce-section="currentType === 'tasks' ? 'warehouse-task-detail' : currentType === 'transactions' ? 'inventory-transaction-detail' : undefined"
+    >
       <el-card shadow="never">
         <template #header>
           <div class="card-header">
@@ -101,14 +107,69 @@
               <el-button @click="goCurrentList">返回列表</el-button>
               <el-button @click="goCurrentParent">返回上级</el-button>
               <el-button v-if="hasCurrentSource" type="primary" @click="goCurrentSource">{{ currentSourceButtonLabel }}</el-button>
+              <el-button
+                v-if="showQualifiedInboundConfirm"
+                type="success"
+                :disabled="!qualifiedInboundActionState?.allowed"
+                @click="confirmQualifiedInbound"
+              >确认入库</el-button>
+              <el-button v-if="showQualifiedInboundResult" @click="viewQualifiedInboundTransaction">查看库存流水</el-button>
             </div>
           </div>
         </template>
         <div class="info-grid">
           <article v-for="column in listColumns" :key="column.key">
             <span>{{ column.label }}</span>
-            <strong>{{ formatCell(currentDetailRecord, column.key) }}</strong>
+            <strong :data-testid="detailFieldTestId(column.key)">{{ formatCell(currentDetailRecord, column.key) }}</strong>
           </article>
+        </div>
+        <el-alert
+          v-if="showQualifiedInboundConfirm && qualifiedInboundActionState && !qualifiedInboundActionState.allowed"
+          :title="qualifiedInboundActionState.message || qualifiedInboundActionState.reason"
+          type="warning"
+          show-icon
+          :closable="false"
+        />
+      </el-card>
+
+      <el-card
+        v-if="currentType === 'transactions'"
+        shadow="never"
+        data-pce-section="inventory-transaction-source-context"
+      >
+        <template #header><h2>来源业务信息</h2></template>
+        <div class="info-grid">
+          <article>
+            <span>来源仓库任务</span>
+            <strong data-testid="inventory-transaction-source-warehouse-task-no">
+              {{ inventoryTransactionSourceContext.warehouseTaskNo || '未记录' }}
+            </strong>
+          </article>
+          <article>
+            <span>来源来料检验单</span>
+            <strong data-testid="inventory-transaction-source-inspection-no">{{ currentDetailRecord.sourceInspectionNo || '未记录' }}</strong>
+          </article>
+          <article>
+            <span>来源采购收货预备</span>
+            <strong data-testid="inventory-transaction-source-purchase-receive-no">
+              {{ currentDetailRecord.sourcePurchaseReceiveNo || currentDetailRecord.sourceReceiveNo || '未记录' }}
+            </strong>
+          </article>
+          <article>
+            <span>来源采购订单</span>
+            <strong data-testid="inventory-transaction-source-purchase-order-no">{{ currentDetailRecord.sourcePurchaseOrderNo || '未记录' }}</strong>
+          </article>
+        </div>
+        <div class="button-row">
+          <el-button
+            v-if="inventoryTransactionSourceContext.canNavigate"
+            type="primary"
+            data-testid="inventory-transaction-view-source-warehouse-task"
+            @click="viewInventoryTransactionSourceWarehouseTask"
+          >查看来源仓库任务</el-button>
+          <span v-else-if="inventoryTransactionSourceContext.readFailed" class="muted">
+            来源仓库任务读取失败：{{ inventoryTransactionSourceContext.reason }}
+          </span>
         </div>
       </el-card>
 
@@ -138,7 +199,7 @@
         <template #header>
           <div class="card-header">
             <div>
-              <h2>{{ currentList.title }}</h2>
+              <h2 data-acceptance-id="page-internal-subject-title">{{ pageTitle }}</h2>
               <span>{{ currentList.subtitle }}</span>
             </div>
             <div class="button-row">
@@ -155,28 +216,60 @@
           <span class="sort-help">快速搜索用于跨字段临时查找；精准查询请使用高级筛选。</span>
         </div>
 
-        <div v-if="quickSearchVisible" class="toolbar">
-          <el-autocomplete
-            v-model="keyword"
-            :fetch-suggestions="querySearchSuggestions"
-            placeholder="搜索单号、供应商、物料、部门、状态"
-            clearable
-            @select="handleSuggestionSelect"
-          />
+        <div
+          v-if="quickSearchVisible"
+          class="toolbar"
+          data-acceptance-id="standard-list-toolbar"
+          :data-pce-page-id="currentPageId"
+          :data-pce-toolbar-for="currentTableId"
+        >
+          <span data-acceptance-id="list-fuzzy-search-input">
+            <el-autocomplete
+              v-model="keyword"
+              :fetch-suggestions="querySearchSuggestions"
+              placeholder="搜索单号、供应商、物料、部门、状态"
+              clearable
+              @select="handleSuggestionSelect"
+            />
+          </span>
           <el-select v-model="statusFilter" placeholder="状态筛选" clearable>
             <el-option v-for="item in currentList.statuses" :key="item" :label="statusLabel(item)" :value="item" />
           </el-select>
-          <el-button @click="clearFilters">重置</el-button>
+          <el-button data-acceptance-id="list-fuzzy-search-button" @click="clearSelection">搜索</el-button>
+          <el-button
+            data-acceptance-id="list-advanced-filter-toggle"
+            :data-pce-filter-toggle-for="currentTableId"
+            :aria-expanded="String(advancedFilterVisible)"
+            @click="advancedFilterVisible = !advancedFilterVisible"
+          >
+            {{ advancedFilterVisible ? '收起高级筛选' : '展开高级筛选' }}
+          </el-button>
+          <el-button data-acceptance-id="list-clear-filter-button" @click="clearFilters">重置</el-button>
+          <el-button data-acceptance-id="list-clear-sort-button" @click="resetSorting">清除排序</el-button>
+          <el-button
+            type="success"
+            data-acceptance-id="list-export-current-result-button"
+            :data-pce-export-for="currentTableId"
+            @click="exportCurrentList"
+          >
+            导出当前结果
+          </el-button>
+          <span data-acceptance-id="list-result-count-visible">当前结果 {{ sortedRows.length }} 条</span>
+          <span data-acceptance-id="business-flow-selected-count">已选择 {{ selectedRows.length }} 条</span>
         </div>
 
         <div class="toolbar">
           <el-button @click="resetSorting">清除排序</el-button>
           <span class="sort-help">排序：点击表格表头字段可升序/降序排序；点击“清除排序”恢复默认顺序。</span>
           <span class="sort-help">{{ currentSortText }}</span>
-          <el-button @click="advancedFilterVisible = !advancedFilterVisible">
-            {{ advancedFilterVisible ? '收起高级筛选' : '展开高级筛选' }}
+          <el-button
+            type="success"
+            data-acceptance-id="list-export-current-result-button"
+            :data-pce-export-for="currentTableId"
+            @click="exportCurrentList"
+          >
+            导出当前结果
           </el-button>
-          <el-button type="success" @click="exportCurrentList">导出当前结果</el-button>
         </div>
 
         <el-alert
@@ -187,7 +280,7 @@
           :closable="false"
         />
 
-        <div v-if="batchActions.length" class="batch-bar">
+        <div v-if="batchActions.length" class="batch-bar" :data-pce-section="`${currentPageId}-batch-actions`">
           <span>已选择 {{ selectedRows.length }} 条</span>
           <span v-if="currentType === 'receive'">可生成仓库收货任务 {{ wmsBatchCounts.task }} 条</span>
           <span v-if="currentType === 'receive'">可生成采购收货预备单 {{ wmsBatchCounts.receive }} 条</span>
@@ -196,7 +289,8 @@
           <el-button size="small" @click="clearSelection">清空选择</el-button>
           <el-button
             v-for="action in batchActions"
-            :key="action.label"
+            :key="action.id"
+            :data-pce-action-id="action.id"
             size="small"
             :type="action.type || 'primary'"
             :disabled="action.disabled"
@@ -223,25 +317,39 @@
           </template>
         </div>
 
-        <div v-if="advancedFilterVisible" class="filter-grid">
-          <div v-for="column in listColumns" :key="column.key" class="filter-item">
+        <div
+          v-show="advancedFilterVisible"
+          class="filter-grid"
+          data-acceptance-id="list-advanced-filter-panel"
+          :data-pce-filter-for="currentTableId"
+        >
+          <div
+            v-for="column in listColumns"
+            :key="column.key"
+            class="filter-item"
+            :data-pce-filter-field="column.key"
+            :data-declared-control-type="columnFilterType(column)"
+            :data-filter-span="filterSpanForColumn(column)"
+          >
             <label>{{ column.label }}</label>
             <el-input
               v-if="columnFilterType(column) === 'text'"
               v-model="columnFilters[column.key].text"
               clearable
               placeholder="模糊筛选"
+              data-pce-rendered-control-type="text"
             />
             <el-date-picker
-              v-else-if="columnFilterType(column) === 'date'"
+              v-else-if="['date', 'date_range'].includes(columnFilterType(column))"
               v-model="columnFilters[column.key].range"
               type="daterange"
               value-format="YYYY-MM-DD"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
+              data-pce-rendered-control-type="date_range"
               @change="handleDateFilterChange(column.key)"
             />
-            <div v-else-if="columnFilterType(column) === 'number'" class="range-row">
+            <div v-else-if="['number', 'number_range'].includes(columnFilterType(column))" class="range-row" data-pce-rendered-control-type="number_range">
               <el-input-number v-model="columnFilters[column.key].min" :precision="2" placeholder="最小" />
               <el-input-number v-model="columnFilters[column.key].max" :precision="2" placeholder="最大" />
             </div>
@@ -252,7 +360,8 @@
               filterable
               clearable
               collapse-tags
-              placeholder="请选择"
+              :placeholder="columnFilterType(column) === 'searchable_select' ? '请选择或搜索' : '请选择'"
+              :data-pce-rendered-control-type="columnFilterType(column)"
             >
               <el-option v-for="option in columnFilterOptions(column)" :key="option.value" :label="option.label" :value="option.value" />
             </el-select>
@@ -267,8 +376,16 @@
           :closable="false"
         />
         <el-empty v-if="!pagedRows.length" description="暂无符合条件的数据" />
-        <el-table v-else ref="listTableRef" :data="pagedRows" border stripe height="520" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="48" fixed="left" />
+        <BusinessTableScrollContainer
+          v-else
+          class="pce-baseline-table-shell"
+          acceptance-id="business-table-scroll-purchase-receive-preview-main"
+          :page-id="currentPageId"
+          :table-id="currentTableId"
+          min-width="1900px"
+        >
+        <el-table ref="listTableRef" :data="pagedRows" border stripe height="520" scrollbar-always-on @selection-change="handleSelectionChange">
+          <el-table-column type="selection" width="48" fixed="left" class-name="business-table-selection-column" header-class-name="business-table-selection-column" />
           <el-table-column v-if="currentType === 'receive'" type="expand" width="48" fixed="left">
             <template #default="{ row }">
               <el-table :data="row.items || []" border size="small" class="nested-table" height="320">
@@ -292,13 +409,26 @@
               </el-table>
             </template>
           </el-table-column>
-          <el-table-column label="序号" width="70" fixed="left">
-            <template #default="{ $index }">{{ globalIndex($index) }}</template>
-          </el-table-column>
-          <el-table-column v-for="column in listColumns" :key="column.key" :label="column.label" :min-width="column.width || 120">
+          <el-table-column type="index" label="序号" width="70" fixed="left" :index="globalIndex" class-name="pce-fixed-index-column" header-class-name="pce-fixed-index-column" />
+          <el-table-column
+            v-for="column in listColumns"
+            :key="column.key"
+            :label="column.label"
+            :min-width="column.width || 120"
+            :fixed="column.key === primaryBusinessNoColumnKey ? 'left' : undefined"
+            :class-name="column.key === primaryBusinessNoColumnKey ? 'pce-fixed-primary-no-column' : ''"
+            :header-class-name="column.key === primaryBusinessNoColumnKey ? 'pce-fixed-primary-no-column' : ''"
+          >
             <template #header>
-              <button class="sort-button" type="button" title="点击表头字段可升序/降序排序" @click="toggleSort(column.key)">
-                {{ column.label }} {{ sortIcon(column.key) }}
+              <button
+                class="sort-button global-sort-button"
+                :class="{ 'sort-button-active': sortState.key === column.key }"
+                type="button"
+                title="点击表头字段可升序/降序排序"
+                @click="toggleSort(column.key)"
+              >
+                <span>{{ column.label }}</span>
+                <b :class="['sort-button-icon', sortState.key === column.key ? `sort-${sortState.direction}` : 'sort-default']">{{ sortIcon(column.key) }}</b>
               </button>
             </template>
             <template #default="{ row }">
@@ -317,31 +447,38 @@
           </el-table-column>
           <el-table-column v-if="currentType === 'receive'" label="采购收货预备单" min-width="160">
             <template #default="{ row }">
-              <el-tag :type="rowPurchaseReceive(row) ? 'success' : 'info'">{{ rowPurchaseReceive(row) ? '已生成' : '未生成' }}</el-tag>
+              <el-tag :type="purchaseReceiveLinkTagType(rowPurchaseReceiveLink(row))">
+                {{ purchaseReceiveLinkLabel(rowPurchaseReceiveLink(row)) }}
+              </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(wmsActionColumnLabels)">
+          <el-table-column label="操作" fixed="right" :width="getActionColumnWidth(wmsActionColumnLabels)" class-name="payment-fixed-action-column" header-class-name="payment-fixed-action-column">
             <template #default="{ row }">
               <div class="app-action-cell">
                 <el-button v-if="currentType === 'balances'" size="small" class="app-action-button-sm" @click="router.push(`/wms/inventory-transactions?balance=${row.id}`)">查看流水</el-button>
-                <el-button v-if="currentType === 'tasks' && row.status === 'pending'" size="small" class="app-action-button-sm" type="primary" @click="completeTask(row)">完成任务</el-button>
+                <el-button v-if="currentType === 'tasks' && row.status === 'pending' && getWarehouseTaskBusinessType(row) !== 'qualifiedInboundPrepare'" size="small" class="app-action-button-sm" type="primary" @click="completeTask(row)">完成任务</el-button>
                 <el-button v-if="currentType === 'tasks' && row.taskType === 'purchaseReceive'" size="small" class="app-action-button-lg" type="success" @click="createPurchaseReceiveFromTask(row)">由任务生成采购收货预备单</el-button>
                 <el-button v-if="currentType === 'tasks' && row.status === 'pending'" size="small" class="app-action-button-sm" @click="cancelTask(row)">取消任务</el-button>
                 <el-button v-if="currentType === 'warnings' && row.status === 'open'" size="small" class="app-action-button-sm" type="primary" @click="handleWarning(row)">处理预警</el-button>
                 <el-button v-if="currentType === 'warnings' && row.status === 'open'" size="small" class="app-action-button-sm" @click="ignoreWarning(row)">忽略预警</el-button>
+                <el-button v-if="currentType === 'warnings'" size="small" class="app-action-button-sm" @click="router.push(`/wms/inventory-balances?material=${encodeURIComponent(row.materialId || row.materialCode || '')}`)">查看库存</el-button>
                 <el-button v-if="detailRoute(row)" size="small" class="app-action-button-sm" @click="router.push(detailRoute(row))">详情</el-button>
                 <el-button v-if="currentType === 'receive'" size="small" class="app-action-button-lg" @click="goSource(router, sourceRecordForRow(row), notify)">查看来源采购订单</el-button>
                 <el-button v-if="currentType === 'receive' && !rowHasReceiveTask(row)" size="small" class="app-action-button-lg" type="primary" @click="createReceiveTask(row)">生成仓库收货任务</el-button>
                 <el-button v-if="currentType === 'receive' && rowHasReceiveTask(row)" size="small" class="app-action-button-lg" @click="goWarehouseTask(row)">查看仓库收货任务</el-button>
-                <el-button v-if="currentType === 'receive' && !rowPurchaseReceive(row)" size="small" class="app-action-button-lg" type="success" @click="createPurchaseReceive(row)">直接生成采购收货预备单</el-button>
-                <el-button v-if="currentType === 'receive' && rowPurchaseReceive(row)" size="small" class="app-action-button-lg" @click="goPurchaseReceive(row)">查看采购收货预备单</el-button>
+                <el-button v-if="currentType === 'receive' && rowPurchaseReceiveLink(row).linkStatus === 'not_generated'" size="small" class="app-action-button-lg" type="success" @click="createPurchaseReceive(row)">直接生成采购收货预备单</el-button>
+                <el-button v-if="currentType === 'receive' && rowPurchaseReceiveLink(row).linkStatus === 'generated'" size="small" class="app-action-button-lg" :data-target-no="rowPurchaseReceiveLink(row).targetNo" @click="goPurchaseReceive(row)">查看采购收货预备单</el-button>
+                <span v-if="currentType === 'receive' && ['conflict', 'read_failed'].includes(rowPurchaseReceiveLink(row).linkStatus)" class="muted">
+                  {{ rowPurchaseReceiveLink(row).reason }}
+                </span>
                 <span v-if="!hasRowAction(row)" class="muted">只读</span>
               </div>
             </template>
           </el-table-column>
         </el-table>
+        </BusinessTableScrollContainer>
 
-        <div class="pagination-row">
+        <div class="pagination-row" :data-pce-pagination-for="currentTableId">
           <span>共 {{ sortedRows.length }} 条</span>
           <el-pagination
             v-model:current-page="currentPage"
@@ -390,7 +527,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   getEmployeeOptions,
@@ -402,9 +539,12 @@ import {
   applyPagination,
   applySorting,
   buildFilterOptions,
-  exportRowsToCsv as exportRowsToCsvUtil,
 } from '../manufacturing/foundationTableUtils.js'
 import { buildMultiFieldSuggestions, filterSuggestions } from '../runtime/filterSuggestionEngine.js'
+import { BUSINESS_TABLE_EXPORT_SCOPES, downloadBusinessTableCsv } from '../runtime/businessTableExport.js'
+import { resolvePageNameConsumption } from '../governance/pageNameConsumer.js'
+import { findPceBusinessModuleById } from '../runtime/pceBusinessModuleRegistry.js'
+import BusinessTableScrollContainer from '../components/BusinessTableScrollContainer.vue'
 import {
   formatBusinessDateTime,
   getInventoryStatusLabel,
@@ -424,15 +564,11 @@ import {
   batchCancelWarehouseTasks,
   batchCompleteWarehouseTasks,
   batchCreateWarehouseTasksFromPurchaseOrders,
-  batchPostInboundFromWarehouseTasks,
   cancelWarehouseTask,
   completeWarehouseTask,
   createPurchaseReceiveTaskFromScmPurchaseOrder,
   generateStockWarnings,
   getReceivableScmPurchaseOrders,
-  getInventoryBalanceById,
-  getInventoryTransactionById,
-  getWarehouseTaskById,
   getWarehouseTaskBusinessType,
   getWmsState,
   handleStockWarning,
@@ -440,10 +576,16 @@ import {
   resetWmsState,
 } from '../wms/wmsStore.js'
 import {
+  batchConfirmQualifiedInboundWarehouseTasks,
+  confirmQualifiedInboundWarehouseTask,
+  getQualifiedInboundTaskActionState,
+} from '../wms/qualifiedInboundCommand.js'
+import {
   batchCreatePurchaseReceivesFromPurchaseOrders,
   createPurchaseReceiveFromScmPurchaseOrder,
   createPurchaseReceiveFromWarehouseTask,
   listPurchaseReceives,
+  resolvePurchaseReceivePrepareLink,
 } from '../wms/purchaseReceiveStore.js'
 import { getActionColumnWidth } from '../runtime/tableActionColumnEngine.js'
 import {
@@ -468,7 +610,7 @@ const batchResult = ref(null)
 const batchMessageType = ref('success')
 const openingDialogVisible = ref(false)
 const advancedFilterVisible = ref(false)
-const quickSearchVisible = ref(false)
+const quickSearchVisible = ref(true)
 const columnFilters = reactive({})
 const sortState = reactive({ key: '', direction: 'asc' })
 const openingForm = reactive({
@@ -488,23 +630,23 @@ const configs = {
     statuses: ['normal', 'lowStock', 'overStock', 'locked', 'disabled'],
     rows: () => wmsState.value.inventoryBalances,
     columns: [
-      { key: 'materialCode', label: '物料编码' },
-      { key: 'materialName', label: '物料名称', width: 160 },
-      { key: 'specification', label: '规格型号' },
-      { key: 'unit', label: '单位' },
-      { key: 'warehouseName', label: '仓库' },
-      { key: 'locationName', label: '库位' },
-      { key: 'batchNo', label: '批号' },
+      { key: 'materialCode', label: '物料编码', filterType: 'searchable_select' },
+      { key: 'materialName', label: '物料名称', width: 160, filterType: 'searchable_select' },
+      { key: 'specification', label: '规格型号', filterType: 'searchable_select' },
+      { key: 'unit', label: '单位', filterType: 'searchable_select' },
+      { key: 'warehouseName', label: '仓库', filterType: 'searchable_select' },
+      { key: 'locationName', label: '库位', filterType: 'searchable_select' },
+      { key: 'batchNo', label: '批号', filterType: 'searchable_select' },
       { key: 'qualityStatus', label: '质量状态', filterType: 'enum' },
       { key: 'quantity', label: '当前库存', filterType: 'number' },
       { key: 'availableQuantity', label: '可用数量', filterType: 'number' },
       { key: 'lockedQuantity', label: '锁定数量', filterType: 'number' },
       { key: 'safetyStock', label: '安全库存', filterType: 'number' },
       { key: 'maxStock', label: '最高库存', filterType: 'number' },
-      { key: 'sourceInspectionNo', label: '来源检验单', width: 150 },
-      { key: 'sourceReceiveNo', label: '来源收货单', width: 150 },
-      { key: 'sourcePurchaseOrderNo', label: '来源采购订单', width: 150 },
-      { key: 'rootRequestNo', label: '原始请购单', width: 150 },
+      { key: 'sourceInspectionNo', label: '来源检验单', width: 150, filterType: 'searchable_select' },
+      { key: 'sourceReceiveNo', label: '来源收货单', width: 150, filterType: 'searchable_select' },
+      { key: 'sourcePurchaseOrderNo', label: '来源采购订单', width: 150, filterType: 'searchable_select' },
+      { key: 'rootRequestNo', label: '原始请购单', width: 150, filterType: 'searchable_select' },
       { key: 'status', label: '状态', filterType: 'enum' },
       { key: 'lastTransactionAt', label: '最近交易时间', filterType: 'date', width: 180 },
     ],
@@ -519,7 +661,7 @@ const configs = {
       { key: 'transactionNo', label: '流水号', width: 170 },
       { key: 'transactionDate', label: '交易日期', filterType: 'date' },
       { key: 'transactionType', label: '类型', filterType: 'enum' },
-      { key: 'materialName', label: '物料' },
+      { key: 'materialName', label: '物料名称' },
       { key: 'warehouseName', label: '仓库' },
       { key: 'locationName', label: '库位' },
       { key: 'batchNo', label: '批号' },
@@ -546,7 +688,7 @@ const configs = {
       { key: 'taskNo', label: '任务号', width: 170 },
       { key: 'taskType', label: '任务类型', filterType: 'enum' },
       { key: 'businessType', label: '业务类型', filterType: 'enum', width: 170 },
-      { key: 'businessStatus', label: '业务阶段', width: 150 },
+      { key: 'businessStatus', label: '业务状态', width: 150 },
       { key: 'sourceTaskNo', label: '仓库任务号', width: 170 },
       { key: 'sourceNo', label: '来源单据' },
       { key: 'sourceInspectionNo', label: '来源检验单', width: 150 },
@@ -554,12 +696,13 @@ const configs = {
       { key: 'sourcePurchaseOrderNo', label: '来源采购订单', width: 150 },
       { key: 'rootRequestNo', label: '原始请购单', width: 150 },
       { key: 'supplierName', label: '供应商' },
-      { key: 'materialName', label: '物料' },
+      { key: 'materialName', label: '物料名称' },
       { key: 'warehouseName', label: '仓库' },
       { key: 'locationName', label: '库位' },
       { key: 'plannedQuantity', label: '计划数量', filterType: 'number' },
       { key: 'completedQuantity', label: '完成数量', filterType: 'number' },
-      { key: 'status', label: '状态', filterType: 'enum' },
+      { key: 'inventoryTransactionNo', label: '库存流水编号', width: 180 },
+      { key: 'status', label: '任务状态', filterType: 'enum' },
       { key: 'operatorId', label: '操作人', filterType: 'enum' },
       { key: 'plannedExecutionDate', label: '计划执行日期', filterType: 'date', width: 180 },
       { key: 'createdAt', label: '创建时间', filterType: 'date', width: 180 },
@@ -620,6 +763,7 @@ const configs = {
       { key: 'actualAmount', label: '实际金额', filterType: 'number' },
       { key: 'plannedArrivalDate', label: '计划到货日期', filterType: 'date' },
       { key: 'deliveryUrgency', label: '交期紧急程度', filterType: 'enum', sortType: 'urgency', width: 140 },
+      { key: 'purchaseType', label: '采购类型', filterType: 'enum', width: 130 },
       { key: 'hasReceiveTask', label: '是否已生成仓库收货任务', filterType: 'enum', width: 190 },
       { key: 'hasPurchaseReceive', label: '是否已生成采购收货预备单', filterType: 'enum', width: 210 },
       { key: 'receiveStage', label: '收货阶段', width: 150 },
@@ -638,8 +782,14 @@ const currentType = computed(() => {
   return ''
 })
 const currentList = computed(() => configs[currentType.value] || null)
-const pageTitle = computed(() => currentList.value?.title || 'WMS库存管理')
-const currentWmsModuleName = computed(() => currentList.value?.title || 'WMS库存管理')
+const currentPageId = computed(() => currentType.value === 'receive' ? 'purchase-receive-preview' : `wms-${currentType.value || 'list'}`)
+const currentTableId = computed(() => currentType.value === 'receive' ? 'purchase-receive-preview-main' : `wms-${currentType.value || 'list'}-main`)
+const inventoryBalanceCanonicalName = resolvePageNameConsumption({ pageCode: 'inventory-balances', route: '/wms/inventory-balances' }).pageTitle
+const pageTitle = computed(() => {
+  const consumed = resolvePageNameConsumption({ route: route.path })
+  return consumed.pageTitle
+})
+const currentWmsModuleName = computed(() => pageTitle.value)
 const wmsActionColumnLabels = computed(() => {
   if (currentType.value === 'balances') return ['查看流水']
   if (currentType.value === 'tasks') return ['完成任务', '由任务生成采购收货预备单', '取消任务', '详情']
@@ -653,7 +803,22 @@ function isWmsNavActive(type) {
   return currentType.value === type
 }
 const listRows = computed(() => currentList.value ? currentList.value.rows().map(enrichWmsRow) : [])
-const listColumns = computed(() => currentList.value?.columns || [])
+const currentAdvancedFilterSchema = computed(() => (
+  currentType.value === 'receive'
+    ? findPceBusinessModuleById('purchase-receive-preview')?.advancedFilterSchema || []
+    : []
+))
+const listColumns = computed(() => (currentList.value?.columns || []).map((column) => {
+  const filterMetadata = currentAdvancedFilterSchema.value.find((field) => field.key === column.key)
+  return filterMetadata ? { ...column, ...filterMetadata } : column
+}))
+const primaryBusinessNoColumnKey = computed(() => ({
+  balances: 'materialCode',
+  transactions: 'transactionNo',
+  tasks: 'taskNo',
+  receive: 'poNo',
+  warnings: 'warningNo',
+})[currentType.value] || listColumns.value[0]?.key || '')
 const currentPageType = computed(() => ({
   balances: 'inventoryBalances',
   transactions: 'inventoryTransactions',
@@ -663,10 +828,11 @@ const currentPageType = computed(() => ({
 }[currentType.value] || ''))
 const currentDetailRecord = computed(() => {
   if (!route.params.id || !currentType.value) return null
-  const id = route.params.id
-  if (currentType.value === 'balances') return getInventoryBalanceById(id)
-  if (currentType.value === 'transactions') return getInventoryTransactionById(id)
-  if (currentType.value === 'tasks') return getWarehouseTaskById(id)
+  const id = String(route.params.id)
+  const state = wmsState.value
+  if (currentType.value === 'balances') return state.inventoryBalances.find((item) => String(item.id) === id) || null
+  if (currentType.value === 'transactions') return state.inventoryTransactions.find((item) => String(item.id) === id) || null
+  if (currentType.value === 'tasks') return state.warehouseTasks.find((item) => String(item.id) === id) || null
   if (currentType.value === 'receive') return getReceivableScmPurchaseOrders().find((item) => String(item.id) === String(id)) || null
   return null
 })
@@ -677,6 +843,40 @@ const detailRecordTitle = computed(() => {
 const currentSourceRecord = computed(() => sourceRecordForRow(currentDetailRecord.value))
 const hasCurrentSource = computed(() => hasSourceRoute(currentSourceRecord.value))
 const currentSourceButtonLabel = computed(() => getSourceButtonLabel(currentSourceRecord.value))
+const inventoryTransactionSourceContext = computed(() => {
+  if (currentType.value !== 'transactions' || !currentDetailRecord.value) {
+    return { warehouseTaskId: '', warehouseTaskNo: '', canNavigate: false, readFailed: false, reason: '' }
+  }
+  const transaction = currentDetailRecord.value
+  const warehouseTaskId = String(transaction.sourceWarehouseTaskId || '')
+  const sourceTask = warehouseTaskId
+    ? wmsState.value.warehouseTasks.find((item) => String(item.id) === warehouseTaskId) || null
+    : null
+  const warehouseTaskNo = transaction.sourceWarehouseTaskNo || sourceTask?.taskNo || ''
+  return {
+    warehouseTaskId,
+    warehouseTaskNo,
+    canNavigate: Boolean(warehouseTaskId && sourceTask),
+    readFailed: Boolean(warehouseTaskId && !sourceTask),
+    reason: warehouseTaskId && !sourceTask ? `未找到仓库任务 ${warehouseTaskId}` : '',
+  }
+})
+const qualifiedInboundActionState = computed(() => (
+  currentType.value === 'tasks' && currentDetailRecord.value
+    ? getQualifiedInboundTaskActionState(currentDetailRecord.value.id)
+    : null
+))
+const showQualifiedInboundConfirm = computed(() => (
+  currentType.value === 'tasks'
+  && getWarehouseTaskBusinessType(currentDetailRecord.value || {}) === 'qualifiedInboundPrepare'
+  && currentDetailRecord.value?.status !== 'done'
+))
+const showQualifiedInboundResult = computed(() => (
+  currentType.value === 'tasks'
+  && getWarehouseTaskBusinessType(currentDetailRecord.value || {}) === 'qualifiedInboundPrepare'
+  && currentDetailRecord.value?.status === 'done'
+  && Boolean(currentDetailRecord.value?.inventoryTransactionId)
+))
 
 const overviewCards = computed(() => {
   const todayCount = wmsState.value.inventoryTransactions.filter((item) => item.transactionDate === today()).length
@@ -711,7 +911,7 @@ const currentSortText = computed(() => {
   const column = listColumns.value.find((item) => item.key === sortState.key)
   return `当前排序：${column?.label || sortState.key} / ${sortState.direction === 'desc' ? '降序' : '升序'}`
 })
-const purchaseReceives = computed(() => listPurchaseReceives())
+const purchaseReceives = ref(listPurchaseReceives())
 const processDescription = computed(() => ({
   receive: '采购到货预备流程：采购订单已下达 -> 生成仓库收货任务 / 直接生成采购收货预备单 -> 提交收货 -> QMS 来料检验。本页只安排到货和收货预备，不直接入库、不生成应付。',
   tasks: '仓库任务流程：任务生成 -> 仓库执行 -> 完成任务 -> 进入下一业务动作。',
@@ -728,9 +928,12 @@ const wmsBatchCounts = computed(() => {
   }
   if (currentType.value === 'tasks') {
     return {
-      complete: selectedRows.value.filter((row) => ['pending', 'processing'].includes(row.status)).length,
+      complete: selectedRows.value.filter((row) => ['pending', 'processing'].includes(row.status) && getWarehouseTaskBusinessType(row) !== 'qualifiedInboundPrepare').length,
       cancel: selectedRows.value.filter((row) => !['done', 'cancelled'].includes(row.status)).length,
-      inbound: selectedRows.value.filter((row) => getWarehouseTaskBusinessType(row) === 'qualifiedInboundPrepare').length,
+      inbound: selectedRows.value.filter((row) => (
+        getWarehouseTaskBusinessType(row) === 'qualifiedInboundPrepare'
+        && getQualifiedInboundTaskActionState(row.id).allowed
+      )).length,
     }
   }
   return { task: 0, receive: 0, complete: 0, cancel: 0, inbound: 0 }
@@ -742,7 +945,7 @@ function applyWmsColumnFilters(rows = []) {
     const type = columnFilterType(column)
     const rawValue = row[column.key]
     const displayValue = formatCell(row, column.key)
-    if (type === 'number') {
+    if (['number', 'number_range'].includes(type)) {
       const min = filter.min === '' || filter.min == null ? null : Number(filter.min)
       const max = filter.max === '' || filter.max == null ? null : Number(filter.max)
       const number = Number(rawValue ?? 0)
@@ -750,7 +953,7 @@ function applyWmsColumnFilters(rows = []) {
       if (max != null && number > max) return false
       return true
     }
-    if (type === 'date') {
+    if (['date', 'date_range'].includes(type)) {
       const start = filter.start ? new Date(filter.start) : null
       const end = filter.end ? new Date(`${filter.end}T23:59:59`) : null
       if (!start && !end) return true
@@ -760,7 +963,7 @@ function applyWmsColumnFilters(rows = []) {
       if (end && date > end) return false
       return true
     }
-    if (type === 'enum') {
+    if (['enum', 'select', 'searchable_select', 'boolean_select'].includes(type)) {
       const values = Array.isArray(filter.values) ? filter.values.filter(Boolean) : []
       if (!values.length) return true
       return values.some((value) => (
@@ -776,21 +979,38 @@ function applyWmsColumnFilters(rows = []) {
 const batchActions = computed(() => {
   if (currentType.value === 'receive') {
     return [
-      { label: '批量生成仓库收货任务', executableCount: wmsBatchCounts.value.task, disabled: !wmsBatchCounts.value.task, disabledReason: selectedRows.value.length ? '所选记录均已生成仓库收货任务。' : '请先选择记录。', handler: () => batchCreateWarehouseTasksFromPurchaseOrders(selectedIds.value) },
-      { label: '批量生成采购收货预备单', type: 'success', executableCount: wmsBatchCounts.value.receive, disabled: !wmsBatchCounts.value.receive, disabledReason: selectedRows.value.length ? '所选记录均已生成采购收货预备单。' : '请先选择记录。', handler: () => batchCreatePurchaseReceivesFromPurchaseOrders(selectedIds.value) },
+      { id: 'create-warehouse-receive-tasks', label: '批量生成仓库收货任务', executableCount: wmsBatchCounts.value.task, disabled: !wmsBatchCounts.value.task, disabledReason: selectedRows.value.length ? '所选记录均已生成仓库收货任务。' : '请先选择记录。', handler: () => batchCreateWarehouseTasksFromPurchaseOrders(selectedIds.value) },
+      { id: 'create-purchase-receive-prepares', label: '批量生成采购收货预备单', type: 'success', executableCount: wmsBatchCounts.value.receive, disabled: !wmsBatchCounts.value.receive, disabledReason: selectedRows.value.length ? '所选记录均已生成采购收货预备单。' : '请先选择记录。', handler: () => batchCreatePurchaseReceivesFromPurchaseOrders(selectedIds.value) },
     ]
   }
   if (currentType.value === 'tasks') {
     return [
-      { label: '批量完成任务', executableCount: wmsBatchCounts.value.complete, disabled: !wmsBatchCounts.value.complete, disabledReason: '所选任务没有可完成记录。', handler: () => batchCompleteWarehouseTasks(selectedIds.value) },
-      { label: '批量取消任务', type: 'warning', executableCount: wmsBatchCounts.value.cancel, disabled: !wmsBatchCounts.value.cancel, disabledReason: '所选任务没有可取消记录。', handler: () => batchCancelWarehouseTasks(selectedIds.value) },
-      { label: '批量确认入库', type: 'success', executableCount: wmsBatchCounts.value.inbound, disabled: !wmsBatchCounts.value.inbound, disabledReason: '所选任务没有检验合格入库预备任务。', handler: () => batchPostInboundFromWarehouseTasks(selectedIds.value) },
+      { id: 'confirm-qualified-inbound-tasks', label: '批量确认入库', type: 'success', executableCount: wmsBatchCounts.value.inbound, disabled: !wmsBatchCounts.value.inbound, disabledReason: '所选任务没有同时满足检验合格和数量规则的入库记录。', handler: () => batchConfirmQualifiedInboundWarehouseTasks(selectedIds.value) },
+      { id: 'complete-warehouse-tasks', label: '批量完成任务', executableCount: wmsBatchCounts.value.complete, disabled: !wmsBatchCounts.value.complete, disabledReason: '所选任务没有可完成记录。', handler: () => batchCompleteWarehouseTasks(selectedIds.value) },
+      { id: 'cancel-warehouse-tasks', label: '批量取消任务', type: 'warning', executableCount: wmsBatchCounts.value.cancel, disabled: !wmsBatchCounts.value.cancel, disabledReason: '所选任务没有可取消记录。', handler: () => batchCancelWarehouseTasks(selectedIds.value) },
     ]
   }
   return []
 })
 
 function enrichWmsRow(row = {}) {
+  if (currentType.value === 'balances') {
+    const relatedTransaction = (wmsState.value.inventoryTransactions || [])
+      .filter((transaction) => (
+        String(transaction.materialId || transaction.materialCode || '') === String(row.materialId || row.materialCode || '')
+        && String(transaction.warehouseId || transaction.warehouseName || '') === String(row.warehouseId || row.warehouseName || '')
+        && String(transaction.locationId || transaction.locationName || '') === String(row.locationId || row.locationName || '')
+        && String(transaction.batchNo || '') === String(row.batchNo || '')
+      ))
+      .sort((left, right) => String(right.createdAt || right.transactionDate || '').localeCompare(String(left.createdAt || left.transactionDate || '')))[0]
+    return {
+      ...row,
+      sourceInspectionNo: row.sourceInspectionNo || relatedTransaction?.sourceInspectionNo || '',
+      sourceReceiveNo: row.sourceReceiveNo || relatedTransaction?.sourceReceiveNo || '',
+      sourcePurchaseOrderNo: row.sourcePurchaseOrderNo || relatedTransaction?.sourcePurchaseOrderNo || '',
+      rootRequestNo: row.rootRequestNo || relatedTransaction?.rootRequestNo || '',
+    }
+  }
   if (currentType.value === 'tasks') {
     return {
       ...row,
@@ -817,6 +1037,7 @@ function enrichWmsRow(row = {}) {
     materialCodes: [...new Set(lines.map((item) => item.materialCode).filter(Boolean))].join('、'),
     materialNames: [...new Set(lines.map((item) => item.materialName).filter(Boolean))].join('、'),
     specifications: [...new Set(lines.map((item) => item.specification || item.spec).filter(Boolean))].join('、'),
+    purchaseType: row.purchaseType || row.orderType || row.procurementType || '',
     hasReceiveTask: rowHasReceiveTask(row) ? '是' : '否',
     hasPurchaseReceive: rowPurchaseReceive(row) ? '是' : '否',
     sourceTypeLabel: 'SCM采购订单',
@@ -847,7 +1068,32 @@ function rowHasReceiveTask(row) {
 }
 
 function rowPurchaseReceive(row) {
-  return purchaseReceives.value.find((item) => item.sourceType === 'scmPurchaseOrder' && String(item.sourceOrderId) === String(row.id) && item.status !== 'cancelled')
+  return rowPurchaseReceiveLink(row).targetRecord
+}
+
+function rowPurchaseReceiveLink(row) {
+  return resolvePurchaseReceivePrepareLink({
+    purchaseOrder: row,
+    purchaseReceivePrepares: purchaseReceives.value,
+  })
+}
+
+function purchaseReceiveLinkLabel(link) {
+  return {
+    not_generated: '未生成',
+    generated: `已生成 ${link.targetNo}`,
+    conflict: `关联冲突 ${link.conflictRecords.length} 条`,
+    read_failed: '关联读取失败',
+  }[link.linkStatus] || '关联读取失败'
+}
+
+function purchaseReceiveLinkTagType(link) {
+  return {
+    not_generated: 'info',
+    generated: 'success',
+    conflict: 'danger',
+    read_failed: 'warning',
+  }[link.linkStatus] || 'warning'
 }
 
 function goWarehouseTask(row) {
@@ -882,7 +1128,7 @@ function normalizeBatchResult(result = {}, action = {}) {
   }
 }
 
-function runBatchAction(action) {
+async function runBatchAction(action) {
   if (!selectedIds.value.length) {
     notify('请先选择要批量处理的记录。', 'warning')
     return
@@ -891,7 +1137,7 @@ function runBatchAction(action) {
     notify(action.disabledReason || '所选记录没有可执行数据。', 'warning')
     return
   }
-  const result = action.handler()
+  const result = await action.handler()
   refresh()
   clearSelection()
   batchResult.value = normalizeBatchResult(result || {}, action)
@@ -1078,6 +1324,25 @@ function detailRoute(row) {
   return ''
 }
 
+function detailFieldTestId(key) {
+  if (currentType.value === 'tasks') {
+    return ({
+      taskNo: 'warehouse-task-detail-task-no',
+      status: 'warehouse-task-detail-status',
+      businessStatus: 'warehouse-task-detail-business-status',
+      completedQuantity: 'warehouse-task-detail-completed-quantity',
+    })[key]
+  }
+  if (currentType.value === 'transactions') {
+    return ({
+      transactionNo: 'inventory-transaction-detail-transaction-no',
+      transactionType: 'inventory-transaction-detail-transaction-type',
+      quantity: 'inventory-transaction-detail-quantity',
+    })[key]
+  }
+  return undefined
+}
+
 function sourceRecordForRow(row = {}) {
   if (!row) return {}
   if (currentType.value === 'receive' || row.poNo) {
@@ -1151,12 +1416,35 @@ function syncColumnFilters() {
 
 function columnFilterType(column) {
   ensureColumnFilter(column.key)
-  return column.filterType || inferColumnFilterType(column.key)
+  return column.filterControlType || column.filterType || inferColumnFilterType(column.key)
+}
+
+function filterSpanForColumn(column) {
+  return ['date', 'date_range', 'number', 'number_range'].includes(columnFilterType(column)) ? 2 : 1
 }
 
 function columnFilterOptions(column) {
   ensureColumnFilter(column.key)
-  return buildFilterOptions(listRows.value.map((row) => ({ ...row, [column.key]: formatCell(row, column.key) })), column)
+  let optionRows = listRows.value
+  if (currentType.value === 'balances' && ['materialName', 'specification', 'unit'].includes(column.key)) {
+    const materialCodes = columnFilters.materialCode?.values?.filter(Boolean) || []
+    if (materialCodes.length) {
+      optionRows = optionRows.filter((row) => materialCodes.some((value) => String(row.materialCode) === String(value)))
+    }
+  }
+  if (currentType.value === 'balances' && column.key === 'locationName') {
+    const warehouses = columnFilters.warehouseName?.values?.filter(Boolean) || []
+    if (warehouses.length) {
+      optionRows = optionRows.filter((row) => warehouses.some((value) => String(row.warehouseName) === String(value)))
+    }
+  }
+  if (currentType.value === 'receive' && column.key === 'specifications') {
+    const materialValues = columnFilters.materialNames?.values?.filter(Boolean) || []
+    if (materialValues.length) {
+      optionRows = optionRows.filter((row) => materialValues.some((value) => String(row.materialNames || '').includes(value)))
+    }
+  }
+  return buildFilterOptions(optionRows.map((row) => ({ ...row, [column.key]: formatCell(row, column.key) })), column)
 }
 
 function handleDateFilterChange(key) {
@@ -1208,8 +1496,8 @@ function toggleSort(key) {
 }
 
 function sortIcon(key) {
-  if (sortState.key !== key) return ''
-  return sortState.direction === 'asc' ? '↑' : '↓'
+  if (sortState.key !== key) return '▲▼'
+  return sortState.direction === 'asc' ? '▲' : '▼'
 }
 
 function globalIndex(index) {
@@ -1224,11 +1512,17 @@ function exportCurrentList() {
     })
     return next
   })
-  exportRowsToCsvUtil(rows, listColumns.value, `wms-${currentType.value || 'list'}-${today()}.csv`)
+  downloadBusinessTableCsv({
+    scope: BUSINESS_TABLE_EXPORT_SCOPES.currentResult,
+    sortedRows: rows,
+    columns: listColumns.value,
+    canonicalName: pageTitle.value,
+  })
 }
 
 function refresh() {
   wmsState.value = getWmsState()
+  purchaseReceives.value = listPurchaseReceives()
 }
 
 function notify(text, type = 'success') {
@@ -1303,6 +1597,38 @@ function completeTask(row) {
   notify('仓库任务已完成')
 }
 
+async function confirmQualifiedInbound() {
+  if (!currentDetailRecord.value) return
+  const outcome = await confirmQualifiedInboundWarehouseTask({
+    taskId: currentDetailRecord.value.id,
+    warehouseId: currentDetailRecord.value.warehouseId,
+    locationId: currentDetailRecord.value.locationId,
+    operatorId: currentDetailRecord.value.operatorId,
+  })
+  if (!outcome.ok) return notify(`${outcome.message || outcome.error}（回滚：${outcome.rollbackResult || '未执行'}）`, 'warning')
+  refresh()
+  await nextTick()
+  const refreshedTask = currentDetailRecord.value
+  const resultIsConsistent = refreshedTask?.status === 'done'
+    && Number(refreshedTask.completedQuantity) === Number(refreshedTask.plannedQuantity)
+    && Boolean(refreshedTask.inventoryTransactionId)
+    && String(refreshedTask.inventoryTransactionId) === String(outcome.inventoryTransaction?.id || '')
+  if (!resultIsConsistent) return notify('正式入库结果校验失败，请勿重复操作', 'warning')
+  notify(outcome.status === 'already_completed' ? '该仓库任务已完成入库。' : `正式入库完成，库存流水：${outcome.inventoryTransaction?.transactionNo || '-'}`)
+}
+
+function viewQualifiedInboundTransaction() {
+  const transactionId = currentDetailRecord.value?.inventoryTransactionId
+  if (!transactionId) return notify('未找到当前仓库任务关联的库存流水。', 'warning')
+  router.push(`/wms/inventory-transaction/${transactionId}`)
+}
+
+function viewInventoryTransactionSourceWarehouseTask() {
+  const { warehouseTaskId, canNavigate } = inventoryTransactionSourceContext.value
+  if (!canNavigate) return notify(inventoryTransactionSourceContext.value.reason || '未记录来源仓库任务。', 'warning')
+  router.push(`/wms/warehouse-task/${encodeURIComponent(warehouseTaskId)}`)
+}
+
 function cancelTask(row) {
   const outcome = cancelWarehouseTask(row.id)
   if (!outcome.success) return notify(outcome.error, 'warning')
@@ -1333,9 +1659,20 @@ function createReceiveTask(row) {
 
 function createPurchaseReceive(row) {
   const outcome = createPurchaseReceiveFromScmPurchaseOrder(row.id)
-  if (!outcome.success) return notify(outcome.error, 'warning')
+  if (!outcome.ok) return notify(outcome.message || outcome.error || '采购收货预备单生成失败。', 'warning')
   refresh()
-  notify(`${outcome.existed ? '已存在' : '已生成'}采购收货预备单 ${outcome.receiveNo}，库存余额不变`)
+  const link = rowPurchaseReceiveLink(row)
+  const relationValid = link.linkStatus === 'generated'
+    && Boolean(link.targetNo)
+    && link.targetNo === outcome.targetNo
+    && String(link.targetRecord?.sourceOrderId) === String(row.id)
+    && String(link.targetRecord?.sourceOrderNo) === String(row.poNo)
+  if (!relationValid) {
+    return notify('采购收货预备单生成结果校验失败，请勿重复操作。', 'error')
+  }
+  notify(outcome.status === 'already_exists'
+    ? `采购收货预备单已存在，未重复生成：${link.targetNo}`
+    : `采购收货预备单生成成功：${link.targetNo}，库存余额不变`)
 }
 
 function createPurchaseReceiveFromTask(row) {
@@ -1358,7 +1695,7 @@ watch(() => route.fullPath, () => {
   refresh()
   syncColumnFilters()
   advancedFilterVisible.value = false
-  quickSearchVisible.value = false
+  quickSearchVisible.value = true
   currentPage.value = 1
 }, { immediate: true })
 
@@ -1538,12 +1875,36 @@ h2 {
 }
 
 .sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 0;
   padding: 0;
   background: transparent;
   color: inherit;
   font: inherit;
+  font-weight: 700;
   cursor: pointer;
+}
+
+.sort-button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 20px;
+  color: #1d4ed8;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.sort-default {
+  color: #475569;
+}
+
+.sort-button-active .sort-button-icon {
+  color: #1d4ed8;
 }
 
 .pagination-row {

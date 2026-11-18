@@ -5,6 +5,7 @@ export function normalizeText(value) {
 }
 
 export function getColumnFilterType(column = {}) {
+  if (column.filterType === 'select') return 'enum'
   if (column.filterType) return column.filterType
   if (column.type === 'number') return 'number'
   if (column.type === 'date') return 'date'

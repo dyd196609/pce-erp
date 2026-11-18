@@ -1,10 +1,23 @@
 <template>
-  <main class="reference-page">
+  <main
+    class="reference-page"
+    data-acceptance-id="enterprise-data-reference-center"
+    data-page-version="V1.14.2.8.4.8.5.2"
+    data-page-name="数据引用中心"
+    data-page-module="Reference"
+    data-fact-source="manufacturingReferenceService"
+    data-danger-action-count="0"
+    data-edit-action-count="0"
+    data-detail-display-mode="read-only-relationship-table"
+    data-maintenance-entry="false"
+    data-acceptance-status="PASS"
+  >
     <header class="page-header">
       <section>
-        <p class="eyebrow">V1.11.2 基础资料引用源标准化</p>
+        <p class="eyebrow">V1.14.2.8.4.8.5.2 企业入口边界治理</p>
         <h1>{{ pageTitle }}</h1>
-        <p>这些数据来自 V1.11.1 基础资料底座，不是独立数据；本页面只读展示引用源，不提供新增、编辑、删除。</p>
+        <p>展示企业主数据被各业务模块引用关系。</p>
+        <p>本页面只展示引用关系，不提供新增、编辑、删除或维护。</p>
       </section>
       <nav class="page-tabs">
         <router-link to="/reference">数据引用中心</router-link>
@@ -14,7 +27,7 @@
         <router-link to="/reference/production">生产资源引用</router-link>
         <router-link to="/reference/warning">预警引用</router-link>
         <router-link to="/reference/check">完整性检查</router-link>
-        <router-link to="/foundation">返回基础资料</router-link>
+        <router-link to="/master-data/organizations">企业主数据中心</router-link>
       </nav>
     </header>
 
@@ -25,8 +38,11 @@
             <h2>后续模块引用关系</h2>
             <span>SCM / CRM / WMS / MRP / MPS / APS / MES / QMS / BI / KPI / FDM</span>
           </div>
-          <button type="button" @click="router.push('/reference/check')">基础资料检查</button>
         </header>
+        <div class="boundary-notice" data-acceptance-id="reference-boundary-notice">
+          <p><strong>数据维护：</strong>请进入企业主数据中心。</p>
+          <p><strong>数据引用：</strong>本页面只展示引用关系。</p>
+        </div>
         <div class="module-grid">
           <article v-for="module in integrationCards" :key="module.moduleId" class="module-card">
             <span>{{ module.moduleId.toUpperCase() }}</span>
@@ -62,7 +78,7 @@
                 <th>检查结果</th>
                 <th>问题说明</th>
                 <th>建议处理页面</th>
-                <th>操作</th>
+                <th class="operation-cell">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -71,7 +87,7 @@
                 <td><span :class="['status-pill', item.status]">{{ statusText(item.status) }}</span></td>
                 <td>{{ item.message }}<br><small>{{ item.suggestion }}</small></td>
                 <td>{{ item.route }}</td>
-                <td><button type="button" @click="router.push(item.route)">跳转处理</button></td>
+                <td class="operation-cell"><button type="button" @click="router.push(item.route)">跳转处理</button></td>
               </tr>
             </tbody>
           </table>
@@ -175,7 +191,7 @@ const pageDescription = computed(() => ({
   '/reference/warehouse': '显示仓库、库位、仓库属性、是否纳入MRP、是否允许负库存。',
   '/reference/production': '显示工作中心、班次、人员技能、物料、生产参数引用源。',
   '/reference/warning': '显示预警规则、预警订阅人、预警等级、所属模块、启用状态。',
-})[route.path] || '统一展示 V1.11.1 基础资料如何被后续制造业模块引用。')
+})[route.path] || '展示企业主数据被各业务模块引用关系。')
 
 const checkSummary = computed(() => checkResults.value.reduce((result, item) => ({
   ...result,
@@ -192,12 +208,12 @@ const currentRows = computed(() => {
 })
 
 const emptyTargetRoute = computed(() => ({
-  '/reference/master-data': '/foundation/erp/materials',
-  '/reference/organization': '/foundation/pfm/employees',
-  '/reference/warehouse': '/foundation/erp/warehouses',
-  '/reference/production': '/foundation/erp/work-centers',
-  '/reference/warning': '/foundation/warnings/rules',
-})[route.path] || '/foundation')
+  '/reference/master-data': '/master-data/materials',
+  '/reference/organization': '/master-data/organizations',
+  '/reference/warehouse': '/master-data/warehouses',
+  '/reference/production': '/master-data/routings',
+  '/reference/warning': '/master-data/organizations',
+})[route.path] || '/master-data/organizations')
 
 const EmptyState = defineComponent({
   props: {
@@ -206,8 +222,8 @@ const EmptyState = defineComponent({
   setup(props) {
     return () => h('section', { class: 'empty-state' }, [
       h('h2', '暂无可引用数据'),
-      h('p', '请先回到 V1.11.1 基础资料底座维护对应资料，再返回引用中心查看。'),
-      h('a', { href: `#${props.targetRoute}` }, '前往基础资料维护'),
+      h('p', '请进入企业主数据中心维护对应资料，再返回数据引用中心查看关系。'),
+      h('a', { href: `#${props.targetRoute}` }, '进入企业主数据中心'),
     ])
   },
 })
@@ -300,6 +316,19 @@ function statusText(status) {
   padding: 22px;
   background: #f4f7fb;
   color: #172033;
+}
+
+.boundary-notice {
+  margin: 14px 0;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #eff6ff;
+  color: #1e3a5f;
+}
+
+.boundary-notice p {
+  margin: 4px 0;
 }
 
 .page-header,

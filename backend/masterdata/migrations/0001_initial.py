@@ -47,7 +47,10 @@ class Migration(migrations.Migration):
                 'verbose_name': '物料分类',
                 'verbose_name_plural': '物料分类',
                 'db_table': 'material_category',
-                'managed': False,
+                # MaterialCategory is referenced by later migrations. A clean
+                # test database must create the base table before 0003 adds
+                # its self-referencing parent field.
+                'managed': True,
             },
         ),
         migrations.CreateModel(

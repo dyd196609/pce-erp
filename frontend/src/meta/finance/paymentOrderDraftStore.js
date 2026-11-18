@@ -150,6 +150,12 @@ function paymentOrderDraft(payload = {}) {
     paymentConfirmed: payload.paymentConfirmed ?? false,
     paymentConfirmedAt: payload.paymentConfirmedAt || '',
     paymentConfirmedBy: payload.paymentConfirmedBy || '',
+    paymentExecutionGenerated: Boolean(payload.paymentExecutionGenerated),
+    targetPaymentExecutionId: payload.targetPaymentExecutionId || '',
+    targetPaymentExecutionNo: payload.targetPaymentExecutionNo || '',
+    targetModule: payload.targetModule || '',
+    paymentExecutionStatus: payload.paymentExecutionStatus || '',
+    paymentExecutionGeneratedAt: payload.paymentExecutionGeneratedAt || '',
     bankPaymentStatus: payload.bankPaymentStatus || 'notPaid',
     voucherStatus: payload.voucherStatus || 'notGenerated',
     remark: payload.remark || '',
@@ -629,6 +635,28 @@ export function cancelPaymentOrderDraft(id) {
   const current = byId(state.paymentOrderDrafts, id)
   if (current && !['draft', 'checking'].includes(current.paymentOrderStatus)) return { success: false, error: '当前状态不能取消；已确认或可付款的草稿不能取消。' }
   return applyStatus(id, 'cancelled', '取消付款单草稿')
+}
+
+export function markPaymentOrderDraftPaymentExecutionGenerated(id, execution = {}) {
+  const current = byId(state.paymentOrderDrafts, id)
+  if (!current) return { success: false, error: '未找到正式付款单草稿。' }
+  Object.assign(current, {
+    paymentExecutionGenerated: true,
+    targetPaymentExecutionId: execution.id || execution.targetPaymentExecutionId || current.targetPaymentExecutionId || '',
+    targetPaymentExecutionNo: execution.paymentExecutionNo || execution.targetPaymentExecutionNo || current.targetPaymentExecutionNo || '',
+    targetModule: 'paymentExecution',
+    paymentExecutionStatus: execution.paymentExecutionStatus || current.paymentExecutionStatus || 'draft',
+    paymentExecutionGeneratedAt: current.paymentExecutionGeneratedAt || nowText(),
+    updatedAt: nowText(),
+  })
+  persist()
+  writePaymentOrderDraftLog('同步付款执行草稿生成状态', {
+    sourceNo: current.paymentOrderDraftNo,
+    targetId: current.targetPaymentExecutionId,
+    targetNo: current.targetPaymentExecutionNo,
+    result: `已生成付款执行草稿，当前状态：${current.paymentExecutionStatus}`,
+  })
+  return { success: true, paymentOrderDraft: clone(current) }
 }
 
 export function batchRunPaymentExecutionChecks(ids = []) {

@@ -1,0 +1,105 @@
+:root {
+  --pce-filter-control-height: 36px;
+  --pce-filter-control-min-width: 180px;
+  --pce-filter-column-gap: 12px;
+  --pce-filter-label-gap: 6px;
+  --pce-filter-row-gap: 14px;
+}
+
+.pce-unified-advanced-filter {
+  display: grid;
+  gap: var(--pce-filter-row-gap);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 12px 0;
+  padding: 14px;
+  border: 1px solid #d7e0ec;
+  border-radius: 10px;
+  background: #f8fafc;
+  overflow-x: hidden;
+}
+
+body [data-pce-filter-layout-version="PCE-ADVANCED-FILTER-LAYOUT-V1.0"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.pce-filter-layout-row {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pce-filter-layout-row + .pce-filter-layout-row {
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pce-filter-layout-row-title {
+  margin: 0;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 20px;
+}
+
+.pce-filter-layout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--pce-filter-column-gap);
+  min-width: 0;
+}
+
+.pce-filter-layout-grid > label,
+.pce-filter-layout-grid > .pce-advanced-filter-field {
+  display: grid;
+  gap: var(--pce-filter-label-gap);
+  min-width: 0;
+  margin: 0;
+}
+
+.pce-filter-layout-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: var(--pce-filter-control-height);
+}
+
+.pce-unified-advanced-filter :is(input, select, button),
+.pce-unified-advanced-filter .el-input__wrapper,
+.pce-unified-advanced-filter .el-select__wrapper,
+.pce-unified-advanced-filter .el-date-editor,
+.pce-unified-advanced-filter .el-input-number,
+.pce-unified-advanced-filter .el-button {
+  min-height: var(--pce-filter-control-height) !important;
+  height: var(--pce-filter-control-height) !important;
+  box-sizing: border-box !important;
+}
+
+.pce-unified-advanced-filter :is(input, select),
+.pce-unified-advanced-filter :is(.el-input, .el-select, .el-date-editor, .el-input-number) {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.pce-unified-advanced-filter select[multiple] {
+  padding: 4px 8px;
+  overflow: auto;
+}
+
+@media (min-width: 768px) {
+  .pce-filter-layout-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .pce-filter-layout-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1440px) {
+  .pce-filter-layout-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}

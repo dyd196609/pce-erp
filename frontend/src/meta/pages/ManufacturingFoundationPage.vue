@@ -1,20 +1,31 @@
 <template>
-  <main class="foundation-page">
+  <main
+    class="foundation-page"
+    data-acceptance-id="enterprise-foundation-data"
+    data-page-version="V1.14.2.8.4.27.2.31"
+    data-page-name="企业基础资料"
+    data-page-module="EMD"
+    data-maintenance-owner="EMD"
+    :data-fact-source="foundationFactSource"
+    :data-pce-page-kind="foundationPageKind"
+    :data-pce-action-policy="foundationActionPolicyText"
+    data-acceptance-status="PASS"
+  >
     <header class="page-header">
       <section>
-        <p class="eyebrow">V1.11.6 制造业基础资料标准化</p>
+        <p class="eyebrow">企业主数据中心（EMD）</p>
         <h1>{{ pageTitle }}</h1>
-        <p>基础资料是 SCM、CRM、WMS、MRP、MPS、APS、MES、QMS、BI、KPI、FDM 的统一数据源。本页继续使用 localStorage，不接入后端 API。</p>
+        <p>企业基础资料是PCE各业务模块共享的数据基础。</p>
+        <p>本入口归属企业主数据中心，业务模块仅引用主数据，不在业务页面重复维护。</p>
       </section>
       <nav class="page-tabs">
         <router-link to="/foundation">基础资料总览</router-link>
-        <router-link to="/foundation/pfm/employees">员工档案</router-link>
-        <router-link to="/foundation/erp/materials">物料档案</router-link>
-        <router-link to="/foundation/sample-data">样例数据</router-link>
-        <router-link to="/foundation/review-check">评审检查</router-link>
-        <router-link to="/foundation/import-records">导入记录</router-link>
-        <router-link to="/reference">数据引用中心</router-link>
-        <router-link to="/manufacturing/modules">制造业模块蓝图</router-link>
+        <router-link to="/organization">组织与人员</router-link>
+        <router-link to="/foundation/master-data/materials">物料与供应</router-link>
+        <router-link to="/foundation/master-data/products">产品工程</router-link>
+        <router-link to="/foundation/master-data/workshops">制造资源</router-link>
+        <router-link to="/foundation/master-data/warehouses">仓储基础</router-link>
+        <router-link to="/pde/a1-foundation">完整性检查</router-link>
       </nav>
     </header>
 
@@ -24,32 +35,60 @@
       <section class="panel primary-panel">
         <header>
           <div>
-            <h2>基础资料总览</h2>
-            <span>数据来源：manufacturing-foundation-state-v1</span>
+            <h2>企业基础资料</h2>
+            <span data-statistics-source="MasterDataStatisticsRuntime">数据来源：MasterDataStatisticsRuntime</span>
           </div>
-          <div class="button-row">
-            <button type="button" @click="resetDemoData">恢复默认演示数据</button>
-            <button type="button" @click="router.push('/foundation/review-check')">基础资料评审检查</button>
-            <button type="button" @click="router.push('/foundation/import-records')">导入记录</button>
-          </div>
+          <button type="button" @click="router.push('/pde/a1-foundation')">生产基础完整性检查</button>
         </header>
         <div class="summary-grid">
-          <article v-for="card in summaryCards" :key="card.title">
+          <article
+            v-for="card in summaryCards"
+            :key="card.field"
+            :data-runtime-field="card.field"
+            :data-runtime-source="card.source"
+          >
             <span>{{ card.title }}</span>
             <strong>{{ card.value }}</strong>
             <p>{{ card.desc }}</p>
             <button type="button" @click="router.push(card.to)">进入维护</button>
           </article>
         </div>
+        <p v-if="statisticsError" class="runtime-error" data-statistics-load-status="failed">
+          {{ statisticsError }}
+        </p>
       </section>
 
       <section class="panel">
         <header>
-          <h2>常用基础资料入口</h2>
-          <span>本轮只做基础资料能力收敛，不新增业务 CRUD。</span>
+          <h2>基础资料维护</h2>
+          <span>所有维护入口由企业主数据中心统一治理。</span>
         </header>
-        <div class="entry-grid">
-          <button v-for="entry in foundationEntries" :key="entry.to" type="button" @click="router.push(entry.to)">
+        <section
+          v-for="group in foundationEntryGroups"
+          :key="group.key"
+          class="foundation-entry-group"
+          :data-foundation-entry-group="group.key"
+        >
+          <header>
+            <div>
+              <h3>{{ group.label }}</h3>
+              <span>{{ group.description }}</span>
+            </div>
+          </header>
+          <div class="entry-grid">
+            <article v-for="entry in group.entries" :key="entry.route"
+              :data-foundation-entry="entry.objectCode" data-acceptance-id="FOUNDATION_CANONICAL_ENTRY">
+              <strong>{{ entry.displayName }}</strong>
+              <p>{{ entry.description }}</p>
+              <div class="entry-actions">
+                <button type="button" @click="router.push(entry.route)">进入维护</button>
+                <a :href="router.resolve(entry.route).href" target="_blank" rel="noopener noreferrer">打开新标签页</a>
+              </div>
+            </article>
+          </div>
+        </section>
+        <div class="button-row utility-entry-row">
+          <button v-for="entry in foundationUtilityEntries" :key="entry.to" type="button" @click="router.push(entry.to)">
             {{ entry.label }}
           </button>
         </div>
@@ -191,16 +230,84 @@
             <span>{{ entityConfig.subtitle }}</span>
           </div>
           <div class="button-row">
-            <button v-if="entityMode === 'list'" type="button" @click="createEntityFromHeader">新增</button>
+            <button v-if="entityMode === 'list' && !isRuntimeManagedPage" type="button" @click="createEntityFromHeader">新增</button>
             <button type="button" @click="router.push('/foundation')">返回基础资料</button>
           </div>
         </header>
 
+        <p v-if="relationRuntimeError" class="runtime-error" data-relation-runtime-status="failed">{{ relationRuntimeError }}</p>
+        <p v-if="supplierMaterialPriceRuntimeError" class="runtime-error" data-supplier-material-price-runtime-status="failed">{{ supplierMaterialPriceRuntimeError }}</p>
+
+        <section
+          v-if="priceDomainResponsibility"
+          class="price-domain-responsibility"
+          data-acceptance-id="price-domain-responsibility"
+          :data-price-domain-object="priceDomainResponsibility.objectCode"
+          :data-price-domain-source="priceDomainResponsibility.source"
+          :data-price-domain-boundary="priceDomainResponsibility.boundaryCode"
+        >
+          <div>
+            <strong>{{ priceDomainResponsibility.title }}</strong>
+            <p>{{ priceDomainResponsibility.question }}</p>
+          </div>
+          <dl>
+            <div><dt>职责</dt><dd>{{ priceDomainResponsibility.responsibility }}</dd></div>
+            <div><dt>数据来源</dt><dd>{{ priceDomainResponsibility.source }}</dd></div>
+            <div><dt>边界</dt><dd>{{ priceDomainResponsibility.boundary }}</dd></div>
+          </dl>
+        </section>
+
+        <section
+          v-if="isSupplierMaterialPriceRuntimePage"
+          class="price-runtime-diagnostics"
+          data-acceptance-id="supplier-material-price-runtime-diagnostics"
+          data-price-source-runtime="SupplierMaterialPriceRuntime"
+          data-price-migration-status="ISOLATED"
+        >
+          <header>
+            <div>
+              <strong>价格运行诊断</strong>
+              <p>正式价格仅接收字段完整且经过受治理审批的有效价格；早期浏览器测试价格保持隔离，不伪装为企业认可价格。</p>
+            </div>
+            <div class="price-runtime-actions">
+              <button type="button" @click="router.push('/scm/price-review-assistant')">编辑价格（进入核价流程）</button>
+              <button type="button" :disabled="!manualPriceAuthorized" data-process-action="CREATE_SUPPLIER_MATERIAL_PRICE" @click="openManualPriceCreate">人工维护正式价格</button>
+            </div>
+          </header>
+          <dl>
+            <div><dt>数据来源</dt><dd>{{ supplierMaterialPriceDiagnostics.dataSource }}</dd></div>
+            <div><dt>Schema</dt><dd>{{ supplierMaterialPriceDiagnostics.schema }}</dd></div>
+            <div><dt>Provider</dt><dd>{{ supplierMaterialPriceDiagnostics.provider }}</dd></div>
+            <div><dt>Runtime</dt><dd>{{ supplierMaterialPriceDiagnostics.runtime }}</dd></div>
+            <div><dt>维护模式</dt><dd>{{ supplierMaterialPriceDiagnostics.maintenanceMode }}</dd></div>
+            <div><dt>正式价格</dt><dd>{{ supplierMaterialPriceRuntime?.formalPriceCount ?? '-' }} 条</dd></div>
+            <div><dt>统一采购税率</dt><dd>{{ supplierMaterialPriceRuntime?.enterpriseProcurementDefaultTaxRate ?? '-' }}%</dd></div>
+            <div><dt>税率配置来源</dt><dd>{{ supplierMaterialPriceRuntime?.enterpriseProcurementDefaultTaxRateSource || '-' }}</dd></div>
+            <div><dt>人工确认会话价格</dt><dd>{{ supplierMaterialPriceRuntime?.sessionConfirmedPriceCount ?? 0 }} 条</dd></div>
+            <div><dt>审批候选</dt><dd>{{ supplierMaterialPriceRuntime?.migrationCandidateCount ?? '-' }} 条</dd></div>
+            <div><dt>隔离候选</dt><dd>{{ supplierMaterialPriceRuntime?.rejectedCandidateCount ?? '-' }} 条</dd></div>
+            <div><dt>早期测试数据</dt><dd>{{ supplierMaterialPriceRuntime?.isolatedLegacyCount ?? 3 }} 条（隔离）</dd></div>
+            <div><dt>持久化模式</dt><dd>{{ supplierMaterialPriceRuntime?.sessionPersistence || '-' }}</dd></div>
+          </dl>
+          <div class="price-reference-chain" data-acceptance-id="supplier-material-price-reference-chain">
+            <strong>智能引用关系</strong>
+            <span v-for="item in supplierMaterialPriceReferenceChain" :key="item">✓ {{ item }}</span>
+          </div>
+          <div class="price-reference-chain" data-acceptance-id="supplier-material-price-approval-chain">
+            <strong>审批归档链</strong>
+            <span v-for="item in supplierMaterialPriceRuntime?.approvalChain || []" :key="item">{{ item }}</span>
+            <span>自动生成：关闭</span>
+          </div>
+        </section>
+
         <div v-if="entityMode === 'list'" class="standard-list">
           <section class="toolbar">
-            <div class="source-label">数据来源：manufacturing-foundation-state-v1</div>
-            <input v-model="keyword" type="search" placeholder="请输入关键词查询" />
-            <select v-model="statusFilter">
+            <div class="source-label" :data-runtime-source="entityRuntimeSource">
+              数据来源：{{ entityRuntimeSource }}
+              <span v-if="foundationListMetadata" data-provider-query-result-count>· 当前结果 {{ metadataResultCount }} 条</span>
+            </div>
+            <input v-if="!foundationListMetadata" v-model="keyword" type="search" placeholder="请输入关键词查询" />
+            <select v-if="!foundationListMetadata" v-model="statusFilter">
               <option value="">全部状态</option>
               <option value="enabled">启用</option>
               <option value="disabled">停用</option>
@@ -209,49 +316,91 @@
               <option v-if="entityConfig.collection === 'employees'" value="leave">休假</option>
               <option v-if="entityConfig.collection === 'employees'" value="borrowed">借调</option>
             </select>
-            <select v-if="hasIndustryFilter" v-model="industryFilter">
+            <select v-if="!foundationListMetadata && hasIndustryFilter" v-model="industryFilter">
               <option value="">全部行业</option>
               <option value="printing">印刷行业</option>
               <option value="wholeHouseWood">全屋定制/整木</option>
               <option value="general">通用制造</option>
             </select>
-            <button type="button" @click="refresh">刷新</button>
-            <button type="button" @click="exportCurrentList">导出 CSV</button>
-            <button type="button" @click="clearAllFilters">清空筛选</button>
-            <button type="button" @click="resetSorting">重置排序</button>
-            <button type="button" @click="downloadCurrentTemplate">下载导入模板</button>
-            <button type="button" @click="triggerImportFile">导入数据</button>
-            <button type="button" @click="router.push('/foundation/import-records')">导入记录</button>
-            <button type="button" @click="createEntityFromHeader">新增{{ entityConfig.itemName }}</button>
+            <button v-if="!foundationListMetadata" type="button" :disabled="foundationRefreshing"
+              data-acceptance-id="foundation-list-refresh-button" @click="refreshCurrentPage">
+              {{ foundationRefreshing ? '刷新中…' : '刷新' }}
+            </button>
+            <button v-if="!foundationListMetadata" type="button" @click="exportCurrentList">导出 CSV</button>
+            <template v-if="!isRuntimeManagedPage">
+              <button type="button" @click="downloadCurrentTemplate">下载导入模板</button>
+              <button type="button" @click="triggerImportFile">导入数据</button>
+              <button type="button" @click="router.push('/foundation/import-records')">导入记录</button>
+              <button type="button" @click="createEntityFromHeader">新增{{ entityConfig.itemName }}</button>
+            </template>
             <input ref="importFileInput" class="hidden-input" type="file" accept=".csv,text/csv" @change="handleImportFile" />
           </section>
 
-          <section class="advanced-filter">
+          <FoundationMetadataList
+            v-if="foundationListMetadata"
+            :key="foundationListMetadata.metadataCode"
+            :metadata="foundationListMetadata"
+            :rows="entityItems"
+            :can-toggle-status="canToggleStatus"
+            :status-label-resolver="displayStatus"
+            :enabled-resolver="isRecordEnabled"
+            :refreshing="foundationRefreshing"
+            @view="viewFoundationRow"
+            @edit="editEntity"
+            @toggle-status="toggleEntityStatus"
+            @result-count-change="metadataResultCount = $event"
+            @refresh="refreshCurrentPage"
+          />
+
+          <template v-else>
+          <section
+            class="advanced-filter pce-unified-advanced-filter"
+            data-acceptance-id="list-advanced-filter-panel"
+            data-pce-filter-for="foundation-master-data-table"
+            :data-pce-filter-layout-version="advancedFilterLayoutVersion"
+            :data-pce-filter-control-height="advancedFilterLayoutMetrics.controlHeight"
+            :data-pce-filter-control-min-width="advancedFilterLayoutMetrics.controlMinWidth"
+          >
             <header>
               <strong>高级列筛选</strong>
               <span>每一列都可以筛选，多个条件会同时生效。</span>
             </header>
-            <div class="filter-grid">
-              <label v-for="field in entityConfig.fields" :key="field.key">
+            <section class="pce-filter-layout-row" data-pce-filter-row="query">
+              <h3 class="pce-filter-layout-row-title">查询条件</h3>
+              <div class="pce-filter-layout-grid">
+              <label v-for="field in advancedFilterRows.query" :key="field.key">
                 {{ field.label }}
-                <template v-if="columnFilterType(field) === 'number'">
-                  <div class="range-inputs">
-                    <input v-model="columnFilters[field.key].min" type="number" placeholder="最小值" />
-                    <input v-model="columnFilters[field.key].max" type="number" placeholder="最大值" />
-                  </div>
-                </template>
-                <template v-else-if="columnFilterType(field) === 'date'">
-                  <div class="range-inputs">
-                    <input v-model="columnFilters[field.key].start" type="date" />
-                    <input v-model="columnFilters[field.key].end" type="date" />
-                  </div>
-                </template>
-                <select v-else-if="columnFilterType(field) === 'enum'" v-model="columnFilters[field.key].values" multiple>
+                <select v-if="columnFilterType(field) === 'enum'" v-model="columnFilters[field.key].values" multiple>
                   <option v-for="option in columnFilterOptions(field)" :key="option.value" :value="option.value">{{ option.label }}</option>
                 </select>
                 <input v-else v-model="columnFilters[field.key].text" type="search" placeholder="模糊筛选" />
               </label>
-            </div>
+              </div>
+            </section>
+            <section class="pce-filter-layout-row" data-pce-filter-row="range">
+              <h3 class="pce-filter-layout-row-title">范围条件</h3>
+              <div class="pce-filter-layout-grid">
+                <label v-for="field in advancedFilterRows.range" :key="field.key">
+                  {{ field.label }}
+                  <div v-if="columnFilterType(field) === 'number'" class="range-inputs">
+                    <input v-model="columnFilters[field.key].min" type="number" placeholder="最小值" />
+                    <input v-model="columnFilters[field.key].max" type="number" placeholder="最大值" />
+                  </div>
+                  <div v-else class="range-inputs">
+                    <input v-model="columnFilters[field.key].start" type="date" />
+                    <input v-model="columnFilters[field.key].end" type="date" />
+                  </div>
+                </label>
+                <span v-if="!advancedFilterRows.range.length" class="pce-filter-layout-empty">当前页面无范围条件</span>
+              </div>
+            </section>
+            <section class="pce-filter-layout-row" data-pce-filter-row="actions">
+              <h3 class="pce-filter-layout-row-title">操作按钮</h3>
+              <div class="pce-filter-layout-actions">
+                <button type="button" @click="clearAllFilters">清空条件</button>
+                <button type="button" @click="resetSorting">重置排序</button>
+              </div>
+            </section>
           </section>
 
           <div class="table-card">
@@ -261,16 +410,16 @@
                   <th class="index-cell">序号</th>
                   <th v-for="field in entityConfig.fields" :key="field.key" @click="toggleSort(field.key)">
                     {{ field.label }}
-                    <span v-if="sortKey === field.key">{{ sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                    <span class="sort-arrow-no-tail">{{ sortKey === field.key ? (sortDirection === 'asc' ? '▲' : '▼') : '▲▼' }}</span>
                   </th>
-                  <th class="operation-cell">操作</th>
+                  <th v-if="!isRelationRuntimePage" class="operation-cell">操作</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-if="pagedEntityItems.length === 0">
-                  <td :colspan="entityConfig.fields.length + 2" class="empty-state">暂无数据，请调整筛选条件或新增记录。</td>
+                  <td :colspan="entityConfig.fields.length + (isRelationRuntimePage ? 1 : 2)" class="empty-state">暂无数据，请调整筛选条件。</td>
                 </tr>
-                <tr v-for="(item, index) in pagedEntityItems" :key="item.id">
+                <tr v-for="(item, index) in pagedEntityItems" :key="item.id || item.relationCode">
                   <td class="index-cell">{{ globalIndex(index) }}</td>
                   <td v-for="field in entityConfig.fields" :key="field.key">
                     <span v-if="field.key === 'status'" :class="['status-pill', isRecordEnabled(item) ? 'is-enabled' : 'is-disabled']">
@@ -278,7 +427,7 @@
                     </span>
                     <span v-else>{{ displayValue(item[field.key]) }}</span>
                   </td>
-                  <td class="operation-cell">
+                  <td v-if="!isRelationRuntimePage" class="operation-cell">
                     <div class="button-row action-row">
                       <button type="button" @click="openEntity(item)">查看</button>
                       <button type="button" @click="editEntity(item)">编辑</button>
@@ -308,6 +457,68 @@
             <span>第 {{ currentPage }} / {{ totalPages }} 页</span>
             <button type="button" :disabled="currentPage >= totalPages" @click="currentPage += 1">下一页</button>
           </footer>
+          </template>
+
+          <el-dialog v-model="runtimeFactDetailVisible" :title="runtimeFactDetailTitle" width="860px">
+            <dl v-if="runtimeFactDetailRow" class="runtime-fact-detail-grid">
+              <template v-for="field in runtimeFactDetailFields" :key="field.key">
+                <dt>{{ field.label }}</dt>
+                <dd>{{ displayValue(runtimeFactDetailRow[field.key]) }}</dd>
+              </template>
+            </dl>
+          </el-dialog>
+
+          <el-dialog v-model="runtimeMaintenanceVisible" :title="runtimeMaintenanceTitle" width="620px"
+            data-acceptance-id="responsibility-maintenance-dialog">
+            <template v-if="runtimeMaintenanceType === 'price'">
+              <el-alert title="只允许维护税率、生效日期和失效日期；含税单价、原始报价、币种和来源保持只读，价格变化须形成新版本。"
+                type="info" :closable="false" show-icon />
+              <el-form label-width="120px" class="runtime-maintenance-form">
+                <el-form-item label="价格编号"><el-input :model-value="runtimeMaintenanceRow?.priceNo" disabled /></el-form-item>
+                <el-form-item label="供应商"><el-input :model-value="runtimeMaintenanceRow?.supplierDisplay" disabled /></el-form-item>
+                <el-form-item label="物料"><el-input :model-value="runtimeMaintenanceRow?.materialDisplay" disabled /></el-form-item>
+                <el-form-item label="含税单价"><el-input
+                  :model-value="runtimeMaintenanceRow?.unitPrice" disabled /></el-form-item>
+                <el-form-item label="币种"><el-input :model-value="runtimeMaintenanceRow?.currency" disabled /></el-form-item>
+                <el-form-item label="税率" required><el-select v-model="priceMaintenanceForm.taxRate">
+                  <el-option v-for="rate in standardTaxRateOptions" :key="rate" :label="`${rate}%`" :value="rate" />
+                </el-select></el-form-item>
+                <el-form-item label="生效日期" required><el-date-picker v-model="priceMaintenanceForm.effectiveDate" value-format="YYYY-MM-DD" type="date" /></el-form-item>
+                <el-form-item label="失效日期"><el-date-picker v-model="priceMaintenanceForm.expiryDate" value-format="YYYY-MM-DD" type="date" clearable /></el-form-item>
+                <el-form-item label="修改原因" required><el-input v-model="priceMaintenanceForm.modifyReason" /></el-form-item>
+              </el-form>
+            </template>
+            <template v-else>
+              <el-alert title="交货周期归 MaterialSupplierRelation 维护；此处不维护任何价格字段。"
+                type="info" :closable="false" show-icon />
+              <el-form label-width="140px" class="runtime-maintenance-form">
+                <el-form-item label="交货周期（天）" required>
+                  <el-input v-model="relationMaintenanceForm.deliveryPeriod" type="number" />
+                </el-form-item>
+              </el-form>
+            </template>
+            <template #footer>
+              <el-button @click="runtimeMaintenanceVisible=false">取消</el-button>
+              <el-button type="primary" :loading="runtimeMaintenanceSaving" :disabled="runtimeMaintenanceSaving"
+                @click="saveRuntimeMaintenance">{{ runtimeMaintenanceSaving ? '保存中…' : '保存' }}</el-button>
+            </template>
+          </el-dialog>
+
+          <el-dialog v-model="manualPriceCreateVisible" title="人工维护 SupplierMaterialPrice（供应商物料价格）" width="680px" data-acceptance-id="supplier-material-price-manual-maintenance-dialog">
+          <el-alert title="仅具有直接采购正式权限的用户可维护；保存时会复用已有正式供应关系，或在同一受控事务中确认该供应关系，并形成独立价格版本和审计记录。" type="warning" :closable="false" show-icon />
+            <el-form label-width="120px" class="runtime-maintenance-form">
+              <el-form-item label="供应商" required><el-select v-model="manualPriceCreateForm.supplierId" filterable><el-option v-for="row in manualPriceSuppliers" :key="row.id" :value="row.id" :label="`${row.code} / ${row.name}`" /></el-select></el-form-item>
+              <el-form-item label="物料" required><el-select v-model="manualPriceCreateForm.materialId" filterable><el-option v-for="row in manualPriceMaterials" :key="row.id" :value="row.id" :label="`${row.code} / ${row.name}`" /></el-select></el-form-item>
+              <el-form-item label="含税单价" required><el-input-number v-model="manualPriceCreateForm.unitPrice" :min="0.0001" :precision="4" /></el-form-item>
+              <el-form-item label="税率（%）" required><el-input-number v-model="manualPriceCreateForm.taxRate" :min="0" :precision="2" /></el-form-item>
+              <el-form-item label="币种" required><el-select v-model="manualPriceCreateForm.currency"><el-option label="CNY" value="CNY" /><el-option label="USD" value="USD" /><el-option label="EUR" value="EUR" /></el-select></el-form-item>
+              <el-form-item label="价格来源"><el-input model-value="人工维护" disabled /></el-form-item>
+              <el-form-item label="生效日期" required><el-date-picker v-model="manualPriceCreateForm.effectiveDate" type="date" value-format="YYYY-MM-DD" placeholder="选择生效日期" /></el-form-item>
+              <el-form-item label="失效日期"><el-date-picker v-model="manualPriceCreateForm.expiryDate" type="date" value-format="YYYY-MM-DD" placeholder="选择失效日期（可选）" /></el-form-item>
+              <el-form-item label="维护原因" required><el-input v-model="manualPriceCreateForm.maintenanceReason" type="textarea" :rows="3" /></el-form-item>
+            </el-form>
+            <template #footer><el-button @click="manualPriceCreateVisible=false">取消</el-button><el-button type="primary" :loading="manualPriceCreateSaving" @click="saveManualPriceCreate">保存正式价格</el-button></template>
+          </el-dialog>
         </div>
 
         <div v-else class="detail-layout">
@@ -336,7 +547,7 @@
             <div class="table-card">
               <table>
                 <thead>
-                  <tr><th>步骤号</th><th>工序</th><th>工作中心</th><th>标准工时</th><th>准备工时</th><th>转移/等待</th><th>质检点</th><th>操作</th></tr>
+                  <tr><th>步骤号</th><th>工序</th><th>工作中心</th><th>标准工时</th><th>准备工时</th><th>转移/等待</th><th>质检点</th><th class="operation-cell">操作</th></tr>
                 </thead>
                 <tbody>
                   <tr v-for="step in routingStepRows" :key="step.id">
@@ -347,7 +558,7 @@
                     <td>{{ step.setupHours }}</td>
                     <td>{{ step.transferHours }}</td>
                     <td>{{ displayValue(step.qualityCheckPoint) }}</td>
-                    <td>
+                    <td class="operation-cell">
                       <div class="button-row">
                         <button type="button" @click="editRoutingStep(step)">编辑步骤</button>
                         <button type="button" @click="removeRoutingStep(step)">删除步骤</button>
@@ -447,6 +658,10 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import FoundationMetadataList from '../components/FoundationMetadataList.vue'
+import { findFoundationListMetadata } from '../master-data/masterDataRegistry.js'
+import { foundationEntryGroups } from '../master-data/foundationEntryUnificationRegistry.js'
 import {
   clearOperationLogs,
   createCertificate,
@@ -563,10 +778,38 @@ import {
   previewImportRows,
   validateImportRows,
 } from '../manufacturing/foundationImportExportUtils.js'
+import { loadMasterDataStatisticsRuntime } from '../providers/masterDataStatisticsRuntimeProvider.js'
+import { loadMaterialSupplierRelationRuntime,
+  updateMaterialSupplierDeliveryPeriod as updateRuntimeDeliveryPeriod } from '../providers/materialSupplierRelationRuntimeProvider.js'
+import { loadSupplierMaterialPriceRuntime,
+  updateSupplierMaterialPrice as updateRuntimeSupplierMaterialPrice } from '../providers/supplierMaterialPriceRuntimeProvider.js'
+import {
+  MATERIAL_SUPPLIER_RELATION_LIST_METADATA,
+  MATERIAL_SUPPLIER_RELATION_RUNTIME_FIELDS,
+} from '../runtime/materialSupplierRelationRuntime.js'
+import {
+  SUPPLIER_MATERIAL_PRICE_REFERENCE_CHAIN,
+  SUPPLIER_MATERIAL_PRICE_RUNTIME_DIAGNOSTICS,
+} from '../runtime/supplierMaterialPriceRuntime.js'
+import {
+  buildAdvancedFilterLayoutRows,
+  PCE_ADVANCED_FILTER_LAYOUT_METRICS,
+  PCE_ADVANCED_FILTER_LAYOUT_VERSION,
+} from '../runtime/pceAdvancedFilterLayoutRuntime.js'
+import { createPceListRefreshRuntime } from '../runtime/pceEnterpriseListContract.js'
+import { enterpriseMasterDataApi } from '@/api/enterpriseMasterData.js'
+import { getActivePurchaseOrderMaterials, getActivePurchaseOrderSuppliers } from '@/api/scmStandardPageFacts.js'
+import { loadMaterialMasterRuntime } from '../providers/materialMasterRuntimeProvider.js'
 
 const route = useRoute()
 const router = useRouter()
 const state = ref(getFoundationState())
+const statisticsRuntime = ref(null)
+const statisticsError = ref('')
+const materialSupplierRelationRuntime = ref(null)
+const relationRuntimeError = ref('')
+const supplierMaterialPriceRuntime = ref(null)
+const supplierMaterialPriceRuntimeError = ref('')
 const message = ref('')
 const entityForm = reactive({})
 const routingStepForm = reactive({})
@@ -589,6 +832,49 @@ const importFileName = ref('')
 const importRecordId = ref('')
 const importRecordKeyword = ref('')
 const importRecordStatus = ref('')
+const metadataResultCount = ref(0)
+const foundationRefreshing = ref(false)
+const serverFoundationRows = ref({})
+const runtimeFactDetailVisible = ref(false)
+const runtimeFactDetailRow = ref(null)
+const runtimeMaintenanceVisible = ref(false)
+const runtimeMaintenanceSaving = ref(false)
+const runtimeMaintenanceType = ref('price')
+const runtimeMaintenanceRow = ref(null)
+const manualPriceCreateVisible = ref(false)
+const manualPriceCreateSaving = ref(false)
+const manualPriceSuppliers = ref([])
+const manualPriceMaterials = ref([])
+const manualPriceCreateForm = reactive({ supplierId: null, materialId: null, unitPrice: null, taxRate: 13, currency: 'CNY', effectiveDate: '', expiryDate: '', maintenanceReason: '' })
+const manualPriceAuthorized = computed(() => supplierMaterialPriceRuntime.value?.strictFacts?.manualMaintenanceAuthorization?.allowed === true)
+const priceMaintenanceForm = reactive({ taxRate: '', effectiveDate: '', expiryDate: '', modifyReason: '' })
+const standardTaxRateOptions = computed(() => supplierMaterialPriceRuntime.value?.standardTaxRateOptions || ['0', '3', '6', '9', '13'])
+const relationMaintenanceForm = reactive({ deliveryPeriod: '' })
+const runtimeMaintenanceTitle = computed(() => runtimeMaintenanceType.value === 'price'
+  ? '编辑供应商物料价格' : '编辑物料供应商关系')
+
+async function openManualPriceCreate() {
+  if (!manualPriceAuthorized.value) return
+  const [supplierResponse, materialResponse] = await Promise.all([getActivePurchaseOrderSuppliers(), getActivePurchaseOrderMaterials()])
+  const supplierData = supplierResponse?.data || {}, materialData = materialResponse?.data || {}
+  manualPriceSuppliers.value = (supplierData.results || supplierData || []).filter(row => row.is_active !== false)
+  manualPriceMaterials.value = (materialData.results || materialData || []).filter(row => row.is_active !== false && row.is_purchased !== false)
+  Object.assign(manualPriceCreateForm, { supplierId: null, materialId: null, unitPrice: null, taxRate: 13, currency: 'CNY', effectiveDate: '', expiryDate: '', maintenanceReason: '' })
+  manualPriceCreateVisible.value = true
+}
+
+async function saveManualPriceCreate() {
+  if (!manualPriceCreateForm.supplierId || !manualPriceCreateForm.materialId || !manualPriceCreateForm.unitPrice || !manualPriceCreateForm.effectiveDate || !manualPriceCreateForm.maintenanceReason.trim()) return ElMessage.warning('请完整填写人工维护价格信息')
+  if (manualPriceCreateForm.expiryDate && manualPriceCreateForm.expiryDate < manualPriceCreateForm.effectiveDate) return ElMessage.warning('失效日期不得早于生效日期')
+  manualPriceCreateSaving.value = true
+  try {
+    await enterpriseMasterDataApi.createSupplierMaterialPrice({ ...manualPriceCreateForm, expiryDate: manualPriceCreateForm.expiryDate || null })
+    manualPriceCreateVisible.value = false
+    supplierMaterialPriceRuntime.value = await loadSupplierMaterialPriceRuntime({ force: true })
+    ElMessage.success('正式供应商物料价格已保存并记录审计来源')
+  } catch (error) { ElMessage.error(error.message || String(error)) }
+  finally { manualPriceCreateSaving.value = false }
+}
 
 const statusOptions = [
   { value: 'enabled', label: '启用' },
@@ -606,21 +892,7 @@ const industryOptions = [
   { value: 'general', label: '通用制造' },
 ]
 
-const employeeFields = [
-  { key: 'employeeNo', label: '工号', required: true, readonly: true },
-  { key: 'name', label: '姓名', required: true },
-  { key: 'idCardNo', label: '身份证号' },
-  { key: 'nativePlace', label: '籍贯' },
-  { key: 'department', label: '部门', required: true },
-  { key: 'role', label: '岗位', required: true },
-  { key: 'jobGrade', label: '职等' },
-  { key: 'jobLevel', label: '职级' },
-  { key: 'hireDate', label: '入职日期', type: 'date' },
-  { key: 'leaveDate', label: '离职日期', type: 'date' },
-  { key: 'workYears', label: '工龄', type: 'number', readonly: true },
-  { key: 'status', label: '人员状态', type: 'select', options: employeeStatusOptions },
-  { key: 'phone', label: '电话' },
-]
+const employeeFields = findFoundationListMetadata('employees').fields
 const materialFields = [
   { key: 'code', label: '物料编码', required: true, readonly: true },
   { key: 'name', label: '物料名称', required: true },
@@ -698,57 +970,11 @@ const permissionFields = [
   { key: 'action', label: '动作' },
   { key: 'status', label: '状态', type: 'select', options: statusOptions },
 ]
-const supplierMaterialPriceFields = [
-  { key: 'supplierMaterialCode', label: '价格记录编码', required: true, readonly: true },
-  { key: 'supplierId', label: '供应商', required: true },
-  { key: 'materialId', label: '物料', required: true },
-  { key: 'minOrderQty', label: '最小采购量', type: 'number' },
-  { key: 'price', label: '含税单价', type: 'number', required: true },
-  { key: 'taxRate', label: '税率', type: 'number' },
-  { key: 'currency', label: '币种' },
-  { key: 'deliveryDays', label: '交货周期', type: 'number' },
-  { key: 'isDefault', label: '默认价格', type: 'checkbox' },
-  { key: 'status', label: '状态', type: 'select', options: statusOptions },
-]
-const materialSupplierRelationFields = [
-  { key: 'relationCode', label: '关系编码', required: true, readonly: true },
-  { key: 'materialId', label: '物料', required: true },
-  { key: 'supplierId', label: '供应商', required: true },
-  { key: 'priority', label: '优先级', type: 'number' },
-  { key: 'isPrimary', label: '主供应商', type: 'checkbox' },
-  { key: 'leadTimeDays', label: '交货周期', type: 'number' },
-  { key: 'qualityLevel', label: '质量等级' },
-  { key: 'onTimeRate', label: '准时率', type: 'number' },
-  { key: 'status', label: '状态', type: 'select', options: statusOptions },
-]
-const processFields = [
-  { key: 'processCode', label: '工序编码', required: true, readonly: true },
-  { key: 'processName', label: '工序名称', required: true },
-  { key: 'industryType', label: '行业类型', type: 'select', options: industryOptions },
-  { key: 'workCenterId', label: '工作中心' },
-  { key: 'standardHours', label: '标准工时', type: 'number' },
-  { key: 'skillRequired', label: '技能要求' },
-  { key: 'qualityCheckRequired', label: '质检要求', type: 'checkbox' },
-  { key: 'status', label: '状态', type: 'select', options: statusOptions },
-]
-const routingFields = [
-  { key: 'routingCode', label: '工艺路线编码', required: true, readonly: true },
-  { key: 'routingName', label: '工艺路线名称', required: true },
-  { key: 'industryType', label: '行业类型', type: 'select', options: industryOptions },
-  { key: 'productCategory', label: '产品类别' },
-  { key: 'materialId', label: '适用物料' },
-  { key: 'version', label: '版本' },
-  { key: 'status', label: '状态', type: 'select', options: statusOptions },
-]
-const equipmentFields = [
-  { key: 'equipmentCode', label: '设备编码', required: true, readonly: true },
-  { key: 'equipmentName', label: '设备名称', required: true },
-  { key: 'industryType', label: '行业类型', type: 'select', options: industryOptions },
-  { key: 'workCenterId', label: '工作中心', required: true },
-  { key: 'equipmentType', label: '设备类型' },
-  { key: 'capacityPerHour', label: '每小时产能', type: 'number' },
-  { key: 'status', label: '状态', type: 'select', options: statusOptions },
-]
+const supplierMaterialPriceFields = findFoundationListMetadata('supplierMaterialPrices').fields
+const materialSupplierRelationFields = MATERIAL_SUPPLIER_RELATION_RUNTIME_FIELDS
+const processFields = findFoundationListMetadata('processes').fields
+const routingFields = findFoundationListMetadata('routings').fields
+const equipmentFields = findFoundationListMetadata('equipment').fields
 const productCategoryFields = [
   { key: 'categoryCode', label: '类别编码', required: true, readonly: true },
   { key: 'categoryName', label: '类别名称', required: true },
@@ -836,7 +1062,7 @@ const entityConfigs = {
   '/foundation/erp/data-dictionaries': makeEntityConfig('数据字典', '维护基础资料枚举项', '数据字典', 'dataDictionaries', dictionaryFields, null, '/foundation/erp/data-dictionaries', createDataDictionary, updateDataDictionary, deleteDataDictionary),
   '/foundation/erp/coding-rules': makeEntityConfig('编码规则', '维护基础资料自动编码规则', '编码规则', 'codingRules', codingRuleFields, null, '/foundation/erp/coding-rules', createCodingRule, updateCodingRule, deleteCodingRule),
   '/foundation/erp/system-parameters': makeEntityConfig('系统参数', '配置默认入口与基础资料校验参数', '系统参数', 'systemParameters', parameterFields, null, '/foundation/erp/system-parameters', createSystemParameter, updateSystemParameter, deleteSystemParameter),
-  '/foundation/erp/supplier-material-prices': makeEntityConfig('供应商物料价格', '维护供应商、物料、含税价格、税率、交期和默认价格', '供应商物料价格', 'supplierMaterialPrices', supplierMaterialPriceFields, null, '/foundation/erp/supplier-material-prices', createSupplierMaterialPrice, updateSupplierMaterialPrice, deleteSupplierMaterialPrice, null, 'supplierMaterialPrice'),
+  '/foundation/erp/supplier-material-prices': makeEntityConfig('供应商物料价格', '企业认可的合同、协议或人工维护有效价格；不是采购历史价格', '供应商物料价格', 'supplierMaterialPrices', supplierMaterialPriceFields, null, '/foundation/erp/supplier-material-prices', createSupplierMaterialPrice, updateSupplierMaterialPrice, deleteSupplierMaterialPrice, null, 'supplierMaterialPrice'),
   '/foundation/erp/material-suppliers': makeEntityConfig('物料供应商关系', '维护主供应商、供应优先级、准时率和质量等级', '物料供应商关系', 'materialSupplierRelations', materialSupplierRelationFields, null, '/foundation/erp/material-suppliers', createMaterialSupplierRelation, updateMaterialSupplierRelation, deleteMaterialSupplierRelation, null, 'materialSupplierRelation'),
   '/foundation/erp/product-categories': makeEntityConfig('产品类别', '维护产品分类和父子级关系', '产品类别', 'productCategories', productCategoryFields, null, '/foundation/erp/product-categories', createProductCategory, updateProductCategory, deleteProductCategory, null, 'productCategory'),
   '/foundation/manufacturing/processes': makeEntityConfig('工序资料', '维护生产工序、标准工时、工作中心和质检要求', '工序', 'processes', processFields, null, '/foundation/manufacturing/processes', createProcess, updateProcess, deleteProcess, getProcessById, 'process'),
@@ -869,6 +1095,25 @@ const entityConfig = computed(() => {
   config.listPath = detail.list
   return config
 })
+
+const foundationListMetadata = computed(() => {
+  const collection = entityConfig.value?.collection
+  if (collection === 'materialSupplierRelations') return MATERIAL_SUPPLIER_RELATION_LIST_METADATA
+  return findFoundationListMetadata(collection) || null
+})
+const runtimeFactDetailFields = computed(() => foundationListMetadata.value?.fields || [])
+const runtimeFactDetailTitle = computed(() => `${foundationListMetadata.value?.title || '基础资料'}详情`)
+const foundationPageKind = computed(() => foundationListMetadata.value?.pageKind || '')
+const foundationActionPolicyText = computed(() => foundationListMetadata.value?.actionPolicy?.join(',') || '')
+
+const advancedFilterLayoutVersion = PCE_ADVANCED_FILTER_LAYOUT_VERSION
+const advancedFilterLayoutMetrics = PCE_ADVANCED_FILTER_LAYOUT_METRICS
+const advancedFilterRows = computed(() => buildAdvancedFilterLayoutRows(
+  (entityConfig.value?.fields || []).map((field) => ({
+    ...field,
+    filterType: columnFilterType(field) === 'enum' ? 'select' : columnFilterType(field),
+  })),
+))
 const entityMode = computed(() => {
   if (!entityConfig.value) return ''
   if (route.path.includes('/create')) return 'create'
@@ -876,13 +1121,22 @@ const entityMode = computed(() => {
   return 'list'
 })
 const entityItems = computed(() => {
+  if (entityConfig.value?.collection === 'materialSupplierRelations') {
+    return materialSupplierRelationRuntime.value?.rows || []
+  }
+  if (entityConfig.value?.collection === 'supplierMaterialPrices') {
+    return supplierMaterialPriceRuntime.value?.rows || []
+  }
+  if (Array.isArray(serverFoundationRows.value[entityConfig.value?.collection])) {
+    return serverFoundationRows.value[entityConfig.value.collection]
+  }
   const items = entityConfig.value ? state.value[entityConfig.value.collection] || [] : []
   if (entityConfig.value?.collection === 'warehouses') {
     return items.map((item) => ({ ...item, locationCount: item.locations?.length || 0 }))
   }
   return items
 })
-const canToggleStatus = computed(() => entityConfig.value?.collection !== 'employees')
+const canToggleStatus = computed(() => !['employees', 'supplierMaterialPrices'].includes(entityConfig.value?.collection))
 const hasIndustryFilter = computed(() => entityConfig.value?.fields?.some((field) => field.key === 'industryType'))
 const reviewRows = computed(() => getFoundationReviewResults())
 const filteredEntityItems = computed(() => {
@@ -905,18 +1159,58 @@ const filteredImportRecords = computed(() => {
 })
 const routingStepRows = computed(() => entityConfig.value?.collection === 'routings' && entityMode.value === 'detail' ? getRoutingSteps(routeDetailId()) : [])
 const pageTitle = computed(() => entityConfig.value?.title || {
-  '/foundation': '制造业基础资料',
+  '/foundation': '企业基础资料',
   '/foundation/sample-data': '样例数据管理',
   '/foundation/review-check': '基础资料评审检查',
-}[route.path] || '制造业基础资料')
-const summaryCards = computed(() => [
-  { title: '员工档案', value: `${state.value.employees.length} 人`, desc: '员工、技能、证书、班次', to: '/foundation/pfm/employees' },
-  { title: '物料档案', value: `${state.value.materials.length} 个`, desc: '物料、客户、供应商、工作中心、仓库', to: '/foundation/erp/materials' },
-  { title: '价格与供应关系', value: `${state.value.supplierMaterialPrices?.length || 0} 条`, desc: '供应商物料价格和物料供应商关系', to: '/foundation/erp/supplier-material-prices' },
-  { title: '制造基础', value: `${state.value.processes?.length || 0} 道工序`, desc: '工序、工艺路线、设备、产品类别', to: '/foundation/manufacturing/processes' },
-  { title: '权限与日志', value: `${state.value.permissionPoints.length} 个权限点`, desc: '权限点、角色权限、用户角色、操作日志', to: '/foundation/security/permissions' },
-  { title: '预警基础', value: `${state.value.warningRules.length} 条规则`, desc: '规则、记录、订阅人', to: '/foundation/warnings/rules' },
-])
+}[route.path] || '企业基础资料')
+const isRelationRuntimePage = computed(() => route.path === '/foundation/erp/material-suppliers')
+const isSupplierMaterialPriceRuntimePage = computed(() => route.path === '/foundation/erp/supplier-material-prices')
+const isRuntimeManagedPage = computed(() => isRelationRuntimePage.value || isSupplierMaterialPriceRuntimePage.value)
+const supplierMaterialPriceDiagnostics = SUPPLIER_MATERIAL_PRICE_RUNTIME_DIAGNOSTICS
+const supplierMaterialPriceReferenceChain = SUPPLIER_MATERIAL_PRICE_REFERENCE_CHAIN
+const priceDomainResponsibility = computed(() => ({
+  '/foundation/erp/supplier-material-prices': {
+    objectCode: 'SupplierMaterialPrice',
+    title: '供应商有效价格职责',
+    question: '回答：当前企业认可的供应价格是多少？',
+    responsibility: '合同价格、协议价格与人工维护有效价格；按供应商、物料、生效期和状态维护。',
+    source: 'SupplierMaterialPriceRuntime（正式有效价格运行层）',
+    boundaryCode: 'APPROVAL_WORKFLOW_MANAGED',
+    boundary: '仅展示字段完整且审批通过的正式价格；修改通过核价流程形成新版本，不覆盖历史价格。',
+  },
+  '/foundation/erp/material-suppliers': {
+    objectCode: 'MaterialSupplierRelation',
+    title: '物料供应商关系职责',
+    question: '回答：哪些供应商可以供应该物料？',
+    responsibility: '维护供应关系、主供应商、供应优先级、交期、质量等级与准时率。',
+    source: 'MaterialSupplierRelationRuntime',
+    boundaryCode: 'NO_PURCHASE_HISTORY_PRICE',
+    boundary: '不保存采购历史价格，不替代SupplierMaterialPrice或SupplierPriceFact。',
+  },
+}[route.path] || null))
+const foundationFactSource = computed(() => {
+  if (route.path === '/foundation') return 'MasterDataStatisticsRuntime'
+  if (isRelationRuntimePage.value) return 'MaterialSupplierRelationRuntime'
+  if (isSupplierMaterialPriceRuntimePage.value) return 'SupplierMaterialPriceRuntime'
+  return 'manufacturingFoundationStore'
+})
+const entityRuntimeSource = computed(() => (
+  isRelationRuntimePage.value
+    ? 'MaterialSupplierRelationRuntime'
+    : isSupplierMaterialPriceRuntimePage.value
+      ? 'SupplierMaterialPriceRuntime'
+      : 'manufacturing-foundation-state-v1'
+))
+const summaryCards = computed(() => {
+  const runtime = statisticsRuntime.value
+  const display = (field, unit) => runtime ? `${runtime[field]} ${unit}` : '加载中'
+  return [
+    { field: 'materialCount', source: runtime?.countSources?.materialCount || 'MaterialMasterRuntimeAdapter', title: '物料档案', value: display('materialCount', '个'), desc: 'MaterialMaster Runtime', to: '/foundation/master-data/materials' },
+    { field: 'supplierCount', source: runtime?.countSources?.supplierCount || 'SupplierMasterRuntimeAdapter', title: '供应商档案', value: display('supplierCount', '个'), desc: 'SupplierMaster Runtime', to: '/foundation/erp/suppliers' },
+    { field: 'supplierMaterialRelationCount', source: runtime?.countSources?.supplierMaterialRelationCount || 'MaterialSupplierRelationRuntime', title: '物料供应商关系', value: display('supplierMaterialRelationCount', '条'), desc: 'MaterialSupplierRelation Runtime', to: '/foundation/erp/material-suppliers' },
+    { field: 'supplierPriceCount', source: runtime?.countSources?.supplierPriceCount || 'SupplierMaterialPriceRuntime', title: '供应商物料价格', value: display('supplierPriceCount', '条'), desc: 'SupplierMaterialPrice Runtime', to: '/foundation/erp/supplier-material-prices' },
+  ]
+})
 const sampleDataCards = computed(() => [
   { title: '员工数量', value: state.value.employees?.length || 0, desc: '目标 >= 200' },
   { title: '物料数量', value: state.value.materials?.length || 0, desc: '目标 >= 300' },
@@ -931,22 +1225,85 @@ const sampleDataCards = computed(() => [
   { title: '库位', value: countLocations(state.value.warehouses), desc: '目标 >= 100' },
   { title: '客户', value: state.value.customers?.length || 0, desc: '目标 >= 100' },
 ])
-const foundationEntries = [
-  { label: '员工档案', to: '/foundation/pfm/employees' },
-  { label: '物料档案', to: '/foundation/erp/materials' },
-  { label: '供应商档案', to: '/foundation/erp/suppliers' },
-  { label: '供应商物料价格', to: '/foundation/erp/supplier-material-prices' },
-  { label: '物料供应商关系', to: '/foundation/erp/material-suppliers' },
-  { label: '工序资料', to: '/foundation/manufacturing/processes' },
-  { label: '工艺路线', to: '/foundation/manufacturing/routings' },
-  { label: '设备资料', to: '/foundation/manufacturing/equipment' },
-  { label: '样例数据管理', to: '/foundation/sample-data' },
-  { label: '基础资料评审检查', to: '/foundation/review-check' },
-  { label: '导入记录', to: '/foundation/import-records' },
+const foundationUtilityEntries = [
+  { label: '生产基础完整性检查', to: '/pde/a1-foundation' },
 ]
 
 function refresh() {
   state.value = getFoundationState()
+}
+
+async function refreshStatistics() {
+  statisticsError.value = ''
+  try {
+    statisticsRuntime.value = await loadMasterDataStatisticsRuntime({ force: true })
+  } catch (error) {
+    statisticsRuntime.value = null
+    statisticsError.value = error?.message || '基础资料统计读取失败'
+  }
+}
+
+async function refreshMaterialSupplierRelations() {
+  relationRuntimeError.value = ''
+  try {
+    materialSupplierRelationRuntime.value = await loadMaterialSupplierRelationRuntime({ force: true })
+  } catch (error) {
+    materialSupplierRelationRuntime.value = null
+    relationRuntimeError.value = error?.message || '物料供应商关系读取失败'
+  }
+}
+
+async function refreshSupplierMaterialPrices() {
+  supplierMaterialPriceRuntimeError.value = ''
+  try {
+    supplierMaterialPriceRuntime.value = await loadSupplierMaterialPriceRuntime({ force: true })
+  } catch (error) {
+    supplierMaterialPriceRuntime.value = null
+    supplierMaterialPriceRuntimeError.value = error?.message || '供应商有效价格读取失败'
+  }
+}
+
+const foundationRefreshRuntime = createPceListRefreshRuntime({
+  provider: async () => {
+    const collection = entityConfig.value?.collection
+    if (collection === 'supplierMaterialPrices') return loadSupplierMaterialPriceRuntime({ force: true })
+    if (collection === 'materialSupplierRelations') return loadMaterialSupplierRelationRuntime({ force: true })
+    if (collection === 'materials') return { rows: await loadMaterialMasterRuntime({ force: true }) }
+    if (collection === 'suppliers') {
+      const response = await enterpriseMasterDataApi.facts('suppliers')
+      return { rows: response?.rows || response?.data?.rows || [] }
+    }
+    const metadata = foundationListMetadata.value
+    if (metadata?.entityCode && !['employees', 'processes', 'routings-foundation', 'equipment'].includes(metadata.entityCode)) {
+      const response = await enterpriseMasterDataApi.facts(metadata.entityCode)
+      return { rows: response?.rows || response?.data?.rows || [] }
+    }
+    // 尚未迁移到服务端的本地维护对象仍通过其注册Provider重新读取，不复用旧数组引用。
+    const latest = getFoundationState()
+    return { rows: [...(latest[collection] || [])], localProvider: true }
+  },
+  replaceRows: (rows, payload) => {
+    const collection = entityConfig.value?.collection
+    if (collection === 'supplierMaterialPrices') {
+      supplierMaterialPriceRuntime.value = payload
+      supplierMaterialPriceRuntimeError.value = ''
+    }
+    else if (collection === 'materialSupplierRelations') materialSupplierRelationRuntime.value = payload
+    else serverFoundationRows.value = { ...serverFoundationRows.value, [collection]: rows }
+  },
+  currentResultCount: metadataResultCount,
+})
+
+async function refreshCurrentPage() {
+  foundationRefreshing.value = true
+  try {
+    await foundationRefreshRuntime.refresh()
+    notify('数据已刷新。')
+  } catch (error) {
+    notify(`刷新失败：${error?.message || '未知错误'}`)
+  } finally {
+    foundationRefreshing.value = false
+  }
 }
 
 function notify(text) {
@@ -966,6 +1323,7 @@ function displayValue(value) {
 }
 
 function displayStatus(item) {
+  if (String(item?.statusLabel || '').trim()) return String(item.statusLabel).trim()
   const map = {
     enabled: '启用',
     disabled: '停用',
@@ -974,7 +1332,8 @@ function displayStatus(item) {
     leave: '休假',
     borrowed: '借调',
   }
-  return map[String(item?.status || '')] || item?.status || '启用'
+  const status = String(item?.status || '')
+  return map[status.toLowerCase()] || '状态未提供'
 }
 
 function isRecordEnabled(item) {
@@ -1013,7 +1372,6 @@ function defaultEntityForm(config) {
   }
   if (config.collection === 'supplierMaterialPrices') {
     result.currency = 'CNY'
-    result.taxRate = 13
   }
   if (config.collection === 'materialSupplierRelations') result.priority = 1
   if (config.collection === 'routings') result.version = 'V1'
@@ -1100,8 +1458,74 @@ function openEntity(item) {
   else startInlineEdit(item)
 }
 
-function editEntity(item) {
+function viewFoundationRow(item) {
+  if (foundationListMetadata.value?.pageKind === 'fact' || isRuntimeManagedPage.value) {
+    runtimeFactDetailRow.value = item
+    runtimeFactDetailVisible.value = true
+    return
+  }
   openEntity(item)
+}
+
+function editEntity(item) {
+  if (isSupplierMaterialPriceRuntimePage.value) {
+    runtimeMaintenanceType.value = 'price'
+    runtimeMaintenanceRow.value = item
+    Object.assign(priceMaintenanceForm, {
+      taxRate: item?.taxRate || '',
+      effectiveDate: item?.effectiveDate || '', expiryDate: item?.expiryDate || '',
+      modifyReason: '',
+    })
+    runtimeMaintenanceVisible.value = true
+    return
+  }
+  if (isRelationRuntimePage.value) {
+    runtimeMaintenanceType.value = 'relation'
+    runtimeMaintenanceRow.value = item
+    relationMaintenanceForm.deliveryPeriod = item?.deliveryPeriod || ''
+    runtimeMaintenanceVisible.value = true
+    return
+  }
+  openEntity(item)
+}
+
+async function saveRuntimeMaintenance() {
+  try {
+    if (runtimeMaintenanceType.value === 'price') {
+      if (!String(priceMaintenanceForm.modifyReason || '').trim()) {
+        notify('保存失败：修改原因不能为空。')
+        return
+      }
+      if (priceMaintenanceForm.expiryDate
+        && priceMaintenanceForm.effectiveDate
+        && priceMaintenanceForm.expiryDate < priceMaintenanceForm.effectiveDate) {
+        notify('保存失败：失效日期不能早于生效日期。')
+        return
+      }
+      runtimeMaintenanceSaving.value = true
+      supplierMaterialPriceRuntime.value = await updateRuntimeSupplierMaterialPrice(
+        runtimeMaintenanceRow.value?.priceNo || runtimeMaintenanceRow.value?.priceId,
+        { ...priceMaintenanceForm },
+      )
+      notify('保存成功')
+    } else {
+      runtimeMaintenanceSaving.value = true
+      materialSupplierRelationRuntime.value = await updateRuntimeDeliveryPeriod(
+        runtimeMaintenanceRow.value?.relationCode,
+        relationMaintenanceForm.deliveryPeriod,
+      )
+      notify('物料供应商关系交货周期已保存')
+    }
+    runtimeMaintenanceVisible.value = false
+  } catch (error) {
+    const status = error?.response?.status
+    const serverReason = error?.response?.data?.errorMessage
+    notify(status === 401 || status === 403
+      ? '保存失败：当前登录身份无维护权限。'
+      : `保存失败：${serverReason || error?.message || '服务器更新失败。'}`)
+  } finally {
+    runtimeMaintenanceSaving.value = false
+  }
 }
 
 function createEntityFromHeader() {
@@ -1358,6 +1782,11 @@ watch(sortedEntityItems, () => {
   if (currentPage.value > totalPages.value) currentPage.value = totalPages.value
 })
 watch(() => route.fullPath, syncForm, { immediate: true })
+watch(() => route.path, (path) => {
+  if (path === '/foundation') refreshStatistics()
+  if (path === '/foundation/erp/material-suppliers') refreshMaterialSupplierRelations()
+  if (path === '/foundation/erp/supplier-material-prices') refreshSupplierMaterialPrices()
+}, { immediate: true })
 watch(entityConfig, () => {
   resetColumnFilters()
   syncForm()
@@ -1398,11 +1827,53 @@ h2 {
 
 .page-tabs,
 .button-row,
-.entry-grid {
+.entry-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
+
+.entry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.entry-grid article {
+  display: grid;
+  gap: 12px;
+  border: 1px solid #dce5f2;
+  border-radius: 8px;
+  padding: 14px;
+  background: #f8fafc;
+}
+
+.foundation-entry-group {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.foundation-entry-group:first-of-type {
+  margin-top: 0;
+}
+
+.foundation-entry-group > header {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.foundation-entry-group h3,
+.foundation-entry-group p {
+  margin: 0;
+}
+
+.foundation-entry-group .entry-grid article p {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.utility-entry-row { margin-top: 14px; }
 
 .page-tabs a,
 .panel a,
@@ -1486,27 +1957,40 @@ button:disabled {
   font-size: 22px;
 }
 
+.price-runtime-diagnostics {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  background: #eff6ff;
+}
+
+.price-runtime-diagnostics header,
+.price-reference-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.price-runtime-diagnostics p { margin: 4px 0 0; color: #475569; }
+.price-runtime-diagnostics dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.price-runtime-diagnostics dl div { padding: 10px; border-radius: 8px; background: #fff; }
+.price-runtime-diagnostics dt { color: #64748b; font-size: 12px; }
+.price-runtime-diagnostics dd { margin: 5px 0 0; overflow-wrap: anywhere; font-weight: 800; }
+.price-reference-chain { justify-content: flex-start; }
+.price-reference-chain span { padding: 5px 9px; border-radius: 999px; background: #dcfce7; color: #166534; }
+
 .toolbar {
   flex-wrap: wrap;
   justify-content: flex-start;
 }
 
-.advanced-filter {
-  border: 1px dashed #cbd5e1;
-  border-radius: 8px;
-  padding: 12px;
-  background: #f8fafc;
-}
-
 .advanced-filter header {
   justify-content: flex-start;
-  margin-bottom: 10px;
-}
-
-.filter-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(180px, 1fr));
-  gap: 12px;
+  margin-bottom: 0;
 }
 
 .range-inputs {
@@ -1542,6 +2026,17 @@ th {
   color: #334155;
   cursor: pointer;
   white-space: nowrap;
+}
+
+.sort-arrow-no-tail {
+  display: inline-flex;
+  min-width: 22px;
+  margin-left: 6px;
+  color: #1d4ed8;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .index-cell {
@@ -1610,10 +2105,46 @@ p {
   line-height: 1.55;
 }
 
+.price-domain-responsibility {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0;
+  padding: 16px;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  background: #eff6ff;
+}
+
+.price-domain-responsibility p { margin: 6px 0 0; }
+.price-domain-responsibility dl { display: grid; gap: 8px; margin: 0; }
+.price-domain-responsibility dl div { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 10px; }
+.price-domain-responsibility dt { color: #1d4ed8; font-weight: 800; }
+.price-domain-responsibility dd { margin: 0; color: #334155; }
+
+.runtime-fact-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(130px, .35fr) minmax(0, 1fr);
+  margin: 0;
+}
+
+.runtime-fact-detail-grid dt,
+.runtime-fact-detail-grid dd {
+  margin: 0;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.runtime-fact-detail-grid dt {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 800;
+}
+
+.runtime-fact-detail-grid dd { overflow-wrap: anywhere; }
+
 @media (max-width: 1100px) {
   .summary-grid,
-  .form-grid,
-  .filter-grid {
+  .form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -1627,8 +2158,7 @@ p {
   }
 
   .summary-grid,
-  .form-grid,
-  .filter-grid {
+  .form-grid {
     grid-template-columns: 1fr;
   }
 }

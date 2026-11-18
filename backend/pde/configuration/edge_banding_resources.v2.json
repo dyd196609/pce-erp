@@ -1,0 +1,153 @@
+{
+  "contractVersion": "PCE-MANUFACTURING-RESOURCE-CONFIGURATION-V1",
+  "companyId": 1,
+  "businessReason": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+  "operationCorrections": [
+    {
+      "objectId": 5,
+      "expected": {
+        "calculation_basis": "area",
+        "calculation_uom_id": 18
+      },
+      "values": {
+        "calculation_basis": "length",
+        "calculation_uom_id": 17
+      },
+      "requestKey": "edge-measurement-v2:process:5"
+    }
+  ],
+  "capacities": [
+    {
+      "requestKey": "edge-capacity-v2:pct:11",
+      "payload": {
+        "code": "SC-EDGE-LENGTH-PCT11-V2",
+        "name": "正式封边长度日产能 / QSFB/FM",
+        "company_id": 1,
+        "resource_scope": "work_center",
+        "work_center_id": 6,
+        "operation_id": 5,
+        "product_type_id": 11,
+        "measurement_status": "measured",
+        "quantity": "500",
+        "uom_id": 17,
+        "time_basis": "day",
+        "time_basis_quantity": "1",
+        "time_unit": "DAY",
+        "effective_from": "2026-10-14",
+        "conditions": {
+          "capacityUsageScope": {
+            "contractVersion": "PCE-MANUFACTURING-CAPACITY-SCOPE-V1",
+            "usageScope": "ENGINEERING_EOR_ONLY",
+            "version": "V2",
+            "businessFactReference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+            "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94"
+          }
+        }
+      },
+      "sourceIdentity": {
+        "sourceSystem": "PCE-APPROVED-CONFIGURATION",
+        "sourceType": "authorized_business_configuration",
+        "sourceObjectType": "StandardCapacity",
+        "externalId": "SC-EDGE-LENGTH-PCT11-V2",
+        "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94",
+        "auditMetadata": {
+          "capacityUsageScope": {
+            "contractVersion": "PCE-MANUFACTURING-CAPACITY-SCOPE-V1",
+            "usageScope": "ENGINEERING_EOR_ONLY",
+            "version": "V2",
+            "businessFactReference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+            "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94"
+          }
+        }
+      }
+    },
+    {
+      "requestKey": "edge-capacity-v2:pct:15",
+      "payload": {
+        "code": "SC-EDGE-LENGTH-PCT15-V2",
+        "name": "正式封边长度日产能 / BTKF/SM",
+        "company_id": 1,
+        "resource_scope": "work_center",
+        "work_center_id": 6,
+        "operation_id": 5,
+        "product_type_id": 15,
+        "measurement_status": "measured",
+        "quantity": "500",
+        "uom_id": 17,
+        "time_basis": "day",
+        "time_basis_quantity": "1",
+        "time_unit": "DAY",
+        "effective_from": "2026-10-14",
+        "conditions": {
+          "capacityUsageScope": {
+            "contractVersion": "PCE-MANUFACTURING-CAPACITY-SCOPE-V1",
+            "usageScope": "ENGINEERING_EOR_ONLY",
+            "version": "V2",
+            "businessFactReference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+            "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94"
+          }
+        }
+      },
+      "sourceIdentity": {
+        "sourceSystem": "PCE-APPROVED-CONFIGURATION",
+        "sourceType": "authorized_business_configuration",
+        "sourceObjectType": "StandardCapacity",
+        "externalId": "SC-EDGE-LENGTH-PCT15-V2",
+        "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94",
+        "auditMetadata": {
+          "capacityUsageScope": {
+            "contractVersion": "PCE-MANUFACTURING-CAPACITY-SCOPE-V1",
+            "usageScope": "ENGINEERING_EOR_ONLY",
+            "version": "V2",
+            "businessFactReference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+            "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94"
+          }
+        }
+      }
+    },
+    {
+      "requestKey": "edge-capacity-v2:pct:28",
+      "payload": {
+        "code": "SC-EDGE-LENGTH-PCT28-V2",
+        "name": "正式封边长度日产能 / BTKF/GT",
+        "company_id": 1,
+        "resource_scope": "work_center",
+        "work_center_id": 6,
+        "operation_id": 5,
+        "product_type_id": 28,
+        "measurement_status": "measured",
+        "quantity": "500",
+        "uom_id": 17,
+        "time_basis": "day",
+        "time_basis_quantity": "1",
+        "time_unit": "DAY",
+        "effective_from": "2026-10-14",
+        "conditions": {
+          "capacityUsageScope": {
+            "contractVersion": "PCE-MANUFACTURING-CAPACITY-SCOPE-V1",
+            "usageScope": "ENGINEERING_EOR_ONLY",
+            "version": "V2",
+            "businessFactReference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+            "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94"
+          }
+        }
+      },
+      "sourceIdentity": {
+        "sourceSystem": "PCE-APPROVED-CONFIGURATION",
+        "sourceType": "authorized_business_configuration",
+        "sourceObjectType": "StandardCapacity",
+        "externalId": "SC-EDGE-LENGTH-PCT28-V2",
+        "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94",
+        "auditMetadata": {
+          "capacityUsageScope": {
+            "contractVersion": "PCE-MANUFACTURING-CAPACITY-SCOPE-V1",
+            "usageScope": "ENGINEERING_EOR_ONLY",
+            "version": "V2",
+            "businessFactReference": "PCE-EDGE-BANDING-UOM-EOR-20261014：用户明确授权封边长度m及正式500m/day配置；本轮仅EOR，不进入APS",
+            "sourceFingerprint": "496602ff5b79ccc5a5979ce237ecfc5c67f5526d44854dc5a023cb9827e13a94"
+          }
+        }
+      }
+    }
+  ]
+}

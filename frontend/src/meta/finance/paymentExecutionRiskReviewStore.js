@@ -191,6 +191,12 @@ function normalizeReviewResult(result = {}) {
     nextSuggestion: result.nextSuggestion || '',
     reviewedAt: result.reviewedAt || '',
     reviewedBy: result.reviewedBy || '',
+    paymentExecutionGenerated: Boolean(result.paymentExecutionGenerated),
+    targetPaymentExecutionId: result.targetPaymentExecutionId || '',
+    targetPaymentExecutionNo: result.targetPaymentExecutionNo || '',
+    targetModule: result.targetModule || '',
+    paymentExecutionStatus: result.paymentExecutionStatus || '',
+    paymentExecutionGeneratedAt: result.paymentExecutionGeneratedAt || '',
     cancelledAt: result.cancelledAt || '',
     createdAt: result.createdAt || nowText(),
     updatedAt: result.updatedAt || nowText(),
@@ -607,6 +613,28 @@ export function cancelPaymentExecutionRiskReview(reviewId) {
   Object.assign(current, { riskReviewStatus: 'cancelled', riskLevel: 'medium', cancelledAt: nowText(), updatedAt: nowText() })
   persist()
   writeRiskReviewLog('取消风险评审', { sourceNo: current.sourcePaymentOrderDraftNo, targetId: current.id, targetNo: current.riskReviewNo })
+  return { success: true, review: clone(current) }
+}
+
+export function markPaymentRiskReviewPaymentExecutionGenerated(reviewId, execution = {}) {
+  const current = byId(state.reviewResults, reviewId)
+  if (!current) return { success: false, error: '未找到风险评审记录。' }
+  Object.assign(current, {
+    paymentExecutionGenerated: true,
+    targetPaymentExecutionId: execution.id || execution.targetPaymentExecutionId || current.targetPaymentExecutionId || '',
+    targetPaymentExecutionNo: execution.paymentExecutionNo || execution.targetPaymentExecutionNo || current.targetPaymentExecutionNo || '',
+    targetModule: 'paymentExecution',
+    paymentExecutionStatus: execution.paymentExecutionStatus || current.paymentExecutionStatus || 'draft',
+    paymentExecutionGeneratedAt: current.paymentExecutionGeneratedAt || nowText(),
+    updatedAt: nowText(),
+  })
+  persist()
+  writeRiskReviewLog('同步付款执行草稿生成状态', {
+    sourceNo: current.riskReviewNo,
+    targetId: current.targetPaymentExecutionId,
+    targetNo: current.targetPaymentExecutionNo,
+    result: `已生成付款执行草稿，当前状态：${current.paymentExecutionStatus}`,
+  })
   return { success: true, review: clone(current) }
 }
 

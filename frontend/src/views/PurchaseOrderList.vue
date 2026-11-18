@@ -590,6 +590,7 @@
 import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import request from '../api/request'
+import { getTabAuthToken } from '@/meta/runtime/tabAuthenticationContext.js'
 const departmentList = ref([])
 
 const loadDepartments = async () => {
@@ -1018,7 +1019,7 @@ const onSizeChange = (size) => { pageSize.value = size; currentPage.value = 1; l
 
 // ---------- 导入导出 ----------
 const uploadUrl = 'http://127.0.0.1:8000/api/procurement/purchase_orders/import_excel/'
-const uploadHeaders = computed(() => ({ Authorization: `Bearer ${localStorage.getItem('token')}` }))
+const uploadHeaders = computed(() => ({ Authorization: `Bearer ${getTabAuthToken()}` }))
 
 const beforeUpload = (file) => {
   const allowed = ['xlsx', 'xls', 'csv'].some(ext => file.name.endsWith(ext))
@@ -1034,7 +1035,7 @@ const handleUploadSuccess = (res) => {
 const handleUploadError = () => ElMessage.error('导入失败')
 
 const downloadTemplate = () => {
-  const token = localStorage.getItem('token')
+  const token = getTabAuthToken()
   fetch('http://127.0.0.1:8000/api/procurement/purchase_orders/export_template/', {
     headers: { Authorization: `Bearer ${token}` }
   }).then(res => res.blob()).then(blob => {
@@ -1048,7 +1049,7 @@ const downloadTemplate = () => {
 }
 
 const exportData = () => {
-  const token = localStorage.getItem('token')
+  const token = getTabAuthToken()
   const selectedIds = selectedRows.value.map(row => row.id)
   let url = '/api/procurement/purchase_orders/export/'
   if (selectedIds.length > 0) url += `?ids=${selectedIds.join(',')}`

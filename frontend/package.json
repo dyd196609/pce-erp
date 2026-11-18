@@ -4,9 +4,560 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host localhost --port 5173",
-    "build": "vite build .",
-    "preview": "vite preview"
+    "verify:pde-routing-step-applicability": "node scripts/verifyRoutingStepApplicabilityContract.mjs",
+    "verify:pde-order-calculation-bom-closure": "node scripts/verifyPdeOrderCalculationBomClosure.mjs",
+    "verify:pce-formal-import-backend-continuity": "node scripts/verifyPceFormalImportBackendContinuity.mjs",
+    "verify:pce-import-template-localization": "node scripts/verifyPceImportTemplateLocalization.mjs",
+    "verify:pce-formal-import-file-type-dispatch": "node scripts/verifyPceFormalImportFileTypeDispatch.mjs",
+    "verify:pce-formal-import-actor-context": "node scripts/verifyPceFormalImportActorContext.mjs && node scripts/verifyPceFormalImportRealSessionActor.mjs",
+    "verify:pce-formal-import-real-session-actor": "node scripts/verifyPceFormalImportRealSessionActor.mjs",
+    "verify:pce-base-data-row-selection": "node scripts/verifyPceBaseDataRowSelection.mjs",
+    "verify:pce-latest-base-data-template-adoption": "node scripts/verifyPceLatestBaseDataTemplateAdoption.mjs",
+    "verify:pce-latest-base-data-provider-continuity": "node scripts/verifyPceLatestBaseDataProviderContinuity.mjs",
+    "verify:pce-wave1-provider-runtime": "node scripts/verifyWave1ProviderRuntime.mjs",
+    "verify:pce-base-data-capability-non-regression": "node scripts/verifyPceBaseDataCapabilityNonRegression.mjs",
+    "verify:frontend-page-identity": "node scripts/verifyFrontendPageIdentityConvergence.mjs",
+    "verify:business-storage-gate": "node scripts/verifyCompletedModuleContracts.mjs --gate=storage",
+    "verify:completed-module-data-continuity": "node scripts/verifyCompletedModuleContracts.mjs --gate=data",
+    "verify:menu-continuity": "node scripts/verifyCompletedModuleContracts.mjs --gate=menu",
+    "verify:inventory-permission-separation": "node scripts/verifyCompletedModuleContracts.mjs --gate=permission",
+    "verify:business-trace-authority": "node scripts/verifyCompletedModuleContracts.mjs --gate=trace",
+    "verify:completed-module-contracts": "node scripts/verifyCompletedModuleContracts.mjs --gate=all",
+    "verify:purchase-request-single-entry": "node scripts/verifyPurchaseRequestSingleEntry.mjs",
+    "verify:frontend-tested-served-identity": "node scripts/verifyTestedServedFrontendIdentity.mjs",
+    "verify:system-config-non-regression": "node scripts/verifySystemConfigNonRegression.mjs",
+    "verify:operation-route-recovery:p0": "node scripts/verifyOperationRouteRecoveryP0.mjs",
+    "verify:operation-display-order": "node scripts/verifyOperationDisplayOrderTargeted.mjs",
+    "verify:group3a-final-trial-assembly": "node scripts/verifyGroup3AFinalTrialAssembly.mjs",
+    "test:operation-route-recovery:p0": "playwright test --config scripts/playwright.operation-route-p0.config.js",
+    "verify:foundation-wave1-preview": "node src/meta/runtime/foundationWave1ImportPreview.test.mjs",
+    "verify:production-foundation:a1": "node verifyProductionFoundationA1.mjs",
+    "verify:production-foundation:a0": "node verifyProductionFoundationA0.mjs",
+    "verify:purchase-agreed-price-direct-closure:v11428427246-batch22-r3": "node scripts/verifyPurchaseAgreedPriceAndDirectClosureV11428427246Batch22R3.mjs",
+    "verify:purchase-agreed-price-direct-closure:v11428427246-batch22-r5": "node scripts/verifyPurchaseAgreedPriceAndDirectClosureV11428427246Batch22R5.mjs",
+    "verify:purchase-order-direct-creation:v11428427246-batch22": "node scripts/verifyPurchaseOrderDirectCreationV11428427246Batch22.mjs",
+    "verify:supplier-material-price-multi-version:v11428427246-batch21": "node scripts/verifySupplierMaterialPriceMultiVersionV11428427246Batch21.mjs",
+    "verify:standard-purchase-price-link:v11428427246-batch2": "node scripts/verifyStandardPurchasePriceLinkV11428427246Batch2.mjs",
+    "verify:purchase-order-three-mode-assessment:v11428427246": "node scripts/verifyPurchaseOrderThreeModeAssessmentV11428427246.mjs",
+    "verify:supplier-master-visibility-price-edit:v1142842724512": "node scripts/verifySupplierMasterVisibilityAndPriceEditV1142842724512.mjs",
+    "verify:supplier-master-reverse-enrichment:v1142842724511": "node scripts/verifySupplierMasterReverseEnrichmentV1142842724511.mjs",
+    "verify:price-archive-mapping-list-refresh:v1142842724510": "node scripts/verifyPriceArchiveMappingAndListRefreshV1142842724510.mjs",
+    "verify:price-approval-decision-archive:v114284272458": "node scripts/verifyPriceApprovalDecisionArchiveV114284272458.mjs",
+    "verify:price-archive-runtime-closure:v114284272459": "node scripts/verifyPriceArchiveRuntimeClosureV114284272459.mjs",
+    "verify:price-archive-tax-governance:v114284272457": "node scripts/verifyPriceArchiveAndTaxGovernanceV114284272457.mjs",
+    "verify:real-runtime-object-consistency:v114284272456": "node scripts/verifyRealRuntimeObjectConsistencyV114284272456.mjs",
+    "verify:price-batch-archive-real-chain:v114284272454": "node scripts/verifyPriceBatchArchiveRealChainV114284272454.mjs",
+    "verify:supplier-quotation-batch-archive:v114284272455": "node scripts/verifySupplierQuotationBatchArchiveV114284272455.mjs",
+    "verify:price-archive-real-chain:v114284272453": "node scripts/verifyPriceArchiveRealChainV114284272453.mjs",
+    "verify:price-approval-archive:v11428427245": "node scripts/verifyPriceApprovalArchiveV11428427245.mjs",
+    "verify:price-confirmation-foundation-nav:v114284272451": "node scripts/verifyPriceConfirmationAndFoundationNavV114284272451.mjs",
+    "verify:price-confirmation-responsibility:v114284272452": "node scripts/verifyPriceConfirmationResponsibilityV114284272452.mjs",
+    "verify:supplier-quote-confirmation-price:v11428427244": "node scripts/verifySupplierQuoteConfirmationPriceV11428427244.mjs",
+    "verify:supplier-effective-price:v11428427243": "node scripts/verifySupplierEffectivePriceV11428427243.mjs",
+    "verify:price-domain-runtime-transparent:v11428427242": "node scripts/verifyPriceDomainRuntimeTransparentV11428427242.mjs",
+    "verify:supplier-price-domain-governance:v11428427241": "node scripts/verifySupplierPriceDomainGovernanceV11428427241.mjs",
+    "verify:pce-intelligence-incremental-integration:v11428427240": "node scripts/verifyPceIntelligenceIncrementalIntegrationV11428427240.mjs",
+    "verify:pce-list-action-runtime:v11428427239": "node scripts/verifyPceListActionRuntimeV11428427239.mjs",
+    "verify:purchase-price-review-assistant:v11428427238": "node scripts/verifyPurchasePriceReviewAssistantV11428427238.mjs",
+    "verify:supplier-price-intelligence:v11428427237": "node scripts/verifySupplierPriceIntelligenceV11428427237.mjs",
+    "verify:master-data-runtime-standard:v11428427235": "node scripts/verifyMasterDataRuntimeStandardV11428427235.mjs",
+    "verify:supplier-price-fact:v11428427234": "node scripts/verifySupplierPriceFactV11428427234.mjs",
+    "verify:pce-existing-intelligence:v11428427232": "node scripts/verifyPceExistingIntelligenceReuseV11428427232.mjs",
+    "verify:pce-filter-layout:v11428427231": "node scripts/verifyPceAdvancedFilterLayoutV11428427231.mjs",
+    "verify:material-supplier-relation-runtime:v11428427230": "node scripts/verifyMaterialSupplierRelationRuntimeV11428427230.mjs",
+    "verify:master-data-statistics-runtime:v11428427229": "node scripts/verifyMasterDataStatisticsRuntimeV11428427229.mjs",
+    "verify:supplier-delivery-purchase-order-view:v11428427228": "node scripts/verifySupplierDeliveryPurchaseOrderViewV11428427228.mjs",
+    "verify:supplier-master-completeness:v11428427227": "node scripts/verifySupplierMasterCompletenessV11428427227.mjs",
+    "verify:supplier-master-business-mapping:v11428427226": "node scripts/verifySupplierMasterBusinessMappingV11428427226.mjs",
+    "verify:purchase-order-fact-mapping:v11428427225": "node scripts/verifyPurchaseOrderFactMappingV11428427225.mjs",
+    "verify:material-master-single-source:v11428427223": "node scripts/verifyMaterialMasterSingleSourceV11428427223.mjs",
+    "verify:purchase-order-supplier-fact:v11428427224": "node scripts/verifyPurchaseOrderSupplierFactV11428427224.mjs",
+    "verify:material-selector-source-trace:v11428427222": "node scripts/verifyMaterialSelectorSourceTraceV11428427222.mjs",
+    "verify:purchase-order-material-source:v11428427221": "node scripts/verifyPurchaseOrderMaterialSourceRuntimeV11428427221.mjs",
+    "verify:purchase-order-split-detail:v11428427220": "node scripts/verifyPurchaseOrderSplitDetailRuntimeV11428427220.mjs",
+    "verify:purchase-order-gate-handoff:v11428427219": "node scripts/verifyPurchaseOrderGateHandoffV11428427219.mjs",
+    "verify:purchase-order-real-field-source:v11428427218": "node scripts/verifyPurchaseOrderRealFieldSourceV11428427218.mjs",
+    "verify:purchase-order-number-binding:v11428427217": "node scripts/verifyPurchaseOrderNumberBindingV11428427217.mjs",
+    "verify:pce-runtime-chain-lock:v11428427216": "node scripts/verifyPceRuntimeChainLockV11428427216.mjs",
+    "verify:pce-runtime-governance-purchase-order:v11428427215": "node scripts/verifyPceRuntimeGovernancePurchaseOrderV11428427215.mjs",
+    "verify:purchase-order-canonical-template-lock:v11428427214": "node scripts/verifyPurchaseOrderCanonicalTemplateLockV11428427214.mjs",
+    "verify:purchase-order-business-identity:v11428427211": "node scripts/verifyPurchaseOrderBusinessIdentityV11428427211.mjs",
+    "verify:purchase-order-true-runtime:v11428427210": "node scripts/verifyPurchaseOrderTrueRuntimeV11428427210.mjs",
+    "verify:purchase-order-requirement-runtime:v1142842729": "node scripts/verifyPurchaseOrderRequirementRuntimeV1142842729.mjs",
+    "verify:purchase-order-data-print-runtime:v1142842728": "node scripts/verifyPurchaseOrderDataPrintRuntimeV1142842728.mjs",
+    "verify:purchase-order-detail-real-runtime:v1142842727": "node scripts/verifyPurchaseOrderDetailRealRuntimeV1142842727.mjs",
+    "verify:pce-page-runtime-purchase-order:v1142842726": "node scripts/verifyPcePageRuntimePurchaseOrderV1142842726.mjs",
+    "verify:purchase-order-print-detail:v1142842725": "node scripts/verifyPurchaseOrderPrintDetailV1142842725.mjs",
+    "verify:pce-print-form-standard:v11428427243": "node scripts/verifyPcePrintFormStandardV11428427243.mjs",
+    "verify:scm-purchase-order-document-view:v11428427242": "node scripts/verifyScmPurchaseOrderDocumentViewV11428427242.mjs",
+    "verify:scm-purchase-order-identity:v11428427241": "node scripts/verifyScmPurchaseOrderIdentityV11428427241.mjs",
+    "verify:scm-purchase-order-business-view:v1142842724": "node scripts/verifyScmPurchaseOrderBusinessViewV1142842724.mjs",
+    "verify:pce-list-display-governance:v1142842722": "node scripts/verifyPceListDisplayGovernanceV1142842722.mjs",
+    "verify:scm-purchase-order-detail-flow:v1142842721": "node scripts/verifyScmPurchaseOrderDetailFlowV1142842721.mjs",
+    "verify:scm-purchase-order-lifecycle:v114284272": "node scripts/verifyScmPurchaseOrderLifecycleV114284272.mjs",
+    "verify:scm-purchase-order-final-check:v114284271146": "node scripts/verifyScmPurchaseOrderCreationFinalCheckV114284271146.mjs",
+    "verify:scm-purchase-order-creation-context:v114284271145": "node scripts/verifyScmPurchaseOrderCreationContextV114284271145.mjs",
+    "verify:scm-purchase-order-supplier-real-split:v114284271143": "node scripts/verifyScmPurchaseOrderSupplierRealSplitV114284271143.mjs",
+    "verify:scm-purchase-order-draft-runtime-source:v1142842711431": "node scripts/verifyScmPurchaseOrderDraftRuntimeSourceV1142842711431.mjs",
+    "verify:scm-purchase-order-material-eligibility:v114284271144": "node scripts/verifyScmPurchaseOrderMaterialEligibilityV114284271144.mjs",
+    "verify:scm-purchase-order-draft-ui-refinement:v114284271142": "node scripts/verifyScmPurchaseOrderDraftUiRefinementV114284271142.mjs",
+    "verify:scm-purchase-order-supplier-assignment-ui:v114284271141": "node scripts/verifyScmPurchaseOrderSupplierAssignmentUiV114284271141.mjs",
+    "verify:scm-purchase-order-supplier-split:v11428427114": "node scripts/verifyScmPurchaseOrderSupplierSplitV11428427114.mjs",
+    "verify:scm-purchase-order-draft-quantity-rule:v114284271131": "node scripts/verifyScmPurchaseOrderDraftQuantityRuleV114284271131.mjs",
+    "verify:scm-purchase-order-draft-runtime:v11428427113": "node scripts/verifyScmPurchaseOrderDraftRuntimeV11428427113.mjs",
+    "verify:scm-purchase-order-quantity-model:v11428427112": "node scripts/verifyScmPurchaseOrderQuantityModelV11428427112.mjs",
+    "verify:scm-purchase-order-item-source:v11428427111": "node scripts/verifyScmPurchaseOrderItemSourceV11428427111.mjs",
+    "verify:scm-purchase-order-creation-runtime:v114284271": "node scripts/verifyScmPurchaseOrderCreationRuntimeV114284271.mjs",
+    "verify:scm-supplier-recommendation-gate:v11428425": "node scripts/verifyScmSupplierRecommendationGateV11428425.mjs",
+    "verify:scm-supplier-recommendation-gate-runtime:v114284251": "node scripts/verifyScmSupplierRecommendationGateRuntimeV114284251.mjs",
+    "verify:process-visual-runtime:v114284252": "node scripts/verifyProcessVisualRuntimeV114284252.mjs",
+    "verify:scm-inquiry-quotation-chain-continuity-r2": "node scripts/verifyScmInquiryQuotationChainContinuityR2.mjs",
+    "verify:scm-quote-comparison-data-source-consistency-r2": "node scripts/verifyScmQuoteComparisonDataSourceConsistencyR2.mjs",
+    "verify:scm-quote-comparison-production-continuity-r1": "node scripts/verifyScmQuoteComparisonProductionContinuityR1.mjs",
+    "verify:scm-quote-comparison-continuity:v11428423": "node scripts/verifyScmQuoteComparisonContinuityV11428423.mjs",
+    "verify:scm-supplier-quotation-chain:v11428422": "node scripts/verifyScmSupplierQuotationBusinessChainV11428422.mjs",
+    "verify:scm-purchase-inquiry-chain-r1:v11428421": "node scripts/verifyScmPurchaseInquiryBusinessChainR1V11428421.mjs",
+    "verify:scm-purchase-inquiry-runtime:v11428421": "node scripts/verifyScmPurchaseInquiryRuntimeV11428421.mjs",
+    "verify:supplier-quote-runtime:v114289": "node scripts/verifySupplierQuoteRuntimeV114289.mjs",
+    "verify:quote-comparison-runtime:v1142810": "node scripts/verifyQuoteComparisonRuntimeV1142810.mjs",
+    "verify:material-price-context:v1142815": "node scripts/verifyMaterialPriceContextV1142815.mjs",
+    "verify:regression-recovery:v11428151": "node scripts/verifyV11428151RegressionRecovery.mjs",
+    "verify:business-enhancement-boundary:v11428152": "node scripts/verifyBusinessEnhancementBoundaryGovernanceV11428152.mjs",
+    "verify:supplier-recommendation-decision:v1142816": "node scripts/verifySupplierRecommendationDecisionRuntimeV1142816.mjs",
+    "verify:supplier-recommendation-real-handoff:v11428161": "node scripts/verifySupplierRecommendationRealHandoffV11428161.mjs",
+    "verify:supplier-recommendation-runtime-path:v11428162": "node scripts/verifySupplierRecommendationRuntimePathV11428162.mjs",
+    "verify:process-node-runtime-acceptance:v11428162": "node scripts/verifyProcessNodeRuntimeAcceptanceV11428162.mjs",
+    "verify:supplier-recommendation-entry-consistency:v11428163": "node scripts/verifySupplierRecommendationEntryConsistencyV11428163.mjs",
+    "verify:scm-process-center-navigation:v11428101": "node scripts/verifyScmProcessCenterNavigationV11428101.mjs",
+    "verify:scm-node-page-governance:v11428103": "node scripts/verifyScmNodePageGovernanceV11428103.mjs",
+    "verify:scm-page-governance-compliance:v114281031": "node scripts/verifyScmPageGovernanceComplianceV114281031.mjs",
+    "verify:codex-command-governance:v114281031a": "node scripts/verifyCodexCommandGovernanceV114281031A.mjs",
+    "verify:business-name-approval-binding:v114281032": "node scripts/verifyBusinessNameApprovalBindingV114281032.mjs",
+    "verify:page-shell-name-governance:v114281035": "node scripts/verifyPageShellNameGovernanceV114281035.mjs",
+    "dev": "powershell.exe -ExecutionPolicy Bypass -File ../tools/Start-PceUnifiedDevelopment.ps1",
+    "dev:unified-acceptance": "vite --host localhost --port 5173 --strictPort --mode unified-acceptance",
+    "dev:frontend-only": "vite --host localhost --port 5173 --strictPort --mode frontend-only",
+    "verify:pce-erp-governance:v11428187": "node scripts/verifyPceErpGovernanceFrameworkV11428187.mjs",
+    "verify:scm-purchase-golden-path:v114288": "node scripts/verifyScmPurchaseGoldenPathV114288.mjs",
+    "verify:purchase-inquiry-supplier-selection:v114287-supplement": "node scripts/verifyPurchaseInquirySupplierSelectionV114287Supplement.mjs",
+    "verify:scm-inquiry-business-closure:v114287a": "node scripts/verifyScmInquiryBusinessClosureV114287A.mjs",
+    "verify:scm-purchase-inquiry-handoff:v11428818": "node scripts/verifyScmPurchaseInquiryHandoffV11428818.mjs",
+    "verify:price-approval-business-display:v114288181": "node scripts/verifyPriceApprovalBusinessDisplayV114288181.mjs",
+    "prebuild": "npm run verify:pce-playwright-runner-safety && npm run verify:pce-fact-load-error-contract:v5814 && npm run verify:bank-send-task:v59-guards && npm run verify:bank-send-preparation:v5811-write-contract && npm run verify:bank-send-preparation:v5811-facts && npm run verify:purchase-upstream-governance:v57 && npm run verify:payment-chain-legacy-governance:v56 && npm run verify:pce-business-action-permission:v552 && npm run verify:pce-business-action-real-data:v5511 && npm run verify:pce-business-action-contract:v551 && npm run verify:payment-chain-state-machine:v55 && npm run verify:web-acceptance-contract && npm run verify:pce-filter-contract-standard && npm run verify:pce-filter-control:v532 && npm run verify:formal-payment-order:v542-guards && npm run verify:formal-payment-order:v541-guards && npm run verify:formal-payment-order:v54-guards && npm run verify:formal-payment-order:v533-guards && npm run verify:formal-payment-order:v53-guards && npm run verify:formal-payment-order:v531-guards && npm run verify:pce-purchase-payable-slice && npm run verify:pce-empty-table-fixed-header-evidence && npm run verify:pce-selection-export-context && npm run verify:pce-operation-column-layout && npm run verify:pce-list-required-controls && npm run verify:pce-fixed-columns && npm run verify:pce-horizontal-scroll && npm run verify:pce-canonical-names && npm run verify:pce-change-scope && npm run verify:pce-three-page-batch-capabilities && npm run verify:pce-capability-invariants && npm run verify:pce-page-enforcement && npm run verify:pce-ui-fast && npm run verify:foundation-wave1-preview",
+    "build": "npm run verify:pce-formal-import-backend-continuity && npm run verify:pce-import-template-localization && npm run verify:pce-formal-import-file-type-dispatch && npm run verify:pce-formal-import-actor-context && npm run verify:pce-base-data-row-selection && npm run verify:pce-latest-base-data-template-adoption && npm run verify:pce-latest-base-data-provider-continuity && npm run verify:pce-base-data-capability-non-regression && npm run verify:completed-module-contracts && npm run verify:single-formal-flow && npm run verify:purchase-request-single-entry && npm run verify:frontend-page-identity && npm run verify:system-config-non-regression && npm run verify:operation-route-recovery:p0 && vite build .",
+    "scan:purchase-inquiry-runtime:v1142860": "node scripts/verifyPurchaseInquiryRuntimeV1142860.mjs --scan-only",
+    "verify:purchase-inquiry-runtime:v1142860": "node scripts/verifyPurchaseInquiryRuntimeV1142860.mjs",
+    "scan:purchase-inquiry-quotation-runtime:v1142861": "node scripts/verifyPurchaseInquiryQuotationRuntimeV1142861.mjs --scan-only",
+    "verify:purchase-inquiry-quotation-runtime:v1142861": "node scripts/verifyPurchaseInquiryQuotationRuntimeV1142861.mjs",
+    "scan:purchase-inquiry-price-review-preparation:v1142862": "node scripts/verifyPurchaseInquiryPriceReviewPreparationV1142862.mjs --scan-only",
+    "verify:purchase-inquiry-price-review-preparation:v1142862": "node scripts/verifyPurchaseInquiryPriceReviewPreparationV1142862.mjs",
+    "scan:purchase-inquiry-price-approval-entry:v1142863": "node scripts/verifyPurchaseInquiryPriceApprovalEntryV1142863.mjs --scan-only",
+    "verify:purchase-inquiry-price-approval-entry:v1142863": "node scripts/verifyPurchaseInquiryPriceApprovalEntryV1142863.mjs",
+    "scan:purchase-inquiry-price-approval-creation-freeze:v1142864": "node scripts/verifyPurchaseInquiryPriceApprovalCreationFreezeV1142864.mjs --scan-only",
+    "verify:purchase-inquiry-price-approval-creation-freeze:v1142864": "node scripts/verifyPurchaseInquiryPriceApprovalCreationFreezeV1142864.mjs",
+    "scan:purchase-inquiry-formal-price-approval-projection:v1142865": "node scripts/verifyPurchaseInquiryFormalPriceApprovalProjectionV1142865.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-projection:v1142865": "node scripts/verifyPurchaseInquiryFormalPriceApprovalProjectionV1142865.mjs",
+    "scan:purchase-inquiry-formal-price-approval-object:v1142866": "node scripts/verifyPurchaseInquiryFormalPriceApprovalObjectV1142866.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-object:v1142866": "node scripts/verifyPurchaseInquiryFormalPriceApprovalObjectV1142866.mjs",
+    "scan:purchase-inquiry-formal-price-approval-runtime:v1142867": "node scripts/verifyPurchaseInquiryFormalPriceApprovalRuntimeV1142867.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-runtime:v1142867": "node scripts/verifyPurchaseInquiryFormalPriceApprovalRuntimeV1142867.mjs",
+    "scan:purchase-inquiry-formal-price-approval-creation-simulation:v1142868": "node scripts/verifyPurchaseInquiryFormalPriceApprovalCreationSimulationV1142868.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-creation-simulation:v1142868": "node scripts/verifyPurchaseInquiryFormalPriceApprovalCreationSimulationV1142868.mjs",
+    "scan:purchase-inquiry-formal-price-approval-creation-command:v1142869": "node scripts/verifyPurchaseInquiryFormalPriceApprovalCreationCommandV1142869.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-creation-command:v1142869": "node scripts/verifyPurchaseInquiryFormalPriceApprovalCreationCommandV1142869.mjs",
+    "scan:purchase-inquiry-formal-price-approval-authorization-audit:v11428610": "node scripts/verifyPurchaseInquiryFormalPriceApprovalAuthorizationAuditV11428610.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-authorization-audit:v11428610": "node scripts/verifyPurchaseInquiryFormalPriceApprovalAuthorizationAuditV11428610.mjs",
+    "scan:purchase-inquiry-formal-price-approval-final-release:v11428611": "node scripts/verifyPurchaseInquiryFormalPriceApprovalFinalReleaseV11428611.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-final-release:v11428611": "node scripts/verifyPurchaseInquiryFormalPriceApprovalFinalReleaseV11428611.mjs",
+    "scan:purchase-inquiry-formal-price-approval-sandbox:v11428612": "node scripts/verifyPurchaseInquiryFormalPriceApprovalSandboxV11428612.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-sandbox:v11428612": "node scripts/verifyPurchaseInquiryFormalPriceApprovalSandboxV11428612.mjs",
+    "scan:purchase-inquiry-formal-price-approval-release-agreement:v11428613": "node scripts/verifyPurchaseInquiryFormalPriceApprovalReleaseAgreementV11428613.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-release-agreement:v11428613": "node scripts/verifyPurchaseInquiryFormalPriceApprovalReleaseAgreementV11428613.mjs",
+    "scan:purchase-inquiry-formal-price-approval-execution-boundary:v11428614": "node scripts/verifyPurchaseInquiryFormalPriceApprovalExecutionBoundaryV11428614.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-execution-boundary:v11428614": "node scripts/verifyPurchaseInquiryFormalPriceApprovalExecutionBoundaryV11428614.mjs",
+    "scan:purchase-inquiry-formal-price-approval-end-to-end-drill:v11428615": "node scripts/verifyPurchaseInquiryFormalPriceApprovalEndToEndDrillV11428615.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-end-to-end-drill:v11428615": "node scripts/verifyPurchaseInquiryFormalPriceApprovalEndToEndDrillV11428615.mjs",
+    "scan:purchase-inquiry-formal-price-approval-post-creation-takeover:v11428616": "node scripts/verifyPurchaseInquiryFormalPriceApprovalPostCreationTakeoverV11428616.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-post-creation-takeover:v11428616": "node scripts/verifyPurchaseInquiryFormalPriceApprovalPostCreationTakeoverV11428616.mjs",
+    "scan:purchase-inquiry-formal-price-approval-post-creation-lifecycle:v11428617": "node scripts/verifyPurchaseInquiryFormalPriceApprovalPostCreationLifecycleV11428617.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-post-creation-lifecycle:v11428617": "node scripts/verifyPurchaseInquiryFormalPriceApprovalPostCreationLifecycleV11428617.mjs",
+    "scan:purchase-inquiry-formal-price-approval-workflow-handoff:v11428618": "node scripts/verifyPurchaseInquiryFormalPriceApprovalWorkflowHandoffV11428618.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-workflow-handoff:v11428618": "node scripts/verifyPurchaseInquiryFormalPriceApprovalWorkflowHandoffV11428618.mjs",
+    "scan:purchase-inquiry-formal-price-approval-workflow-start:v11428619": "node scripts/verifyPurchaseInquiryFormalPriceApprovalWorkflowStartV11428619.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-workflow-start:v11428619": "node scripts/verifyPurchaseInquiryFormalPriceApprovalWorkflowStartV11428619.mjs",
+    "scan:purchase-inquiry-formal-price-approval-instance-task:v11428620": "node scripts/verifyPurchaseInquiryFormalPriceApprovalInstanceTaskV11428620.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-instance-task:v11428620": "node scripts/verifyPurchaseInquiryFormalPriceApprovalInstanceTaskV11428620.mjs",
+    "scan:purchase-inquiry-formal-price-approval-workflow-runtime:v11428621": "node scripts/verifyPurchaseInquiryFormalPriceApprovalWorkflowRuntimeV11428621.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-workflow-runtime:v11428621": "node scripts/verifyPurchaseInquiryFormalPriceApprovalWorkflowRuntimeV11428621.mjs",
+    "scan:purchase-inquiry-formal-price-approval-node-decision:v11428622": "node scripts/verifyPurchaseInquiryFormalPriceApprovalNodeDecisionV11428622.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-node-decision:v11428622": "node scripts/verifyPurchaseInquiryFormalPriceApprovalNodeDecisionV11428622.mjs",
+    "scan:purchase-inquiry-formal-price-approval-feedback:v11428623": "node scripts/verifyPurchaseInquiryFormalPriceApprovalFeedbackV11428623.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-feedback:v11428623": "node scripts/verifyPurchaseInquiryFormalPriceApprovalFeedbackV11428623.mjs",
+    "scan:purchase-inquiry-formal-price-approval-audit-archive:v11428624": "node scripts/verifyPurchaseInquiryFormalPriceApprovalAuditArchiveV11428624.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-audit-archive:v11428624": "node scripts/verifyPurchaseInquiryFormalPriceApprovalAuditArchiveV11428624.mjs",
+    "scan:purchase-inquiry-formal-price-approval-governance-summary:v11428625": "node scripts/verifyPurchaseInquiryFormalPriceApprovalGovernanceSummaryV11428625.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-governance-summary:v11428625": "node scripts/verifyPurchaseInquiryFormalPriceApprovalGovernanceSummaryV11428625.mjs",
+    "scan:purchase-inquiry-formal-price-approval-operation-validation:v1142870": "node scripts/verifyPurchaseInquiryFormalPriceApprovalOperationValidationV1142870.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-operation-validation:v1142870": "node scripts/verifyPurchaseInquiryFormalPriceApprovalOperationValidationV1142870.mjs",
+    "scan:purchase-inquiry-formal-price-approval-business-view-user-acceptance:v1142871": "node scripts/verifyPurchaseInquiryFormalPriceApprovalBusinessViewUserAcceptanceV1142871.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-business-view-user-acceptance:v1142871": "node scripts/verifyPurchaseInquiryFormalPriceApprovalBusinessViewUserAcceptanceV1142871.mjs",
+    "scan:purchase-inquiry-formal-price-approval-navigation:v1142872": "node scripts/verifyPurchaseInquiryFormalPriceApprovalNavigationV1142872.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-navigation:v1142872": "node scripts/verifyPurchaseInquiryFormalPriceApprovalNavigationV1142872.mjs",
+    "scan:purchase-inquiry-formal-price-approval-scenario:v1142873": "node scripts/verifyPurchaseInquiryFormalPriceApprovalScenarioV1142873.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-scenario:v1142873": "node scripts/verifyPurchaseInquiryFormalPriceApprovalScenarioV1142873.mjs",
+    "scan:purchase-inquiry-formal-price-approval-view-separation:v1142874": "node scripts/verifyPurchaseInquiryFormalPriceApprovalViewSeparationV1142874.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-view-separation:v1142874": "node scripts/verifyPurchaseInquiryFormalPriceApprovalViewSeparationV1142874.mjs",
+    "scan:purchase-inquiry-formal-price-approval-user-acceptance:v1142875": "node scripts/verifyPurchaseInquiryFormalPriceApprovalUserAcceptanceV1142875.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-user-acceptance:v1142875": "node scripts/verifyPurchaseInquiryFormalPriceApprovalUserAcceptanceV1142875.mjs",
+    "scan:purchase-inquiry-formal-price-approval-human-acceptance:v1142876": "node scripts/verifyPurchaseInquiryFormalPriceApprovalHumanAcceptanceV1142876.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-human-acceptance:v1142876": "node scripts/verifyPurchaseInquiryFormalPriceApprovalHumanAcceptanceV1142876.mjs",
+    "scan:purchase-inquiry-formal-price-approval-canary-cohort:v11428761": "node scripts/verifyPurchaseInquiryFormalPriceApprovalCanaryCohortV11428761.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-canary-cohort:v11428761": "node scripts/verifyPurchaseInquiryFormalPriceApprovalCanaryCohortV11428761.mjs",
+    "scan:purchase-inquiry-formal-price-approval-human-business-acceptance:v11428762": "node scripts/verifyPurchaseInquiryFormalPriceApprovalHumanBusinessAcceptanceV11428762.mjs --scan-only",
+    "verify:purchase-inquiry-formal-price-approval-human-business-acceptance:v11428762": "node scripts/verifyPurchaseInquiryFormalPriceApprovalHumanBusinessAcceptanceV11428762.mjs",
+    "scan:purchase-request-inquiry-mapping:v1142877": "node scripts/verifyPurchaseRequestInquiryMappingV1142877.mjs --scan-only",
+    "verify:purchase-request-inquiry-mapping:v1142877": "node scripts/verifyPurchaseRequestInquiryMappingV1142877.mjs",
+    "scan:inquiry-creation-simulation-supplier-preparation:v1142878": "node scripts/verifyInquiryCreationSimulationSupplierPreparationV1142878.mjs --scan-only",
+    "verify:inquiry-creation-simulation-supplier-preparation:v1142878": "node scripts/verifyInquiryCreationSimulationSupplierPreparationV1142878.mjs",
+    "scan:purchase-request-submit-selection-fix:v11428781": "node scripts/verifyPurchaseRequestSubmitSelectionFixV11428781.mjs --scan-only",
+    "verify:purchase-request-submit-selection-fix:v11428781": "node scripts/verifyPurchaseRequestSubmitSelectionFixV11428781.mjs",
+    "verify:purchase-inquiry-lifecycle-workbench:v11428713": "node scripts/verifyPurchaseInquiryLifecycleWorkbenchV11428713.mjs",
+    "verify:purchase-inquiry-lifecycle-regression:v114287131": "node scripts/verifyPurchaseInquiryLifecycleRegressionV114287131.mjs",
+    "verify:purchase-inquiry-entry-governance:v11428712": "node scripts/verifyPurchaseInquiryEntryGovernanceV11428712.mjs",
+    "test:purchase-inquiry-entry-governance:v11428712": "node --test tests/acceptance/enterprisePurchaseInquiryEntryGovernanceV11428712.test.mjs",
+    "verify:purchase-inquiry-activation:v11428711": "node scripts/verifyPurchaseInquiryActivationV11428711.mjs",
+    "scan:purchase-inquiry-preparation-provider:v11428710": "node scripts/verifyPurchaseInquiryPreparationProviderV11428710.mjs --scan-only",
+    "verify:purchase-inquiry-preparation-provider:v11428710": "node scripts/verifyPurchaseInquiryPreparationProviderV11428710.mjs",
+    "scan:purchase-request-inquiry-preparation-creation:v1142879": "node scripts/verifyPurchaseRequestInquiryPreparationCreationV1142879.mjs --scan-only",
+    "verify:purchase-request-inquiry-preparation-creation:v1142879": "node scripts/verifyPurchaseRequestInquiryPreparationCreationV1142879.mjs",
+    "scan:purchase-request-business-action-closure:v11428782": "node scripts/verifyPurchaseRequestBusinessActionClosureV11428782.mjs --scan-only",
+    "verify:purchase-request-business-action-closure:v11428782": "node scripts/verifyPurchaseRequestBusinessActionClosureV11428782.mjs",
+    "scan:enterprise-entry-governance:v852": "node scripts/scanEnterpriseEntryBoundaryV852.mjs",
+    "verify:enterprise-entry-governance:v852": "node scripts/verifyEnterpriseEntryGovernanceV852.mjs",
+    "test:enterprise-entry-governance:v852": "playwright test --config=playwright.v852.config.js",
+    "finalize:enterprise-entry-governance:v852": "node scripts/finalizeEnterpriseEntryGovernanceV852.mjs",
+    "scan:enterprise-data-boundary:v851": "node scripts/scanEnterpriseDataBoundaryV851.mjs",
+    "verify:enterprise-data-boundary:v851": "node scripts/verifyEnterpriseDataBoundaryV851.mjs",
+    "test:enterprise-data-boundary:v851": "playwright test --config=playwright.v851.config.js",
+    "finalize:enterprise-data-boundary:v851": "node scripts/finalizeEnterpriseDataBoundaryV851.mjs",
+    "verify:bank-send-task:v59-guards": "node scripts/verifyBankSendTaskV59Guards.mjs",
+    "finalize:bank-send-task:v59": "node scripts/finalizeBankSendTaskV59.mjs",
+    "verify:pce-fact-load-error-contract:v5814": "node scripts/verifyPceFactLoadErrorContractV5814.mjs",
+    "verify:pce-enterprise-list-runtime:v612": "node scripts/verifyEnterpriseListPage.mjs",
+    "verify:pce-page-acceptance:v613": "node scripts/verifyPcePageAcceptance.mjs",
+    "test:pce-page-acceptance-rules:v613": "node --test tests/acceptance/pcePageAcceptanceRules.test.mjs",
+    "verify:payment-chain-page-acceptance:v62": "node scripts/verifyPaymentChainPageAcceptanceV62.mjs",
+    "test:payment-chain-page-acceptance-rules:v62": "node --test tests/acceptance/*.test.mjs",
+    "finalize:payment-chain-page-acceptance:v62": "node scripts/finalizePaymentChainPageAcceptanceV62.mjs",
+    "verify:payment-chain-page-acceptance:v63": "node scripts/verifyPaymentChainPageAcceptanceV63.mjs",
+    "verify:bank-send-simulation:v64": "playwright test --config playwright.v64.config.js",
+    "verify:bank-send-simulation:v64-rules": "node scripts/verifyBankSendExecutionSimulationV64.mjs",
+    "finalize:bank-send-simulation:v64": "node scripts/finalizeBankSendExecutionSimulationV64.mjs",
+    "verify:bank-send-simulation-isolation:v65": "playwright test --config playwright.v65.config.js",
+    "verify:bank-send-chain-final-approval:v66": "playwright test --config playwright.v66.config.js",
+    "verify:bank-send-production-release:v67": "playwright test --config playwright.v67.config.js",
+    "verify:bank-send-execution-framework:v68": "playwright test --config playwright.v68.config.js",
+    "verify:supplier-reconciliation-performance:v81": "playwright test --config playwright.v81.config.js",
+    "verify:supplier-settlement-page-governance:v811": "playwright test --config playwright.v811.config.js",
+    "verify:pce-enterprise-list-filter-governance:v812": "playwright test --config playwright.v812.config.js",
+    "report:pce-enterprise-list-filter-governance:v812": "node scripts/verifyPceEnterpriseListFilterGovernanceV812.mjs",
+    "finalize:pce-enterprise-list-filter-governance:v812": "node scripts/finalizePceEnterpriseListFilterGovernanceV812.mjs",
+    "verify:supplier-reconciliation-difference:v82": "playwright test --config playwright.v82.config.js",
+    "report:supplier-reconciliation-difference:v82": "node scripts/verifySupplierReconciliationDifferenceV82.mjs",
+    "finalize:supplier-reconciliation-difference:v82": "node scripts/finalizeSupplierReconciliationDifferenceV82.mjs",
+    "verify:single-formal-flow": "node scripts/verifySingleFormalFlow.mjs",
+    "verify:single-formal-flow:ui": "playwright test --config playwright.single-formal-flow.config.js",
+    "report:business-process-center:v832": "node scripts/verifyBusinessProcessCenterV832.mjs",
+    "verify:business-process-center:v832": "playwright test --config playwright.v832.config.js",
+    "finalize:business-process-center:v832": "node scripts/finalizeBusinessProcessCenterV832.mjs",
+    "report:supplier-settlement:v84": "node scripts/verifySupplierSettlementV84.mjs",
+    "verify:supplier-settlement:v84": "playwright test --config playwright.v84.config.js",
+    "test:payment-chain-page-acceptance-rules:v63": "node --test tests/acceptance/*.test.mjs",
+    "finalize:payment-chain-observability:v63": "node scripts/finalizePaymentChainObservabilityV63.mjs",
+    "finalize:pce-page-acceptance:v613": "node scripts/finalizePcePageAcceptanceV613.mjs",
+    "finalize:pce-enterprise-list-runtime:v612": "node scripts/finalizePceEnterpriseListRuntimeV612.mjs",
+    "test:pce-fact-load-error-contract:v5814": "playwright test --config=playwright.v5814.config.js",
+    "verify:pce-fact-load-error-contract:v5814-recovery": "node scripts/verifyBankSendPreparationFactLoadV5814Recovery.mjs",
+    "test:bank-send-task:v59": "playwright test --config=playwright.v59.config.js",
+    "verify:bank-send-preparation:v58-guards": "node scripts/verifyBankSendPreparationV58Guards.mjs",
+    "verify:bank-send-preparation:v581-write-contract": "node scripts/scanWriteIntentContractGapsV581.mjs",
+    "verify:bank-send-preparation:v5811-write-contract": "node scripts/scanWriteIntentContractGapsV581.mjs",
+    "verify:bank-send-preparation:v5811-facts": "node scripts/verifyBankSendPreparationV58Guards.mjs",
+    "verify:bank-send-preparation:v58-recovery": "node scripts/verifyBankSendPreparationV58Recovery.mjs",
+    "verify:bank-send-preparation:v581-recovery": "node scripts/verifyBankSendPreparationV58Recovery.mjs --version=V1.14.2.8.4.7.58.1 --report-dir=bank-send-preparation-v58-1 --checkpoint=bank_send_preparation_write_contract_ready",
+    "verify:bank-send-preparation:v5811-recovery": "node scripts/verifyBankSendPreparationV58Recovery.mjs --version=V1.14.2.8.4.7.58.1.1 --report-dir=bank-send-preparation-v58-1-1 --checkpoint=bank_send_preparation_write_contract_ready",
+    "finalize:bank-send-preparation:v5811": "node scripts/finalizeBankSendPreparationV5811.mjs",
+    "verify:bank-send-preparation:v5811-checkpoint": "node scripts/verifyBankSendPreparationV5811Checkpoint.mjs",
+    "test:bank-send-preparation:v58": "playwright test --config=playwright.v58.config.js",
+    "test:bank-send-preparation:v581": "playwright test --config=playwright.v581.config.js",
+    "test:bank-send-preparation:v5811": "playwright test --config=playwright.v581.config.js",
+    "verify:canary-operation-data:v571": "node scripts/verifyCanaryOperationDataV571.mjs",
+    "gate:canary-operation-data:v571-browser": "playwright test --config=playwright.v571.config.js",
+    "finalize:canary-operation-data:v571": "node scripts/finalizeCanaryOperationDataV571.mjs",
+    "verify:purchase-upstream-governance:v57": "node scripts/verifyCanaryOperationDataV571.mjs && node scripts/verifyPurchaseUpstreamGovernanceV57.mjs",
+    "gate:purchase-upstream-governance:v57-browser": "playwright test --config=playwright.v57.config.js",
+    "finalize:purchase-upstream-governance:v57": "node scripts/finalizePurchaseUpstreamGovernanceV57.mjs",
+    "verify:payment-chain-legacy-governance:v56": "node scripts/verifyPaymentChainLegacyGovernanceV56.mjs",
+    "verify:payment-chain-legacy-governance:v56-api": "node scripts/verifyPaymentChainLegacyGovernanceApiV56.mjs",
+    "test:payment-chain-legacy-governance:v56": "playwright test tests/ui-baseline/paymentChainLegacyGovernanceV56.spec.js --config=playwright.v56.config.js",
+    "report:payment-chain-legacy-governance:v56-protection": "node scripts/writePaymentChainLegacyGovernanceV56ProtectionReports.mjs",
+    "finalize:payment-chain-legacy-governance:v56": "node scripts/finalizePaymentChainLegacyGovernanceV56.mjs",
+    "verify:payment-chain-legacy-governance:v56-checkpoint": "node scripts/verifyPaymentChainLegacyGovernanceV56Checkpoint.mjs",
+    "verify:pce-business-action-contract:v551": "node scripts/verifyPceBusinessActionContractV551.mjs",
+    "verify:pce-business-action-permission:v552": "node scripts/verifyPceBusinessActionPermissionV552.mjs",
+    "verify:pce-business-action-permission:v552-api": "node scripts/verifyPceBusinessActionPermissionApiV552.mjs",
+    "test:pce-business-action-permission:v552": "playwright test --config=playwright.v552.config.js",
+    "report:pce-business-action-permission:v552-protection": "node scripts/writePceBusinessActionPermissionV552ProtectionReports.mjs",
+    "finalize:pce-business-action-permission:v552": "node scripts/finalizePceBusinessActionPermissionV552.mjs",
+    "verify:pce-business-action-permission:v552-checkpoint": "node scripts/verifyPceBusinessActionPermissionV552Checkpoint.mjs",
+    "verify:pce-business-action-real-data:v5511": "node scripts/verifyPceBusinessActionRealDataV5511.mjs",
+    "verify:pce-business-action-real-data:v5511-api": "node scripts/verifyPceBusinessActionRealDataApiV5511.mjs",
+    "test:pce-business-action-real-data:v5511": "playwright test --config=playwright.v5511.config.js",
+    "finalize:pce-business-action-real-data:v5511": "node scripts/finalizePceBusinessActionRealDataV5511.mjs",
+    "verify:pce-business-action-real-data:v5511-checkpoint": "node scripts/verifyPceBusinessActionRealDataV5511Checkpoint.mjs",
+    "test:pce-business-action-contract:v551": "node scripts/verifyPceBusinessActionUserPathV551.mjs",
+    "gate:pce-business-action-contract:v551": "node scripts/verifyPceBusinessActionUserPathV551.mjs",
+    "finalize:pce-business-action-contract:v551": "node scripts/finalizePceBusinessActionContractV551.mjs",
+    "verify:pce-business-action-contract:v551-checkpoint": "node scripts/verifyPceBusinessActionContractV551Checkpoint.mjs",
+    "gate:pce-web-acceptance:static": "node scripts/verifyPceWebAcceptanceStatic.mjs",
+    "verify:web-acceptance-contract": "node scripts/verifyPceWebAcceptanceStatic.mjs",
+    "verify:pce-filter-contract-standard": "node scripts/verifyPceFilterContractV521Guards.mjs",
+    "gate:pce-filter-contract-standard": "playwright test --config=playwright.v521.config.js",
+    "finalize:pce-filter-contract-standard": "node scripts/finalizePceFilterContractV521.mjs",
+    "verify:pce-filter-contract-checkpoint": "node scripts/verifyPceFilterContractV521Checkpoint.mjs",
+    "gate:web-acceptance": "node scripts/runPceWebAcceptanceGovernance.mjs",
+    "verify:web-acceptance:strict": "node scripts/verifyPceWebAcceptanceStrict.mjs",
+    "gate:web-acceptance:changed": "node scripts/verifyPceWebAcceptanceChanged.mjs",
+    "gate:web-acceptance:strict-browser": "playwright test --config=playwright.v503.config.js",
+    "gate:web-acceptance:strict-recovery": "playwright test --config=playwright.v503.recovery.config.js",
+    "gate:web-acceptance:golden-flow": "node scripts/runPceWebAcceptanceGoldenFlowV503.mjs",
+    "gate:pce-web-acceptance:runtime": "node scripts/runPceWebAcceptanceRuntime.mjs",
+    "gate:pce-web-acceptance:all": "node scripts/runPceWebAcceptanceAll.mjs",
+    "gate:pce-web-acceptance:full-project-scan": "playwright test tests/ui-baseline/pceFullProjectReadonlyScan.spec.js --config=playwright.runtime.config.js",
+    "gate:pce-web-acceptance:finance-chain-browser": "playwright test tests/ui-baseline/pceFinanceChainGovernance.spec.js --config=playwright.runtime.config.js",
+    "preview": "vite preview",
+    "verify:payment-voucher-precheck": "node scripts/verifyPaymentVoucherPreparePrecheckMatrix.mjs",
+    "verify:payment-voucher-precheck-contract": "node scripts/verifyPaymentVoucherPreparePrecheckContract.mjs",
+    "verify:payment-voucher-source-snapshot": "node scripts/verifyPaymentVoucherPrepareSourceSnapshot.mjs",
+    "verify:payment-voucher-request-control": "node scripts/verifyPaymentVoucherPrepareRequestControl.mjs",
+    "verify:payment-voucher-simulation-result": "node scripts/verifyPaymentVoucherPrepareSimulationResult.mjs",
+    "verify:payment-voucher-simulation-guard": "node scripts/verifyPaymentVoucherPrepareSimulationExecutionGuard.mjs",
+    "verify:payment-voucher-acceptance-manifest": "node scripts/verifyPaymentVoucherPrepareAcceptanceManifest.mjs",
+    "verify:payment-voucher-page-acceptance": "node scripts/verifyPaymentVoucherPreparePageAcceptance.mjs",
+    "verify:payment-voucher-release-gate": "node scripts/verifyPaymentVoucherPrepareReleaseGate.mjs",
+    "verify:business-process-navigation": "node scripts/verifyBusinessProcessNavigation.mjs",
+    "verify:purchase-payable-payment-flow": "node scripts/verifyPurchasePayablePaymentFlow.mjs",
+    "verify:payable-prepare-operation-guide": "node scripts/verifyPayablePrepareOperationGuide.mjs",
+    "verify:purchase-payment-page-layouts": "node scripts/verifyPurchasePayablePaymentPageLayouts.mjs",
+    "verify:purchase-payment-page-actions": "node scripts/verifyPurchasePayablePaymentPageActions.mjs",
+    "verify:business-table-horizontal-scroll": "node scripts/verifyBusinessTableHorizontalScroll.mjs",
+    "verify:purchase-payable-action-page-observability": "node scripts/verifyPurchasePayableActionPageObservability.mjs",
+    "verify:business-action-result-page-isolation": "node scripts/verifyBusinessActionResultPageIsolation.mjs",
+    "verify:business-runtime-display-invariants": "node scripts/verifyBusinessRuntimeDisplayInvariants.mjs",
+    "verify:business-target-evidence-status-matrix": "node scripts/verifyBusinessTargetEvidenceStatusMatrix.mjs",
+    "verify:business-target-evidence-trace-matrix": "node scripts/verifyBusinessTargetEvidenceTraceMatrix.mjs",
+    "verify:business-page-selection-actions": "node scripts/verifyBusinessPageSelectionAndActionControls.mjs",
+    "verify:pce-page-enforcement": "node scripts/enforcePcePageBaseline.mjs",
+    "verify:pce-canonical-names": "node scripts/verifyPceCanonicalNames.mjs",
+    "verify:pce-selection-export-context": "node scripts/verifyPceSelectionExportContext.mjs",
+    "verify:pce-selection-export-canonical": "node scripts/verifyPceSelectionExportCanonical.mjs",
+    "verify:pce-operation-column-layout": "node scripts/verifyPceOperationColumnLayout.mjs",
+    "verify:pce-playwright-runner-safety": "node --test tests/acceptance/pcePlaywrightRunnerSafety.test.mjs",
+    "verify:pce-all-business-operation-columns": "node scripts/verifyPceAllBusinessOperationColumns.mjs",
+    "verify:pce-all-business-operation-evidence": "node scripts/verifyPceAllBusinessOperationEvidence.mjs",
+    "verify:pce-list-required-controls": "node scripts/verifyPceListRequiredControls.mjs",
+    "verify:pce-fixed-columns": "node scripts/verifyPceFixedColumns.mjs",
+    "verify:pce-horizontal-scroll": "node scripts/verifyPceHorizontalScroll.mjs",
+    "verify:pce-fixed-columns-evidence": "node scripts/verifyPceFixedColumnsEvidence.mjs",
+    "verify:pce-change-scope": "node scripts/verifyPceChangeScope.mjs",
+    "verify:pce-capability-invariants": "node scripts/verifyPceCapabilityInvariants.mjs",
+    "verify:pce-three-page-batch-capabilities": "node scripts/verifyPceThreePageBatchCapabilities.mjs",
+    "verify:pce-ui-fast": "node scripts/verifyPceUiBaseline.mjs && node scripts/verifyPceDefectRegressionGuards.mjs && node scripts/classifyPceVerificationFailures.mjs",
+    "verify:pce-ui-discover": "node scripts/verifyPceUiBaseline.mjs",
+    "verify:pce-ui-classification": "node scripts/classifyPceVerificationFailures.mjs",
+    "verify:pce-defect-regression": "node scripts/verifyPceDefectRegressionGuards.mjs",
+    "verify:pce-finance-table-layout": "node scripts/verifyPceFinanceTableLayoutRuntime.mjs",
+    "verify:pce-finance-table-layout-evidence": "node scripts/verifyPceFinanceTableLayoutEvidence.mjs",
+    "verify:list-toolbar-baseline": "playwright test -c playwright.runtime.config.js tests/ui-baseline/pceUiBaselineRuntime.spec.js",
+    "verify:page-layout-baseline": "playwright test -c playwright.runtime.config.js tests/ui-baseline/pceUiBaselineRuntime.spec.js",
+    "verify:fixed-column-real-coordinates": "playwright test -c playwright.runtime.config.js tests/ui-baseline/pceUiBaselineRuntime.spec.js",
+    "verify:sidebar-navigation-baseline": "playwright test -c playwright.runtime.config.js tests/ui-baseline/pceUiBaselineRuntime.spec.js -g \"main-sidebar fixed\"",
+    "verify:process-module-boundaries": "playwright test -c playwright.runtime.config.js tests/ui-baseline/pceUiBaselineRuntime.spec.js -g process-center",
+    "verify:payable-check-operation-closure": "playwright test -c playwright.runtime.config.js tests/ui-baseline/pceUiBaselineRuntime.spec.js -g \"payable-check-main 全量页面真实基线\"",
+    "verify:downstream-flow-navigation": "node scripts/verifyBusinessProcessNavigation.mjs",
+    "verify:pce-ui-runtime": "node scripts/runPceUiRuntimeVerification.mjs",
+    "verify:pce-ui-visual": "node scripts/verifyPceUiVisualRegression.mjs",
+    "verify:pce-business-regression": "node scripts/verifyPurchasePayablePaymentFlow.mjs && node scripts/verifyPurchasePayableToPaymentApplicationActions.mjs && node scripts/verifyPurchasePayableToPaymentApplicationWriteback.mjs && node scripts/verifyPurchasePayableToPaymentApplicationRelease.mjs",
+    "verify:purchase-payment-operation-closure": "node scripts/verifyPurchasePayablePaymentOperationClosure.mjs",
+    "verify:purchase-payable-payment-actions": "node scripts/verifyPurchasePayableToPaymentApplicationActions.mjs",
+    "verify:purchase-payable-payment-writeback": "node scripts/verifyPurchasePayableToPaymentApplicationWriteback.mjs",
+    "verify:purchase-payable-payment-release": "node scripts/verifyPurchasePayableToPaymentApplicationRelease.mjs",
+    "verify:purchase-payable-payment-application-closure": "node scripts/verifyPurchasePayableToPaymentApplicationClosure.mjs",
+    "verify:pce-runtime-pages": "playwright test -c playwright.runtime.config.js tests/business-flow/purchasePayableRuntimeAcceptance.spec.js",
+    "verify:pce-purchase-payment-all": "powershell -ExecutionPolicy Bypass -File ./scripts/Test-PcePurchasePaymentFlow.ps1",
+    "verify:pce-purchase-payable-slice": "node scripts/verifyPurchasePayableSliceStability.mjs",
+    "verify:pce-purchase-payable-slice-runtime": "playwright test -c playwright.runtime.config.js tests/ui-baseline/purchasePayableSliceStability.spec.js",
+    "verify:pce-empty-table-fixed-header": "playwright test -c playwright.runtime.config.js tests/ui-baseline/emptyTableFixedHeaderStability.spec.js",
+    "verify:pce-empty-table-fixed-header-evidence": "node scripts/verifyPceEmptyTableFixedHeaderEvidence.mjs",
+    "verify:pce-v11428472-phase1": "playwright test -c playwright.runtime.config.js tests/ui-baseline/pceV11428472PhaseOne.spec.js",
+    "verify:pce-purchase-payment-golden-flow": "node scripts/runPurchaseToFormalPaymentGoldenFlow.mjs",
+    "verify:pce-procurement-entry-golden-flow": "node scripts/runPceProcurementEntryGoldenFlow.mjs",
+    "verify:pce-golden-checkpoint-persistence": "node scripts/runPceGoldenCheckpointPersistence.mjs",
+    "verify:pce-golden-checkpoint-restore": "node scripts/runPceGoldenCheckpointRestore.mjs",
+    "verify:pce-purchase-arrival-receive-golden-flow": "node scripts/runPcePurchaseArrivalReceiveGoldenFlow.mjs",
+    "verify:pce-receive-to-incoming-inspection-ready-golden-flow": "node scripts/runPceReceiveIncomingInspectionGoldenFlow.mjs"
+    ,"verify:pce-purchase-receive-detail-refresh": "node scripts/runPcePurchaseReceiveDetailRefresh.mjs"
+    ,"verify:pce-detail-post-action-refresh-consistency": "node scripts/verifyPcePurchaseReceiveDetailRefresh.mjs"
+    ,"verify:pce-checkpoint-immutable": "node scripts/runPceGoldenCheckpointRestore.mjs receive_ready"
+    ,"verify:pce-trace-single-owner": "node scripts/verifyPceTraceSingleOwner.mjs"
+    ,"verify:pce-incoming-inspection-execution-golden-flow": "node scripts/runPceIncomingInspectionExecutionGoldenFlow.mjs"
+    ,"verify:pce-qualified-inbound-ready-golden-flow": "node scripts/runPceQualifiedInboundReadyGoldenFlow.mjs"
+    ,"verify:pce-wms-empty-state-semantics": "node scripts/runPceWmsEmptyStateSemantics.mjs"
+    ,"verify:pce-checkpoint-required-storage-resolution": "node scripts/verifyPceCheckpointRequiredStorageResolution.mjs"
+    ,"verify:pce-qualified-inbound-completion-golden-flow": "node scripts/runPceQualifiedInboundCompletionGoldenFlow.mjs"
+    ,"verify:pce-payable-prepare-golden-flow": "node scripts/runPcePayablePrepareGoldenFlow.mjs"
+    ,"verify:pce-payable-check-golden-flow": "node scripts/runPcePayableCheckGoldenFlow.mjs"
+    ,"verify:pce-supplier-settlement-golden-flow": "node scripts/runPceSupplierSettlementGoldenFlow.mjs"
+    ,"verify:pce-supplier-settlement-pre-reconciliation": "node scripts/runPceSupplierSettlementPreReconciliationGate.mjs"
+    ,"verify:pce-purchase-reconciliation-precheck-matrix": "node scripts/verifyPurchaseReconciliationPrecheckMatrix.mjs"
+    ,"verify:pce-purchase-reconciliation-pre-generation": "node scripts/runPcePurchaseReconciliationPreGenerationGate.mjs"
+    ,"verify:pce-purchase-reconciliation-simulation-matrix": "node scripts/verifyPurchaseReconciliationSimulationStateMatrix.mjs"
+    ,"verify:pce-purchase-reconciliation-simulation-state-machine": "node scripts/runPcePurchaseReconciliationSimulationStateMachineGate.mjs"
+    ,"verify:pce-purchase-reconciliation-final-review-matrix": "node scripts/verifyPurchaseReconciliationFinalReviewMatrix.mjs"
+    ,"gate:purchase-reconciliation:final-review": "node scripts/runPcePurchaseReconciliationFinalReviewGate.mjs"
+    ,"verify:pce-purchase-reconciliation-transaction-matrix": "node scripts/verifyPurchaseReconciliationTransactionMatrix.mjs"
+    ,"gate:purchase-reconciliation:transaction-design": "node scripts/runPcePurchaseReconciliationTransactionDesignGate.mjs"
+    ,"verify:pce-purchase-reconciliation-controlled-generation-matrix": "node scripts/verifyPurchaseReconciliationControlledGenerationMatrix.mjs"
+    ,"gate:purchase-reconciliation:controlled-generation": "node scripts/runPcePurchaseReconciliationControlledGenerationGate.mjs"
+    ,"gate:purchase-reconciliation:production-persistence": "node scripts/runPurchaseReconciliationProductionPersistenceGate.mjs"
+    ,"verify:pce-purchase-reconciliation-matched-ready-guards": "node scripts/verifyPurchaseReconciliationMatchedReadyGuards.mjs"
+    ,"gate:purchase-reconciliation:matched-ready": "node scripts/runPurchaseReconciliationMatchedReadyGate.mjs"
+    ,"verify:purchase-invoice-prepare:controlled-generation-guards": "node scripts/verifyPurchaseInvoicePrepareControlledGenerationGuards.mjs"
+    ,"gate:purchase-invoice-prepare:controlled-generation": "node scripts/runPurchaseInvoicePrepareControlledGenerationGate.mjs"
+    ,"verify:purchase-invoice-prepare:validation-guards": "node scripts/verifyPurchaseInvoicePrepareValidationGuards.mjs"
+    ,"gate:purchase-invoice-prepare:validation": "node scripts/runPurchaseInvoicePrepareValidationGate.mjs"
+    ,"verify:purchase-accounts-payable-draft:controlled-generation-guards": "node scripts/verifyPurchaseAccountsPayableDraftControlledGenerationGuards.mjs"
+    ,"gate:purchase-accounts-payable-draft:controlled-generation": "node scripts/runPurchaseAccountsPayableDraftControlledGenerationGate.mjs"
+    ,"verify:pce-inventory-transaction-source-context": "node scripts/verifyPceInventoryTransactionSourceContext.mjs"
+    ,"verify:pce-warehouse-task-status-semantics": "node scripts/verifyPceWarehouseTaskStatusSemantics.mjs"
+    ,"verify:pce-qualified-inbound-selector-contract": "node scripts/verifyPceQualifiedInboundSelectorContract.mjs"
+    ,"verify:pce-purchase-payment-list-baseline": "node scripts/verifyPcePurchasePaymentListBaseline.mjs --check=all"
+    ,"verify:pce-advanced-filter-completeness": "node scripts/verifyPcePurchasePaymentListBaseline.mjs --check=advanced"
+    ,"verify:pce-filter-control-types": "node scripts/verifyPcePurchasePaymentListBaseline.mjs --check=control-types"
+    ,"verify:pce-operation-column-presence": "node scripts/verifyPcePurchasePaymentListBaseline.mjs --check=operation"
+    ,"verify:pce-horizontal-scroll-visibility": "node scripts/verifyPcePurchasePaymentListBaseline.mjs --check=horizontal"
+    ,"verify:pce-advanced-filter-grid-layout": "node scripts/verifyPceAdvancedFilterRuntime.mjs --check=layout"
+    ,"verify:pce-rendered-filter-control-types": "node scripts/verifyPceAdvancedFilterRuntime.mjs --check=control-types"
+    ,"verify:pce-filter-option-runtime": "node scripts/verifyPceAdvancedFilterRuntime.mjs --check=options"
+    ,"verify:pce-filter-effect-runtime": "node scripts/verifyPceAdvancedFilterRuntime.mjs --check=effect"
+    ,"verify:pce-inventory-balance-filter-semantics": "node scripts/verifyPceAdvancedFilterRuntime.mjs --check=inventory"
+    ,"verify:pce-advanced-filter-toggle-runtime": "node scripts/verifyPceAdvancedFilterToggleRuntime.mjs"
+    ,"verify:pce-advanced-filter-state-consistency": "node scripts/verifyPceAdvancedFilterToggleRuntime.mjs"
+    ,"verify:pce-advanced-filter-value-persistence": "node scripts/verifyPceAdvancedFilterToggleRuntime.mjs"
+    ,"verify:pce-advanced-filter-single-toggle": "node scripts/verifyPceAdvancedFilterToggleRuntime.mjs"
+    ,"verify:pce-advanced-filter-default-collapsed": "node scripts/verifyPceAdvancedFilterToggleRuntime.mjs"
+    ,"verify:formal-payment-order-draft-filter-completeness": "node scripts/verifyFormalPaymentOrderDraftFilterCompleteness.mjs"
+    ,"verify:dual-list-advanced-filter-section-exact": "node scripts/verifyFormalPaymentOrderDraftFilterCompleteness.mjs"
+    ,"verify:pce-purchase-receive-post-action-consistency": "node scripts/runPcePurchaseReceivePostActionConsistency.mjs"
+    ,"verify:purchase-canary:persistent-guards": "node scripts/verifyPurchaseCanaryPersistentGuards.mjs"
+    ,"gate:purchase-canary:persistent-walkthrough": "node scripts/runPurchaseCanaryPersistentWalkthroughGate.mjs"
+    ,"verify:purchase-canary:normal-pages-visible-guards": "node scripts/verifyPurchaseCanaryNormalPagesVisibleGuards.mjs"
+    ,"gate:purchase-canary:normal-pages-visible": "playwright test tests/ui-baseline/purchaseCanaryNormalPagesVisible.spec.js --config=playwright.v452.config.js"
+    ,"finalize:purchase-canary:normal-pages-visible": "node scripts/finalizePurchaseCanaryNormalPagesVisible.mjs"
+    ,"verify:purchase-canary:downstream-capacity-guards": "node scripts/verifyPurchaseCanaryDownstreamCapacityGuards.mjs"
+    ,"gate:purchase-canary:downstream-capacity": "playwright test tests/ui-baseline/purchaseCanaryDownstreamCapacity.spec.js --config=playwright.v453.config.js"
+    ,"finalize:purchase-canary:downstream-capacity": "node scripts/finalizePurchaseCanaryDownstreamCapacity.mjs"
+    ,"verify:payable-confirmation-prepare:v46-guards": "node scripts/verifyPayableConfirmationPrepareV46Guards.mjs"
+    ,"verify:payable-confirmation-prepare:v46-fault-matrix": "node scripts/runPayableConfirmationPrepareV46FailureMatrix.mjs"
+    ,"gate:payable-confirmation-prepare:v46": "playwright test tests/ui-baseline/payableConfirmationPrepareV46.spec.js --config=playwright.v46.config.js"
+    ,"finalize:payable-confirmation-prepare:v46": "node scripts/finalizePayableConfirmationPrepareV46.mjs"
+    ,"verify:payment-request-prepare:v47-guards": "node scripts/verifyPaymentRequestPrepareV47Guards.mjs"
+    ,"verify:payment-request-prepare:v47-fault-matrix": "node scripts/runPaymentRequestPrepareV47FailureMatrix.mjs"
+    ,"gate:payment-request-prepare:v47": "playwright test tests/ui-baseline/paymentRequestPrepareV47.spec.js --config=playwright.v47.config.js"
+    ,"finalize:payment-request-prepare:v47": "node scripts/finalizePaymentRequestPrepareV47.mjs"
+    ,"gate:payment-request-prepare:validation": "node scripts/runPaymentRequestPrepareV47Gate.mjs"
+    ,"verify:payment-request-prepare:v471-guards": "node scripts/verifyPaymentRequestPrepareV471Guards.mjs"
+    ,"gate:payment-request-prepare:v471": "playwright test tests/ui-baseline/paymentRequestPrepareV471.spec.js --config=playwright.v471.config.js"
+    ,"finalize:payment-request-prepare:v471": "node scripts/finalizePaymentRequestPrepareV471.mjs"
+    ,"finalize:payment-request-prepare:v471-unified": "node scripts/runPaymentRequestPrepareV471Gate.mjs"
+    ,"verify:finance-process-structure:v472-guards": "node scripts/verifyFinanceProcessPageStructureV472Guards.mjs"
+    ,"gate:finance-process-structure:v472": "playwright test tests/ui-baseline/financeProcessPageStructureV472.spec.js --config=playwright.v472.config.js"
+    ,"finalize:finance-process-structure:v472": "node scripts/finalizeFinanceProcessPageStructureV472.mjs"
+    ,"finalize:finance-process-structure:v472-unified": "node scripts/runFinanceProcessPageStructureV472Gate.mjs"
+    ,"verify:payment-request:v48-guards": "node scripts/verifyPaymentRequestV48Guards.mjs"
+    ,"verify:payment-request:v48-fault-matrix": "node scripts/runPaymentRequestV48FailureMatrix.mjs"
+    ,"gate:payment-request:v48-page": "playwright test tests/ui-baseline/paymentRequestV48.spec.js --config=playwright.v48.config.js"
+    ,"gate:payment-request:approval": "node scripts/runPaymentRequestV48Gate.mjs"
+    ,"finalize:payment-request:v48": "node scripts/finalizePaymentRequestV48.mjs"
+    ,"archive:pce-checkpoint": "node scripts/archivePceCheckpoint.mjs"
+    ,"verify:payment-instruction-prepare:v49-guards": "node scripts/verifyPaymentInstructionPrepareV49Guards.mjs"
+    ,"verify:payment-instruction-prepare:v49-fault-matrix": "node scripts/runPaymentInstructionPrepareV49FailureMatrix.mjs"
+    ,"gate:payment-instruction-prepare:v49-page": "playwright test tests/ui-baseline/paymentInstructionPrepareV49.spec.js --config=playwright.v49.config.js"
+    ,"finalize:payment-instruction-prepare:v49": "node scripts/finalizePaymentInstructionPrepareV49.mjs"
+    ,"gate:payment-instruction-prepare:validation": "node scripts/runPaymentInstructionPrepareV49Gate.mjs"
+    ,"verify:payment-instruction-prepare:v491-guards": "node scripts/verifyPaymentInstructionPrepareV491Guards.mjs"
+    ,"gate:payment-instruction-prepare:v491-page": "playwright test tests/ui-baseline/paymentInstructionPrepareV491.spec.js --config=playwright.v491.config.js"
+    ,"finalize:payment-instruction-prepare:v491": "node scripts/finalizePaymentInstructionPrepareV491.mjs"
+    ,"verify:payment-order-prepare:v50-guards": "node scripts/verifyPaymentOrderPrepareV50Guards.mjs"
+    ,"verify:payment-order-prepare:v50-fault-matrix": "node scripts/runPaymentOrderPrepareV50FailureMatrix.mjs"
+    ,"gate:payment-order-prepare:v50-page": "playwright test tests/ui-baseline/paymentOrderPrepareV50.spec.js --config=playwright.v50.config.js"
+    ,"finalize:payment-order-prepare:v50": "node scripts/finalizePaymentOrderPrepareV50.mjs"
+    ,"gate:payment-order-prepare:validation": "node scripts/runPaymentOrderPrepareV50Gate.mjs"
+    ,"verify:payment-order-prepare:v501-guards": "node scripts/verifyPaymentOrderPrepareV501Guards.mjs"
+    ,"gate:payment-order-prepare:v501-page": "playwright test tests/ui-baseline/paymentOrderPrepareV501.spec.js --config=playwright.v501.config.js"
+    ,"finalize:payment-order-prepare:v501": "node scripts/finalizePaymentOrderPrepareV501.mjs"
+    ,"gate:payment-order-prepare:list-contract": "node scripts/runPaymentOrderPrepareV501Gate.mjs"
+    ,"verify:payment-order-draft:v51-guards": "node scripts/verifyPaymentOrderDraftV51Guards.mjs"
+    ,"gate:payment-order-draft:v51-page": "playwright test tests/ui-baseline/paymentOrderDraftV51.spec.js --config=playwright.v51.config.js"
+    ,"finalize:payment-order-draft:v51": "node scripts/finalizePaymentOrderDraftV51.mjs"
+    ,"gate:payment-order-draft:review": "node scripts/runPaymentOrderDraftV51Gate.mjs"
+    ,"finalize:payment-order-draft:v511": "node scripts/finalizePaymentOrderDraftV511.mjs"
+    ,"gate:payment-order-draft:fact-consistency": "node scripts/runPaymentOrderDraftV511Gate.mjs"
+    ,"verify:payment-risk-review:v52-guards": "node scripts/verifyPaymentRiskReviewV52Guards.mjs"
+    ,"gate:payment-risk-review:v52-page": "playwright test tests/ui-baseline/paymentRiskReviewV52.spec.js --config=playwright.v52.config.js"
+    ,"finalize:payment-risk-review:v52": "node scripts/finalizePaymentRiskReviewV52.mjs"
+    ,"gate:payment-risk-review:validation": "node scripts/runPaymentRiskReviewV52Gate.mjs",
+    "verify:formal-payment-order:v53-guards": "node scripts/verifyFormalPaymentOrderV53Guards.mjs",
+    "verify:formal-payment-order:v531-guards": "node scripts/verifyFormalPaymentOrderPageContractV531.mjs",
+    "verify:pce-filter-control:v532": "node scripts/verifyPceFilterIdentifierControlsV532.mjs",
+    "verify:formal-payment-order:v533-guards": "node scripts/verifyFormalPaymentOrderScenarioFilterV533.mjs",
+    "verify:formal-payment-order:v54-guards": "node scripts/verifyFormalPaymentOrderV54Guards.mjs",
+    "gate:formal-payment-order:v54-page": "playwright test tests/ui-baseline/formalPaymentOrderV54.spec.js --config=playwright.v54.config.js",
+    "verify:formal-payment-order:v54-recovery": "node scripts/verifyFormalPaymentOrderV54Recovery.mjs",
+    "finalize:formal-payment-order:v54": "node scripts/finalizeFormalPaymentOrderV54.mjs",
+    "verify:formal-payment-order:v54-checkpoint": "node scripts/verifyFormalPaymentOrderV54Checkpoint.mjs",
+    "scan:state-machine:v541": "node scripts/generateStateMachineCoverageReportV541.mjs",
+    "verify:formal-payment-order:v541-guards": "node scripts/verifyFormalPaymentOrderV541Guards.mjs",
+    "gate:formal-payment-order:v541-page": "playwright test tests/ui-baseline/formalPaymentOrderV541.spec.js --config=playwright.v541.config.js",
+    "verify:formal-payment-order:v541-recovery": "node scripts/verifyFormalPaymentOrderV541Recovery.mjs",
+    "scan:state-machine:v542": "node scripts/generateStateMachineCoverageReportV542.mjs",
+    "verify:formal-payment-order:v542-guards": "node scripts/verifyFormalPaymentOrderV542Guards.mjs",
+    "gate:formal-payment-order:v542-page": "playwright test tests/ui-baseline/formalPaymentOrderV542.spec.js --config=playwright.v542.config.js",
+    "verify:formal-payment-order:v542-recovery": "node scripts/verifyFormalPaymentOrderV542Recovery.mjs",
+    "finalize:formal-payment-order:v542": "node scripts/finalizeFormalPaymentOrderV542.mjs",
+    "verify:formal-payment-order:v542-checkpoint": "node scripts/verifyFormalPaymentOrderV542Checkpoint.mjs",
+    "scan:state-transition-count:v543": "node scripts/scanStateTransitionCountV543.mjs",
+    "verify:state-machine-facts:v543": "node scripts/verifyPceStateMachineFactContractV543.mjs",
+    "gate:formal-payment-order:v543-page": "playwright test tests/ui-baseline/formalPaymentOrderV543.spec.js --config=playwright.v543.config.js",
+    "verify:formal-payment-order:v543-recovery": "node scripts/verifyFormalPaymentOrderV543Recovery.mjs --service-restarted",
+    "finalize:formal-payment-order:v541": "node scripts/finalizeFormalPaymentOrderV541.mjs",
+    "verify:formal-payment-order:v541-checkpoint": "node scripts/verifyFormalPaymentOrderV541Checkpoint.mjs",
+    "finalize:formal-payment-order:v533": "node scripts/finalizeFormalPaymentOrderScenarioFilterV533.mjs",
+    "verify:formal-payment-order:v533-checkpoint": "node scripts/verifyFormalPaymentOrderScenarioFilterCheckpointV533.mjs",
+    "finalize:formal-payment-order:v532": "node scripts/finalizeFormalPaymentOrderFilterControlV532.mjs",
+    "verify:formal-payment-order:v532-checkpoint": "node scripts/verifyFormalPaymentOrderFilterControlCheckpointV532.mjs",
+    "gate:formal-payment-order:v53-page": "playwright test tests/ui-baseline/formalPaymentOrderV53.spec.js --config=playwright.v53.config.js",
+    "gate:formal-payment-order:v531-page": "playwright test tests/ui-baseline/formalPaymentOrderV53.spec.js --config=playwright.v53.config.js",
+    "finalize:formal-payment-order:v531": "node scripts/finalizeFormalPaymentOrderPageContractV531.mjs",
+    "verify:formal-payment-order:v531-checkpoint": "node scripts/verifyFormalPaymentOrderPageContractCheckpointV531.mjs",
+    "finalize:formal-payment-order:v53": "node scripts/finalizeFormalPaymentOrderV53.mjs",
+    "verify:formal-payment-order:v53-checkpoint": "node scripts/verifyFormalPaymentOrderV53Checkpoint.mjs",
+    "verify:formal-payment-order:v53-recovery": "node scripts/verifyFormalPaymentOrderV53Recovery.mjs",
+    "gate:formal-payment-order:validation": "node scripts/runFormalPaymentOrderV53Gate.mjs",
+    "verify:payment-chain-state-machine:v55": "node scripts/verifyPaymentChainStateMachineV55.mjs",
+    "gate:payment-chain-state-machine:v55-page": "playwright test tests/ui-baseline/paymentChainStateMachineV55.spec.js --config=playwright.v55.config.js",
+    "finalize:payment-chain-state-machine:v55": "node scripts/finalizePaymentChainStateMachineV55.mjs",
+    "verify:payment-chain-state-machine:v55-checkpoint": "node scripts/verifyPaymentChainStateMachineV55Checkpoint.mjs"
   },
   "dependencies": {
     "axios": "^1.15.2",
@@ -16,6 +567,7 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@vitejs/plugin-vue": "^6.0.6",
     "vite": "^8.0.8",
     "vite-plugin-vue-devtools": "^8.1.1"

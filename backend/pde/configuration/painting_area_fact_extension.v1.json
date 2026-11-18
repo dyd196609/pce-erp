@@ -1,0 +1,134 @@
+{
+  "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+  "companyId": 1,
+  "version": "V1",
+  "rules": [
+    {
+      "ruleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+      "ruleName": "按正式油漆工艺编码汇总见光面积",
+      "version": "V1",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA",
+          "version": "V1"
+        },
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "sourceType": "AGGREGATED",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "PaintingProcessAreaQuantity",
+            "valueType": "decimal",
+            "resultDomain": "DERIVED_FACT",
+            "unit": "m2",
+            "unitDimension": "area"
+          }
+        ],
+        "expression": "area_quantity",
+        "dependencies": [],
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "applicability": {},
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-EOR-20261014：用户明确确认以正式油漆工艺编码为索引汇总正式见光面积；缺独立油漆工艺FK不补推编码；仅EOR，不进入APS",
+          "sourceAuthority": "现有成功EngineeringDerivedFact及其原Detail、原Calculation对象输入与冻结BaselineItem；工艺来自独立paintProcessTypeId正式FK，禁止使用实例制造工艺替代",
+          "areaTypeDecision": "VISIBLE_AREA；其他面积类型不得混入"
+        },
+        "factExtension": {
+          "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+          "outputUomId": 18,
+          "strategy": "GROUP_SUM",
+          "productCategoryIds": [
+            1,
+            2,
+            3
+          ],
+          "groupKeys": [
+            "PaintingProcessCode",
+            "AreaType"
+          ],
+          "metadataBindings": [
+            {
+              "name": "PaintingProcessCode",
+              "sourceType": "FORMAL_OBJECT_REFERENCE",
+              "inputPath": [
+                "paintProcessTypeId"
+              ],
+              "referenceModel": "pde.ManufacturingProcessType",
+              "valueField": "code"
+            },
+            {
+              "name": "PaintingProcessTypeId",
+              "sourceType": "FORMAL_OBJECT_REFERENCE",
+              "inputPath": [
+                "paintProcessTypeId"
+              ],
+              "referenceModel": "pde.ManufacturingProcessType",
+              "valueField": "id"
+            },
+            {
+              "name": "AreaType",
+              "sourceType": "CONFIGURATION_VALUE",
+              "value": "VISIBLE_AREA"
+            }
+          ],
+          "quantityTraceKey": "AreaQuantity",
+          "uomTraceKey": "UOM",
+          "inputHashTraceKey": "InputHash",
+          "bindings": [
+            {
+              "inputName": "area_quantity",
+              "sourceScope": "ORIGIN",
+              "sourceUomId": 18,
+              "targetUomId": 18,
+              "productCategoryIds": [
+                1
+              ],
+              "selector": {
+                "canonicalField": "W",
+                "producerRuleId": 11,
+                "producerRuleVersion": "V1",
+                "traceEquals": {
+                  "resultScope": "original"
+                }
+              }
+            },
+            {
+              "inputName": "area_quantity",
+              "sourceScope": "ORIGIN",
+              "sourceUomId": 18,
+              "targetUomId": 18,
+              "productCategoryIds": [
+                2,
+                3
+              ],
+              "selector": {
+                "canonicalField": "Q",
+                "producerRuleId": 11,
+                "producerRuleVersion": "V1",
+                "traceEquals": {
+                  "resultScope": "original"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "consolidatedReadback": {
+    "groupKeys": [
+      "PaintingProcessCode",
+      "AreaType"
+    ]
+  }
+}

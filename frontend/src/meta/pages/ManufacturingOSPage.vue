@@ -1,32 +1,35 @@
 <template>
-  <main class="manufacturing-page">
+  <main
+    class="manufacturing-page"
+    data-acceptance-id="pce-manufacturing-capability-map"
+    data-page-version="V1.14.2.8.4.8.5.2"
+    data-page-name="PCE制造数字化能力地图"
+    data-page-module="Manufacturing Capability Map"
+    data-fact-source="manufacturingModuleRegistry"
+    data-danger-action-count="0"
+    data-business-execution-button-count="0"
+    data-detail-display-mode="architecture-card"
+    data-operation-entry="false"
+    data-acceptance-status="PASS"
+  >
     <header class="page-header">
       <section>
-        <p class="eyebrow">掌云智造模块蓝图</p>
-        <h1>制造企业数字化集成平台</h1>
-        <p>覆盖 ERP、CRM、SCM、WMS、MRP、MPS、APS、MES、QMS、BI、FDM、PFM、KPI 13 大核心模块。</p>
+        <p class="eyebrow">V1.14.2.8.4.8.5.2 企业入口边界治理</p>
+        <h1>PCE制造数字化能力地图</h1>
+        <p>展示PCE覆盖的制造数字化能力，不是业务操作入口。</p>
         <p class="app-current-module-badge">当前操作模块：{{ currentManufacturingModuleName }}</p>
       </section>
       <nav class="page-tabs app-module-nav-zone">
         <span class="app-nav-zone-title">制造平台模块导航</span>
         <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isManufacturingNavActive('modules') }" to="/manufacturing/modules">
-          13大核心模块
+          PCE制造数字化能力地图
           <span v-if="isManufacturingNavActive('modules')" class="app-current-tag">当前</span>
         </router-link>
         <router-link class="app-nav-button" :class="{ 'app-nav-button-active': isManufacturingNavActive('plan') }" to="/manufacturing/plan">
           六期开发计划
           <span v-if="isManufacturingNavActive('plan')" class="app-current-tag">当前</span>
         </router-link>
-        <router-link class="app-nav-button" to="/foundation">第一期基础资料</router-link>
-        <router-link class="app-nav-button" to="/foundation/business-partners">业务伙伴档案</router-link>
-        <router-link class="app-nav-button" to="/reference">数据引用中心</router-link>
-        <router-link class="app-nav-button" to="/reference/check">基础资料检查</router-link>
-        <router-link class="app-nav-button" to="/foundation/review-check">基础资料评审检查</router-link>
-        <router-link class="app-nav-button" to="/foundation/import-records">基础资料导入记录</router-link>
-        <router-link class="app-nav-button" to="/scm">SCM采购管理</router-link>
-        <router-link class="app-nav-button" to="/wms">WMS库存管理</router-link>
-        <router-link class="app-nav-button" to="/qms">QMS来料检验</router-link>
-        <router-link class="app-nav-button" to="/process-center">返回企业操作系统</router-link>
+        <router-link class="app-nav-button" to="/process-center">返回业务流程中心</router-link>
       </nav>
     </header>
 
@@ -116,42 +119,12 @@
       <section class="panel primary-panel">
         <header>
           <div>
-            <h2>制造业 13 大核心模块</h2>
-            <span>已注册 {{ summary.total }} 个模块，基础层 {{ summary.status.foundation }} 个，规划层 {{ summary.status.planning }} 个</span>
-          </div>
-          <div class="button-row">
-            <button type="button" @click="router.push('/foundation')">进入第一期基础资料</button>
-            <button type="button" @click="router.push('/foundation/business-partners')">业务伙伴档案</button>
-            <button type="button" @click="router.push('/foundation/sample-data')">样例数据管理</button>
-            <button type="button" @click="router.push('/foundation/erp/supplier-material-prices')">供应商物料价格</button>
-            <button type="button" @click="router.push('/foundation/erp/material-suppliers')">物料供应商关系</button>
-            <button type="button" @click="router.push('/foundation/manufacturing/processes')">工序资料</button>
-            <button type="button" @click="router.push('/foundation/manufacturing/routings')">工艺路线</button>
-            <button type="button" @click="router.push('/foundation/manufacturing/equipment')">设备资料</button>
-            <button type="button" @click="router.push('/reference')">数据引用中心</button>
-            <button type="button" @click="router.push('/reference/check')">基础资料检查</button>
-            <button type="button" @click="router.push('/foundation/review-check')">基础资料评审检查</button>
-            <button type="button" @click="router.push('/foundation/import-records')">基础资料导入记录</button>
-            <button type="button" @click="router.push('/scm')">SCM采购管理</button>
-            <button type="button" @click="router.push('/scm/purchase-requests')">请购单</button>
-            <button type="button" @click="router.push('/scm/purchase-inquiries')">询价单</button>
-            <button type="button" @click="router.push('/scm/price-approvals')">核价单</button>
-            <button type="button" @click="router.push('/scm/purchase-orders')">采购单</button>
-            <button type="button" @click="router.push('/wms')">WMS库存管理</button>
-            <button type="button" @click="router.push('/wms/inventory-balances')">库存余额</button>
-            <button type="button" @click="router.push('/wms/inventory-transactions')">库存流水</button>
-            <button type="button" @click="router.push('/wms/warehouse-tasks')">仓库任务</button>
-            <button type="button" @click="router.push('/wms/stock-warnings')">库存预警</button>
-            <button type="button" @click="router.push('/wms/purchase-receive-preview')">采购到货预备</button>
-            <button type="button" @click="router.push('/wms/purchase-receives')">采购收货预备</button>
-            <button type="button" @click="router.push('/qms')">QMS来料检验预备</button>
-            <button type="button" @click="router.push('/finance/payable-prepares')">采购应付预备</button>
-            <button type="button" @click="router.push('/finance/ap-drafts')">采购应付账款草稿</button>
-            <button type="button" @click="router.push('/manufacturing/plan')">查看开发计划</button>
+            <h2>PCE制造数字化能力地图</h2>
+            <span>已注册 {{ summary.total }} 个制造数字化能力中心；本页仅展示产品能力架构。</span>
           </div>
         </header>
         <p class="platform-note">
-          当前软件定位为制造企业数字化集成平台。V1.10.x 已完成企业操作系统基础能力，V1.11.0 开始进入制造业完整模块蓝图接入阶段。
+          能力卡片用于查看产品架构说明，不提供采购、库存、质量、付款、银行或财务业务操作。
         </p>
       </section>
 
@@ -217,7 +190,7 @@ const isPlanPage = computed(() => route.path === '/manufacturing/plan')
 const currentManufacturingModuleName = computed(() => {
   if (selectedModule.value) return selectedModule.value.name
   if (isPlanPage.value) return '六期开发计划'
-  return '13大核心模块'
+  return 'PCE制造数字化能力地图'
 })
 
 function isManufacturingNavActive(type) {

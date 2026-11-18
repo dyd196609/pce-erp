@@ -3,8 +3,8 @@ import { getModule, listModules } from '../registry/moduleRegistry.js'
 
 const planModuleAccess = {
   basic: ['dashboard', 'work-center', 'analytics'],
-  pro: ['dashboard', 'organization', 'process-center', 'work-center', 'analytics', 'admin'],
-  enterprise: ['dashboard', 'organization', 'process-center', 'work-center', 'analytics', 'admin'],
+  pro: ['dashboard', 'organization', 'process-center', 'process-designer', 'work-center', 'analytics', 'admin'],
+  enterprise: ['dashboard', 'organization', 'process-center', 'process-designer', 'work-center', 'analytics', 'admin'],
 }
 
 const roleActionAccess = {

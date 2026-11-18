@@ -4,6 +4,10 @@ import {
   listPayableChecks,
   markPayableCheckInvoicePrepared,
 } from './payableCheckStore.js'
+import {
+  linkSupplierSettlementInvoicePrepare,
+  listSupplierSettlements,
+} from '../scm/supplierSettlementStore.js'
 
 const STORAGE_KEY = 'invoice-prepare-state-v1'
 const SOURCE_READY_STATUSES = ['checked', 'invoicePrepareReady']
@@ -37,6 +41,26 @@ function toNumber(value) {
 
 function roundAmount(value) {
   return Number(toNumber(value).toFixed(2))
+}
+
+function unique(values = []) {
+  return [...new Set((values || []).filter(Boolean).map((item) => String(item)))]
+}
+
+function sourceNoList(value) {
+  if (Array.isArray(value)) return unique(value)
+  if (!value) return []
+  return unique(String(value).split(/[,\s、，]+/))
+}
+
+function amountMatches(left, right) {
+  return Math.abs(roundAmount(left) - roundAmount(right)) < 0.01
+}
+
+function taxSplitFromNet(invoiceAmount, taxRate = DEFAULT_TAX_RATE) {
+  const amount = roundAmount(invoiceAmount)
+  const taxAmount = roundAmount(amount * toNumber(taxRate) / 100)
+  return { invoiceAmount: amount, taxAmount, totalInvoiceAmount: roundAmount(amount + taxAmount) }
 }
 
 function defaultState() {
@@ -105,20 +129,35 @@ function invoicePrepare(payload = {}) {
     sourcePayableCheckId: payload.sourcePayableCheckId || '',
     sourcePayableCheckNo: payload.sourcePayableCheckNo || '',
     sourcePayablePrepareNo: payload.sourcePayablePrepareNo || '',
+    sourceSettlementId: payload.sourceSettlementId || '',
+    sourceSettlementNo: payload.sourceSettlementNo || '',
     sourceInventoryTransactionIds: payload.sourceInventoryTransactionIds || [],
-    sourceInventoryTransactionNos: payload.sourceInventoryTransactionNos || [],
+    sourceInventoryTransactionNos: sourceNoList(payload.sourceInventoryTransactionNos),
+    inventoryTransactionNos: sourceNoList(payload.inventoryTransactionNos || payload.sourceInventoryTransactionNos),
+    payablePrepareNos: sourceNoList(payload.payablePrepareNos || payload.sourcePayablePrepareNo),
     supplierId: payload.supplierId || '',
     supplierName: payload.supplierName || '',
     buyerId: payload.buyerId || '',
     buyerName: payload.buyerName || '',
     sourcePurchaseOrderNo: payload.sourcePurchaseOrderNo || '',
+    purchaseOrderNo: payload.purchaseOrderNo || payload.sourcePurchaseOrderNo || '',
     sourceReceiveNo: payload.sourceReceiveNo || '',
+    receiveNo: payload.receiveNo || payload.sourceReceiveNo || '',
     sourceInspectionNo: payload.sourceInspectionNo || '',
+    inspectionNo: payload.inspectionNo || payload.sourceInspectionNo || '',
     rootRequestNo: payload.rootRequestNo || '',
     invoicePrepareStatus: payload.invoicePrepareStatus || 'prepared',
+    invoiceStatus: payload.invoiceStatus || 'not_received',
     expectedInvoiceDate: payload.expectedInvoiceDate || today(),
     invoiceType: payload.invoiceType || 'specialVat',
     taxRate,
+    settlementAmount: roundAmount(payload.settlementAmount ?? payload.totalInvoiceAmount ?? summary.totalInvoiceAmount),
+    invoiceAmount: roundAmount(payload.invoiceAmount ?? payload.totalInvoiceAmount ?? summary.totalInvoiceAmount),
+    taxAmount: roundAmount(payload.taxAmount ?? payload.totalTaxAmount ?? summary.totalTaxAmount),
+    sourceReconciliationStatus: payload.sourceReconciliationStatus || '',
+    sourceDifferenceType: payload.sourceDifferenceType || '',
+    sourceDifferenceConfirmStatus: payload.sourceDifferenceConfirmStatus || '',
+    sourceNextStepReadiness: payload.sourceNextStepReadiness || '',
     totalNoTaxAmount: roundAmount(payload.totalNoTaxAmount ?? summary.totalNoTaxAmount),
     totalTaxAmount: roundAmount(payload.totalTaxAmount ?? summary.totalTaxAmount),
     totalInvoiceAmount: roundAmount(payload.totalInvoiceAmount ?? summary.totalInvoiceAmount),
@@ -128,14 +167,38 @@ function invoicePrepare(payload = {}) {
     invoiceReceivedDate: payload.invoiceReceivedDate || '',
     invoiceMatchStatus: payload.invoiceMatchStatus || 'unmatched',
     differenceReason: payload.differenceReason || '',
+    invoicePrepareRemark: payload.invoicePrepareRemark || payload.remark || '',
     apDraftGenerated: payload.apDraftGenerated ?? false,
     targetApDraftId: payload.targetApDraftId || '',
     targetApDraftNo: payload.targetApDraftNo || '',
     targetModule: payload.targetModule || '',
     apDraftGeneratedAt: payload.apDraftGeneratedAt || '',
+    linkedPayableConfirmId: payload.linkedPayableConfirmId || '',
+    linkedPayableConfirmNo: payload.linkedPayableConfirmNo || '',
+    payableConfirmGeneratedAt: payload.payableConfirmGeneratedAt || '',
+    payableConfirmGeneratedBy: payload.payableConfirmGeneratedBy || '',
+    isDemoChain: Boolean(payload.isDemoChain),
+    demoChainVersion: payload.demoChainVersion || '',
+    demoChainGeneratedAt: payload.demoChainGeneratedAt || '',
+    demoChainPurpose: payload.demoChainPurpose || '',
     remark: payload.remark || '',
+    logs: Array.isArray(payload.logs) ? payload.logs : [],
     lines,
+    downstreamActionCode: payload.downstreamActionCode || '',
+    downstreamObjectType: payload.downstreamObjectType || '',
+    downstreamObjectNo: payload.downstreamObjectNo || '',
+    downstreamObjectId: payload.downstreamObjectId || '',
+    downstreamGeneratedAt: payload.downstreamGeneratedAt || '',
+    flowWritebackStatus: payload.flowWritebackStatus || '',
+    nextStepReleaseStatus: payload.nextStepReleaseStatus || '',
+    sourceObjectType: payload.sourceObjectType || '',
+    sourceObjectNo: payload.sourceObjectNo || '',
+    sourceObjectId: payload.sourceObjectId || '',
+    sourceBusinessRoute: payload.sourceBusinessRoute || '',
+    createdFromActionCode: payload.createdFromActionCode || '',
+    sourceLinkStatus: payload.sourceLinkStatus || '',
     createdAt: payload.createdAt || stamp,
+    createdBy: payload.createdBy || 'system',
     updatedAt: payload.updatedAt || stamp,
   }
 }
@@ -173,6 +236,22 @@ export function writeInvoicePrepareLog(action, payload = {}) {
       `结果：${payload.result || '成功'}`,
     ].join('；'),
   })
+}
+
+function appendPrepareLog(current, action, beforeStatus, afterStatus, remark = '', operator = 'page-user') {
+  current.logs = [
+    ...(current.logs || []),
+    {
+      action,
+      beforeStatus,
+      afterStatus,
+      operator,
+      time: nowText(),
+      remark: remark || action,
+      sourceSettlementNo: current.sourceSettlementNo || '',
+      invoicePrepareNo: current.invoicePrepareNo || '',
+    },
+  ]
 }
 
 export function getInvoicePrepareState() {
@@ -218,6 +297,25 @@ export function markInvoicePrepareApDraftGenerated(id, apDraft = {}) {
     sourceNo: current.invoicePrepareNo,
     targetId: current.targetApDraftId,
     targetNo: current.targetApDraftNo,
+  })
+  return { success: true, invoicePrepare: clone(current) }
+}
+
+export function linkInvoicePreparePayableConfirm(id, payableConfirm = {}, operator = 'page-user') {
+  const current = byId(state.invoicePrepares, id)
+  if (!current) return { success: false, error: '未找到采购发票准备记录。' }
+  const beforeStatus = `${current.invoicePrepareStatus || ''}/${current.invoiceStatus || ''}`
+  current.linkedPayableConfirmId = payableConfirm.id || payableConfirm.payableConfirmId || current.linkedPayableConfirmId || ''
+  current.linkedPayableConfirmNo = payableConfirm.payableConfirmNo || current.linkedPayableConfirmNo || ''
+  current.payableConfirmGeneratedAt = current.payableConfirmGeneratedAt || nowText()
+  current.payableConfirmGeneratedBy = operator
+  current.updatedAt = nowText()
+  appendPrepareLog(current, 'link_payable_confirm_prepare', beforeStatus, `${current.invoicePrepareStatus}/${current.invoiceStatus}`, `已关联应付确认准备 ${current.linkedPayableConfirmNo || '-'}`, operator)
+  persist()
+  writeInvoicePrepareLog('link_payable_confirm_prepare', {
+    sourceNo: current.invoicePrepareNo,
+    targetId: current.linkedPayableConfirmId,
+    targetNo: current.linkedPayableConfirmNo,
   })
   return { success: true, invoicePrepare: clone(current) }
 }
@@ -313,6 +411,122 @@ export function createInvoicePrepareFromPayableCheck(payableCheckId) {
   return { success: true, invoicePrepareId: prepare.id, invoicePrepareNo: prepare.invoicePrepareNo, invoicePrepare: clone(prepare), writeBackSuccess: Boolean(writeBack?.success) }
 }
 
+export function isInvoicePrepareGeneratedFromSettlement(settlementOrId) {
+  const settlement = typeof settlementOrId === 'object'
+    ? settlementOrId
+    : listSupplierSettlements().find((item) => String(item.id) === String(settlementOrId))
+  if (!settlement?.id) return false
+  return Boolean(
+    settlement.linkedInvoicePrepareId ||
+    settlement.linkedInvoicePrepareNo ||
+    state.invoicePrepares.some((prepare) => String(prepare.sourceSettlementId) === String(settlement.id)),
+  )
+}
+
+export function canCreateInvoicePrepareFromSettlement(settlement = {}) {
+  if (!settlement?.id) return { canCreate: false, reason: '未找到供应商结算记录。' }
+  if (isInvoicePrepareGeneratedFromSettlement(settlement)) return { canCreate: false, reason: '已存在结算记录对应的发票准备。' }
+  if (settlement.settlementStatus === 'closed') return { canCreate: false, reason: '结算已关闭，不能生成发票准备。' }
+  if (settlement.settlementStatus !== 'reconciled') return { canCreate: false, reason: '结算状态未达到已对账。' }
+  if (settlement.reconciliationConfirmStatus !== 'confirmed') return { canCreate: false, reason: '对账尚未确认。' }
+  if (settlement.nextStepReadiness !== 'ready_for_invoice_prepare') return { canCreate: false, reason: '下一步标识未达到可进入发票准备。' }
+  if (!['not_required', 'confirmed'].includes(settlement.differenceConfirmStatus)) return { canCreate: false, reason: '差异原因尚未确认。' }
+  if (!toNumber(settlement.settlementAmount)) return { canCreate: false, reason: '结算金额为空，不能生成发票准备。' }
+  return { canCreate: true, reason: '' }
+}
+
+export function getInvoicePrepareSourcesFromSupplierSettlements() {
+  return listSupplierSettlements().map((settlement) => {
+    const generated = isInvoicePrepareGeneratedFromSettlement(settlement)
+    const result = canCreateInvoicePrepareFromSettlement(settlement)
+    return {
+      ...settlement,
+      invoicePrepareGenerated: generated,
+      invoicePrepareGeneratedText: generated ? '已生成发票准备' : '未生成',
+      canCreateInvoicePrepare: result.canCreate,
+      sourceRejectReason: result.reason,
+    }
+  })
+}
+
+function buildLineFromSettlement(settlement = {}, taxRate = DEFAULT_TAX_RATE) {
+  const split = taxSplitFromNet(settlement.settlementAmount, taxRate)
+  return normalizeLine({
+    lineNo: 1,
+    materialCode: 'SETTLEMENT',
+    materialName: '供应商结算金额',
+    unit: '项',
+    checkedQty: 1,
+    checkedPrice: settlement.settlementAmount,
+    checkedAmount: settlement.settlementAmount,
+    noTaxAmount: split.invoiceAmount,
+    taxRate,
+    taxAmount: split.taxAmount,
+    invoiceAmount: split.totalInvoiceAmount,
+    sourcePurchaseOrderNo: settlement.purchaseOrderNo,
+    sourceReceiveNo: settlement.receiveNo,
+    sourceInspectionNo: settlement.inspectionNo,
+    remark: '由供应商结算生成发票准备明细，仅用于发票准备。',
+  }, 0, taxRate)
+}
+
+export function createInvoicePrepareFromSupplierSettlement(settlementId, operator = 'page-user') {
+  const settlement = listSupplierSettlements().find((item) => String(item.id) === String(settlementId))
+  const check = canCreateInvoicePrepareFromSettlement(settlement)
+  if (!check.canCreate) {
+    writeInvoicePrepareLog('create_from_settlement_blocked', {
+      sourceNo: settlement?.settlementNo || settlementId,
+      targetId: settlementId,
+      result: check.reason,
+    })
+    return { success: false, error: check.reason, settlement }
+  }
+  const taxRate = DEFAULT_TAX_RATE
+  const split = taxSplitFromNet(settlement.settlementAmount, taxRate)
+  const prepare = invoicePrepare({
+    sourceSettlementId: settlement.id,
+    sourceSettlementNo: settlement.settlementNo,
+    supplierId: settlement.supplierId,
+    supplierName: settlement.supplierName,
+    sourcePurchaseOrderNo: settlement.purchaseOrderNo,
+    purchaseOrderNo: settlement.purchaseOrderNo,
+    sourceReceiveNo: settlement.receiveNo,
+    receiveNo: settlement.receiveNo,
+    sourceInspectionNo: settlement.inspectionNo,
+    inspectionNo: settlement.inspectionNo,
+    inventoryTransactionNos: settlement.inventoryTransactionNos,
+    sourceInventoryTransactionNos: settlement.inventoryTransactionNos,
+    payablePrepareNos: settlement.payablePrepareNos,
+    sourcePayablePrepareNo: (settlement.payablePrepareNos || []).join('、'),
+    settlementAmount: settlement.settlementAmount,
+    invoiceAmount: split.invoiceAmount,
+    taxRate,
+    taxAmount: split.taxAmount,
+    totalInvoiceAmount: split.totalInvoiceAmount,
+    invoicePrepareStatus: 'draft',
+    invoiceStatus: 'not_received',
+    sourceReconciliationStatus: settlement.reconciliationStatus,
+    sourceDifferenceType: settlement.differenceType,
+    sourceDifferenceConfirmStatus: settlement.differenceConfirmStatus,
+    sourceNextStepReadiness: settlement.nextStepReadiness,
+    invoicePrepareRemark: '由供应商结算生成，仅做采购发票准备，不生成正式发票、应付、付款、总账、核销或银行流水。',
+    remark: '由供应商结算生成，仅做采购发票准备。',
+    lines: [buildLineFromSettlement(settlement, taxRate)],
+    createdBy: operator,
+  })
+  appendPrepareLog(prepare, 'create_from_settlement', '', prepare.invoicePrepareStatus, '由供应商结算生成采购发票准备。', operator)
+  state.invoicePrepares.unshift(prepare)
+  persist()
+  const writeBack = linkSupplierSettlementInvoicePrepare(settlement.id, prepare, operator)
+  writeInvoicePrepareLog('create_from_settlement', {
+    sourceNo: settlement.settlementNo,
+    targetId: prepare.id,
+    targetNo: prepare.invoicePrepareNo,
+    result: prepare.totalInvoiceAmount,
+  })
+  return { success: true, invoicePrepareId: prepare.id, invoicePrepareNo: prepare.invoicePrepareNo, invoicePrepare: clone(prepare), writeBackSuccess: Boolean(writeBack?.success) }
+}
+
 function batchResult(ids = [], handler, label, noGetter = (id) => id) {
   const result = { total: ids.length, successCount: 0, failedCount: 0, successItems: [], failedItems: [], failedReason: [] }
   ids.forEach((id) => {
@@ -345,6 +559,100 @@ export function updateInvoicePrepare(id, patch = {}) {
   Object.assign(current, invoicePrepare({ ...current, ...patch, id: current.id, updatedAt: nowText() }))
   persist()
   writeInvoicePrepareLog('更新发票预备', { targetId: current.id, targetNo: current.invoicePrepareNo })
+  return { success: true, invoicePrepare: clone(current) }
+}
+
+export function inputPurchaseInvoiceInfo(id, info = {}, operator = 'page-user') {
+  const current = byId(state.invoicePrepares, id)
+  if (!current) return { success: false, error: '未找到发票准备记录。' }
+  if (['closed', 'cancelled', 'apDraftGenerated'].includes(current.invoicePrepareStatus)) return { success: false, error: '当前发票准备已关闭或已流转，不能录入发票信息。' }
+  const beforeStatus = `${current.invoicePrepareStatus || ''}/${current.invoiceStatus || ''}`
+  const invoiceAmount = roundAmount(info.invoiceAmount ?? current.invoiceAmount ?? current.settlementAmount)
+  const taxRate = toNumber(info.taxRate ?? current.taxRate ?? DEFAULT_TAX_RATE)
+  const taxAmount = roundAmount(info.taxAmount ?? invoiceAmount * taxRate / 100)
+  const totalInvoiceAmount = roundAmount(info.totalInvoiceAmount ?? invoiceAmount + taxAmount)
+  Object.assign(current, invoicePrepare({
+    ...current,
+    invoiceNo: info.invoiceNo ?? current.invoiceNo,
+    invoiceDate: info.invoiceDate ?? current.invoiceDate,
+    invoiceType: info.invoiceType ?? current.invoiceType,
+    invoiceAmount,
+    taxRate,
+    taxAmount,
+    totalInvoiceAmount,
+    totalNoTaxAmount: invoiceAmount,
+    totalTaxAmount: taxAmount,
+    invoicePrepareRemark: info.invoicePrepareRemark ?? info.remark ?? current.invoicePrepareRemark,
+    remark: info.invoicePrepareRemark ?? info.remark ?? current.remark,
+    differenceReason: amountMatches(invoiceAmount, current.settlementAmount)
+      ? current.differenceReason
+      : (info.invoicePrepareRemark || info.remark || '发票金额与结算金额存在差异，待人工核对。'),
+    invoicePrepareStatus: amountMatches(invoiceAmount, current.settlementAmount) ? current.invoicePrepareStatus : 'received_pending_check',
+    invoiceStatus: current.invoiceStatus === 'not_received' ? 'received_pending_check' : current.invoiceStatus,
+    updatedAt: nowText(),
+  }))
+  appendPrepareLog(current, 'input_invoice_info', beforeStatus, `${current.invoicePrepareStatus}/${current.invoiceStatus}`, info.invoicePrepareRemark || info.remark || '录入发票信息。', operator)
+  persist()
+  writeInvoicePrepareLog('input_invoice_info', { targetId: current.id, targetNo: current.invoicePrepareNo })
+  return { success: true, invoicePrepare: clone(current) }
+}
+
+export function markPurchaseInvoiceReceived(id, operator = 'page-user') {
+  const current = byId(state.invoicePrepares, id)
+  if (!current) return { success: false, error: '未找到发票准备记录。' }
+  if (['closed', 'cancelled', 'apDraftGenerated'].includes(current.invoicePrepareStatus)) return { success: false, error: '当前发票准备不能继续收票。' }
+  const beforeStatus = `${current.invoicePrepareStatus || ''}/${current.invoiceStatus || ''}`
+  current.invoiceStatus = 'received_pending_check'
+  current.invoicePrepareStatus = current.invoicePrepareStatus === 'draft' ? 'waiting_invoice' : 'invoice_received'
+  current.invoiceReceived = true
+  current.invoiceReceivedDate = current.invoiceReceivedDate || today()
+  current.updatedAt = nowText()
+  appendPrepareLog(current, 'mark_invoice_received', beforeStatus, `${current.invoicePrepareStatus}/${current.invoiceStatus}`, '登记已收到发票，等待核对。', operator)
+  persist()
+  writeInvoicePrepareLog('mark_invoice_received', { targetId: current.id, targetNo: current.invoicePrepareNo })
+  return { success: true, invoicePrepare: clone(current) }
+}
+
+export function markPurchaseInvoiceChecked(id, operator = 'page-user') {
+  const current = byId(state.invoicePrepares, id)
+  if (!current) return { success: false, error: '未找到发票准备记录。' }
+  if (!current.invoiceNo || !current.invoiceDate) return { success: false, error: '请先录入发票号码和发票日期。' }
+  const amountOk = amountMatches(current.invoiceAmount, current.settlementAmount)
+  if (!amountOk && !current.invoicePrepareRemark && !current.differenceReason) return { success: false, error: '发票金额与结算金额不一致，请先填写核对说明。' }
+  const beforeStatus = `${current.invoicePrepareStatus || ''}/${current.invoiceStatus || ''}`
+  current.invoiceStatus = 'checked'
+  current.invoicePrepareStatus = 'checked'
+  current.invoiceMatchStatus = amountOk ? 'matched' : 'difference_confirmed'
+  current.updatedAt = nowText()
+  appendPrepareLog(current, 'check_invoice_passed', beforeStatus, `${current.invoicePrepareStatus}/${current.invoiceStatus}`, amountOk ? '发票金额与结算金额一致。' : '发票金额存在差异但已有说明，仅完成发票准备核对。', operator)
+  persist()
+  writeInvoicePrepareLog('check_invoice_passed', { targetId: current.id, targetNo: current.invoicePrepareNo })
+  return { success: true, invoicePrepare: clone(current) }
+}
+
+export function markPurchaseInvoiceAbnormal(id, remark = '发票异常，待人工处理。', operator = 'page-user') {
+  const current = byId(state.invoicePrepares, id)
+  if (!current) return { success: false, error: '未找到发票准备记录。' }
+  const beforeStatus = `${current.invoicePrepareStatus || ''}/${current.invoiceStatus || ''}`
+  current.invoiceStatus = 'rejected'
+  current.invoicePrepareStatus = 'blocked'
+  current.differenceReason = remark
+  current.updatedAt = nowText()
+  appendPrepareLog(current, 'mark_invoice_abnormal', beforeStatus, `${current.invoicePrepareStatus}/${current.invoiceStatus}`, remark, operator)
+  persist()
+  writeInvoicePrepareLog('mark_invoice_abnormal', { targetId: current.id, targetNo: current.invoicePrepareNo, result: remark })
+  return { success: true, invoicePrepare: clone(current) }
+}
+
+export function closePurchaseInvoicePrepare(id, remark = '关闭发票准备。', operator = 'page-user') {
+  const current = byId(state.invoicePrepares, id)
+  if (!current) return { success: false, error: '未找到发票准备记录。' }
+  const beforeStatus = `${current.invoicePrepareStatus || ''}/${current.invoiceStatus || ''}`
+  current.invoicePrepareStatus = 'closed'
+  current.updatedAt = nowText()
+  appendPrepareLog(current, 'close_invoice_prepare', beforeStatus, `${current.invoicePrepareStatus}/${current.invoiceStatus || ''}`, remark, operator)
+  persist()
+  writeInvoicePrepareLog('close_invoice_prepare', { targetId: current.id, targetNo: current.invoicePrepareNo, result: remark })
   return { success: true, invoicePrepare: clone(current) }
 }
 

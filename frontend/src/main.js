@@ -6,6 +6,11 @@ import locale from 'element-plus/es/locale/lang/zh-cn'
 import App from './App.vue'
 import router from './router'
 import './styles/appExperience.css'
+import './styles/pceAdvancedFilterLayout.css'
+import {
+  MATERIAL_RUNTIME_STATUS,
+  initializeMaterialMasterRuntimeLifecycle,
+} from './meta/providers/materialMasterRuntimeProvider'
 
 function normalizeHashHistoryUrl() {
   if (typeof window === 'undefined') return false
@@ -36,9 +41,27 @@ function normalizeHashHistoryUrl() {
   return false
 }
 
-if (!normalizeHashHistoryUrl()) {
+async function bootstrap() {
   if (import.meta.env.DEV) {
     console.info(`Current Frontend Origin: ${window.location.origin}`)
+  }
+
+  const materialRuntime = initializeMaterialMasterRuntimeLifecycle({
+    onError(error) {
+      if (![MATERIAL_RUNTIME_STATUS.AUTH_REQUIRED, MATERIAL_RUNTIME_STATUS.PERMISSION_DENIED].includes(error?.code)) {
+        console.error('MaterialMaster runtime preload failed', error)
+      }
+    },
+  })
+
+  // An unauthenticated start is a valid lifecycle state. Authenticated sessions
+  // still preload before mount; login and identity changes trigger a fresh load.
+  try {
+    await materialRuntime.preload()
+  } catch (error) {
+    if (![MATERIAL_RUNTIME_STATUS.AUTH_REQUIRED, MATERIAL_RUNTIME_STATUS.PERMISSION_DENIED].includes(error?.code)) {
+      console.error('MaterialMaster runtime preload failed', error)
+    }
   }
 
   const app = createApp(App)
@@ -47,3 +70,5 @@ if (!normalizeHashHistoryUrl()) {
   app.use(ElementPlus, { locale })
   app.mount('#app')
 }
+
+if (!normalizeHashHistoryUrl()) bootstrap()

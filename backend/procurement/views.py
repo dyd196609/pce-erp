@@ -1,4 +1,12 @@
-import pandas as pd
+import importlib
+
+
+class _LazyPandas:
+    def __getattr__(self, name):
+        return getattr(importlib.import_module("pandas"), name)
+
+
+pd = _LazyPandas()
 from io import BytesIO
 from django.http import HttpResponse
 from django.db import models
@@ -9,6 +17,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from .models import Supplier, PurchaseOrder, PurchaseOrderItem
 from .serializers import SupplierSerializer, PurchaseOrderSerializer
+from .fact_read_access import scoped_queryset
 from masterdata.models import Material
 from django.db.models import Sum, Count, Q, F
 from django.db.models.functions import Coalesce
@@ -186,6 +195,14 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if self.request.method in ("GET", "HEAD"):
+            if self.action == "retrieve":
+                queryset = queryset.filter(pk=self.kwargs.get("pk"))
+            elif self.action == "export" and self.request.query_params.get("ids"):
+                ids = [int(value) for value in self.request.query_params["ids"].split(",") if value.isdigit()]
+                if ids:
+                    queryset = queryset.filter(pk__in=ids)
+            queryset = scoped_queryset(queryset, self.request.user, ("procurement.purchase_order.view",))
 
         # ========== 1. 全局搜索 ==========
         search = self.request.query_params.get("search")
@@ -340,47 +357,23 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def submit(self, request, pk=None):
-        order = self.get_object()
-        if order.status != "draft":
-            return Response({"error": "只有草稿状态才能提交"}, status=400)
-        order.status = "submitted"
-        order.save()
-        return Response(
-            {"status": order.status, "status_display": order.get_status_display()}
-        )
+        from .scm_runtime_actions import order_approval_response
+        return order_approval_response(request, pk, 'procurement.purchase_order.submit')
 
     @action(detail=True, methods=["post"])
     def approve(self, request, pk=None):
-        order = self.get_object()
-        if order.status != "submitted":
-            return Response({"error": "只有已提交状态才能审核"}, status=400)
-        order.status = "approved"
-        order.save()
-        return Response(
-            {"status": order.status, "status_display": order.get_status_display()}
-        )
+        from .scm_runtime_actions import order_approval_response
+        return order_approval_response(request, pk, 'procurement.purchase_order.approve')
 
     @action(detail=True, methods=["post"])
     def review(self, request, pk=None):
-        order = self.get_object()
-        if order.status != "approved":
-            return Response({"error": "只有已审核状态才能复核"}, status=400)
-        order.status = "reviewed"
-        order.save()
-        return Response(
-            {"status": order.status, "status_display": order.get_status_display()}
-        )
+        from .scm_runtime_actions import order_approval_response
+        return order_approval_response(request, pk, 'procurement.purchase_order.review')
 
     @action(detail=True, methods=["post"])
     def final_approve(self, request, pk=None):
-        order = self.get_object()
-        if order.status != "reviewed":
-            return Response({"error": "只有已复核状态才能审批"}, status=400)
-        order.status = "final_approved"
-        order.save()
-        return Response(
-            {"status": order.status, "status_display": order.get_status_display()}
-        )
+        from .scm_runtime_actions import order_approval_response
+        return order_approval_response(request, pk, 'procurement.purchase_order.release')
 
     @action(detail=True, methods=["post"])
     def receive(self, request, pk=None):

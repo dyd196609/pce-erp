@@ -1,4 +1,3 @@
-import pandas as pd
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
@@ -20,6 +19,8 @@ admin.site.register(Position)
 # ==================== 导入视图 ====================
 @staff_member_required
 def import_org_view(request):
+    import pandas as pd
+
     if request.method == 'POST' and request.FILES.get('excel_file'):
         excel_file = request.FILES['excel_file']
         try:

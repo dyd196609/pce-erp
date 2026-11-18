@@ -1,0 +1,29 @@
+{
+  "checklistCode": "PCE-ENTERPRISE-PAGE-COMMON-CHECKLIST-V1",
+  "version": "V1.14.2.8.4.20.7",
+  "allowedResults": ["PASS", "FAIL", "N/A", "UNKNOWN"],
+  "naPolicy": {
+    "removable": false,
+    "reasonRequired": true,
+    "archiveRequired": true,
+    "description": "N/A检查项不得删除，必须记录不适用原因和确认人。"
+  },
+  "checks": [
+    { "id": "COMMON-IDENTITY-001", "family": "identity", "name": "页面身份字段完整", "requiredEvidence": ["pageCode", "pageName", "pageUrl", "moduleCode", "businessObject", "pageVersion"], "executionType": "automatic" },
+    { "id": "COMMON-TEMPLATE-001", "family": "template", "name": "统一页面区域完整", "requiredEvidence": ["页面身份", "业务动作说明", "流程导航", "服务端事实", "业务列表或内容区", "业务边界保护"], "executionType": "automatic+manual" },
+    { "id": "COMMON-ROUTE-001", "family": "route", "name": "路由登记且刷新可恢复", "requiredEvidence": ["routerBinding", "pageCodeBinding", "refreshUrl"], "executionType": "automatic+manual" },
+    { "id": "COMMON-NAV-001", "family": "navigation", "name": "上一页当前页下一页可导航", "requiredEvidence": ["previousPage", "currentPage", "nextPage"], "executionType": "automatic+manual" },
+    { "id": "COMMON-FACT-001", "family": "facts", "name": "五端事实来自同一服务端来源", "requiredEvidence": ["apiFacts", "pageFacts", "diagnosticFacts", "strictFacts", "acceptanceFacts"], "executionType": "automatic" },
+    { "id": "COMMON-API-001", "family": "api", "name": "页面API契约与权限明确", "requiredEvidence": ["endpoint", "method", "httpStatus", "permission"], "executionType": "automatic" },
+    { "id": "COMMON-LIST-001", "family": "list", "name": "企业列表契约完整", "requiredEvidence": ["search", "advancedFilter", "export", "frozenColumns", "horizontalScroll", "pagination"], "executionType": "automatic+manual" },
+    { "id": "COMMON-FILTER-001", "family": "filter", "name": "筛选字段类型和选项受治理", "requiredEvidence": ["filterType", "optionsOrProvider"], "executionType": "automatic" },
+    { "id": "COMMON-STATUS-001", "family": "status", "name": "只展示服务端业务状态标签", "requiredEvidence": ["statusLabel", "technicalCodeHidden"], "executionType": "automatic+manual" },
+    { "id": "COMMON-ACTION-001", "family": "action", "name": "按钮状态权限和写入范围明确", "requiredEvidence": ["buttonName", "allowedStatus", "permission", "writeScope"], "executionType": "automatic+manual" },
+    { "id": "COMMON-REL-001", "family": "relationship", "name": "来源对象与目标对象可追踪", "requiredEvidence": ["sourceObject", "targetObject", "relationshipStatus"], "executionType": "automatic+manual" },
+    { "id": "COMMON-EXCEPTION-001", "family": "exception", "name": "空数据权限失败和接口失败可控", "requiredEvidence": ["emptyState", "permissionDenied", "apiFailure", "pageStillUsable"], "executionType": "automatic+manual" },
+    { "id": "COMMON-PERF-001", "family": "performance", "name": "页面性能指标满足预算", "requiredEvidence": ["routeLoadTime", "schemaLoadTime", "apiTime", "renderTime", "totalTime"], "executionType": "automatic" },
+    { "id": "COMMON-SECURITY-001", "family": "security", "name": "认证权限和危险动作受控", "requiredEvidence": ["authentication", "authorization", "dangerActionCount"], "executionType": "automatic" },
+    { "id": "COMMON-DATA-001", "family": "data-protection", "name": "验收数据写入边界明确", "requiredEvidence": ["productionUserDataWritten", "businessWriteCount", "databaseHash"], "executionType": "automatic" },
+    { "id": "COMMON-SCENARIO-001", "family": "scenario-query", "name": "页面场景参数生效且刷新保持", "requiredEvidence": ["queryParameters", "dataMode", "refreshPreserved"], "executionType": "automatic+manual" }
+  ]
+}

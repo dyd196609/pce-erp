@@ -9,6 +9,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
 
 from .models import PurchaseOrder, PurchaseApprovalRecord, PurchaseOrderItem
+from pfm.formal_employee import formal_employee_queryset
 from .serializers import PurchaseOrderSerializer
 from pfm.models import Employee
 from system.models import Department
@@ -331,7 +332,13 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="base-options")
     def base_options(self, request):
-        employees = Employee.objects.filter(status="active").order_by("employee_no")
+        company_id = getattr(request.user, "company_id", None)
+        employees = formal_employee_queryset(
+            Employee.objects.select_related("department_ref", "position_ref"),
+            company_id=company_id,
+        ).order_by("employee_no")
+        if company_id is None:
+            employees = employees.none()
         departments = Department.objects.filter(is_active=True).order_by("id")
         suppliers = Supplier.objects.all().order_by("id")
         materials = Material.objects.filter(is_active=True).order_by("code")

@@ -382,6 +382,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import request from '../api/request';
+import { getTabAuthToken } from '@/meta/runtime/tabAuthenticationContext.js';
 
 // 清除指定日期范围
 const clearDateRange = (field) => {
@@ -473,7 +474,7 @@ const resignationDateOptions = computed(() => {
 // ========== 导入导出 ==========
 const uploadUrl = computed(() => 'http://127.0.0.1:8000/api/pfm/employees/import_excel/');
 const uploadHeaders = computed(() => ({
-  Authorization: `Bearer ${localStorage.getItem('token')}`
+  Authorization: `Bearer ${getTabAuthToken()}`
 }));
 
 // ========== 弹窗相关 ==========
@@ -696,7 +697,7 @@ const handleSizeChange = (newSize) => {
 
 // ========== 导入模板下载 ==========
 const downloadTemplate = () => {
-  const token = localStorage.getItem('token');
+  const token = getTabAuthToken();
   fetch('http://127.0.0.1:8000/api/pfm/employees/export_template/', {
     method: 'GET',
     headers: { 'Authorization': `Bearer ${token}` }
@@ -715,7 +716,7 @@ const downloadTemplate = () => {
 
 // ========== 导出数据 ==========
 const exportData = () => {
-  const token = localStorage.getItem('token');
+  const token = getTabAuthToken();
   fetch('http://127.0.0.1:8000/api/pfm/employees/export/', {
     method: 'GET',
     headers: { 'Authorization': `Bearer ${token}` }

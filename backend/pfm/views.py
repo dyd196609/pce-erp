@@ -1,4 +1,12 @@
-import pandas as pd
+import importlib
+
+
+class _LazyPandas:
+    def __getattr__(self, name):
+        return getattr(importlib.import_module("pandas"), name)
+
+
+pd = _LazyPandas()
 from io import BytesIO
 from django.http import HttpResponse
 from rest_framework.decorators import action
@@ -8,8 +16,10 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
+from .formal_employee import employee_archive_queryset, formal_employee_queryset
 from .models import Employee, Shift, EmployeeCertificate
 from .serializers import EmployeeSerializer, ShiftSerializer, EmployeeCertificateSerializer
+from system.authorization import scope_employee_queryset
 
 
 class EmployeePagination(PageNumberPagination):
@@ -24,9 +34,46 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = EmployeePagination
 
+    def _history_write_block(self):
+        view_mode = str(self.request.query_params.get('view') or 'current').strip().lower()
+        if view_mode in {'history', 'all', 'archive'}:
+            return Response(
+                {
+                    'code': 'EMPLOYEE_HISTORY_READ_ONLY',
+                    'error': '历史员工视图只读；正式员工变更必须通过当前员工正式组织关系入口。',
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+        return None
+
+    def update(self, request, *args, **kwargs):
+        blocked = self._history_write_block()
+        return blocked if blocked is not None else super().update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        blocked = self._history_write_block()
+        return blocked if blocked is not None else super().partial_update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        blocked = self._history_write_block()
+        return blocked if blocked is not None else super().destroy(request, *args, **kwargs)
+
     def get_queryset(self):
         """支持筛选的查询集（模糊查询 + 多选批量查询）"""
-        queryset = super().get_queryset()
+        queryset = scope_employee_queryset(super().get_queryset(), self.request.user)
+        view_mode = str(self.request.query_params.get('view') or 'current').strip().lower()
+        if view_mode == 'history':
+            queryset = queryset.exclude(
+                pk__in=formal_employee_queryset(queryset).values_list('pk', flat=True)
+            )
+        elif view_mode in {'all', 'archive'}:
+            queryset = employee_archive_queryset(queryset)
+        elif view_mode != 'all':
+            queryset = formal_employee_queryset(queryset)
+        department_filter_field = (
+            'department_ref__name' if view_mode == 'current' else 'department_name'
+        )
+        position_filter_field = 'position_ref__name' if view_mode == 'current' else 'position'
         
         # ========== 多选批量筛选（__in 精确匹配） ==========
         employee_no_in = self.request.query_params.get('employee_no__in')
@@ -59,11 +106,11 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         if department_name_in and department_name_in.strip():
             values = [v.strip() for v in department_name_in.split(',') if v.strip()]
             if values:
-                queryset = queryset.filter(department_name__in=values)
+                queryset = queryset.filter(**{f'{department_filter_field}__in': values})
         if position_in and position_in.strip():
             values = [v.strip() for v in position_in.split(',') if v.strip()]
             if values:
-                queryset = queryset.filter(position__in=values)
+                queryset = queryset.filter(**{f'{position_filter_field}__in': values})
         if gender_in and gender_in.strip():
             values = [v.strip() for v in gender_in.split(',') if v.strip()]
             if values:
@@ -96,10 +143,10 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(status=status)
         department_name = self.request.query_params.get('department_name')
         if department_name:
-            queryset = queryset.filter(department_name__icontains=department_name)
+            queryset = queryset.filter(**{f'{department_filter_field}__icontains': department_name})
         position = self.request.query_params.get('position')
         if position:
-            queryset = queryset.filter(position__icontains=position)
+            queryset = queryset.filter(**{f'{position_filter_field}__icontains': position})
         gender = self.request.query_params.get('gender')
         if gender:
             queryset = queryset.filter(gender=gender)
@@ -140,7 +187,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         elif resignation_date_end:
             queryset = queryset.filter(resignation_date__lte=resignation_date_end)
             
-        return queryset
+        return queryset.order_by('employee_no', 'pk')
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def export_template(self, request):
@@ -171,72 +218,13 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def import_excel(self, request):
         """导入 Excel 或 CSV 文件"""
-        file = request.FILES.get('file')
-        if not file:
-            return Response({'error': '请上传文件'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        file_name = file.name.lower()
-        try:
-            if file_name.endswith('.csv'):
-                # 处理 CSV 文件
-                df = pd.read_csv(file, encoding='utf-8')
-            else:
-                # 处理 Excel 文件
-                df = pd.read_excel(file, engine='openpyxl')
-        except Exception as e:
-            return Response({'error': f'文件解析失败: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        success_count = 0
-        errors = []
-        
-        for index, row in df.iterrows():
-            try:
-                employee_no = str(row.get('工号', '')).strip() if pd.notna(row.get('工号')) else None
-                if not employee_no:
-                    errors.append(f'第{index+2}行：工号不能为空')
-                    continue
-                
-                # 性别转换（导入时统一存储为 M/F）
-                gender_value = row.get('性别', '') if pd.notna(row.get('性别')) else ''
-                if gender_value == '男':
-                    gender_code = 'M'
-                elif gender_value == '女':
-                    gender_code = 'F'
-                else:
-                    gender_code = ''
-                
-                # 状态转换（导入时统一存储为 active/inactive）
-                status_value = row.get('状态', '') if pd.notna(row.get('状态')) else ''
-                if status_value == '在职':
-                    status_code = 'active'
-                elif status_value == '离职':
-                    status_code = 'inactive'
-                else:
-                    status_code = 'active'
-                
-                employee, created = Employee.objects.update_or_create(
-                    employee_no=employee_no,
-                    defaults={
-                        'full_name': str(row.get('姓名', '')) if pd.notna(row.get('姓名')) else '',
-                        'phone': str(row.get('手机号', '')) if pd.notna(row.get('手机号')) else '',
-                        'status': status_code,
-                        'department_name': str(row.get('部门', '')) if pd.notna(row.get('部门')) else '',
-                        'position': str(row.get('职位', '')) if pd.notna(row.get('职位')) else '',
-                        'gender': gender_code,
-                        'birth_date': row.get('生日') if pd.notna(row.get('生日')) else None,
-                        'hire_date': row.get('入职日期') if pd.notna(row.get('入职日期')) else None,
-                        'resignation_date': row.get('离职日期') if pd.notna(row.get('离职日期')) else None,
-                    }
-                )
-                success_count += 1
-            except Exception as e:
-                errors.append(f'第{index+2}行：{str(e)}')
-        
-        return Response({
-            'success': success_count,
-            'errors': errors,
-            'total': len(df)
-        })
+        return Response(
+            {
+                'code': 'LEGACY_EMPLOYEE_IMPORT_DISABLED',
+                'error': '旧员工导入只包含历史文本字段，已停止作为正式员工写入入口；请通过正式组织员工维护入口关联公司、部门和岗位。',
+            },
+            status=status.HTTP_409_CONFLICT,
+        )
 
     @action(detail=False, methods=['get'])
     def export(self, request):
@@ -269,8 +257,8 @@ class EmployeeViewSet(viewsets.ModelViewSet):
                 '姓名': emp.full_name,
                 '手机号': emp.phone,
                 '状态': status_display,
-                '部门': emp.department_name,
-                '职位': emp.position,
+                '部门': emp.department_ref.name if emp.department_ref else '',
+                '职位': emp.position_ref.name if emp.position_ref else '',
                 '性别': gender_display,
                 '生日': emp.birth_date,
                 '入职日期': emp.hire_date,

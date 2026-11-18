@@ -111,7 +111,7 @@ export function generateScmMockState() {
       state.priceApprovalItems.push(...requestLines.map((line, lineIndex) => ({ ...line, id: `pai-2026-${seq}-${lineIndex + 1}`, approvalId, inquiryItemId: `pii-2026-${seq}-${lineIndex + 1}`, supplierId: line.supplierId, quotedPrice: line.price, approvedPrice: line.price, taxRate: 13, deliveryDays: 7, paymentTerms: '月结30天', sourceModule: 'purchaseInquiry', sourceOrderId: inquiryId, sourceOrderNo: `PI-2026-${seq}`, sourceLineId: `pii-2026-${seq}-${lineIndex + 1}` })))
       const orderStatus = status === 'approved' ? 'approved' : status
       const totalAmount = requestLines.reduce((sum, line) => sum + line.amount, 0)
-      state.purchaseOrders.push({ id: orderId, poNo: `PO-2026-${seq}`, orderDate: '2026-07-15', supplierId: supplier.id || requestLines[0]?.supplierId || '', buyerId: buyer.id || '', plannedArrivalDate: '2026-08-10', totalAmount, status: orderStatus, sourceType: 'priceApproval', sourceId: approvalId, sourceModule: 'priceApproval', sourceOrderId: approvalId, sourceOrderNo: `PA-2026-${seq}`, remark: '模拟采购订单' })
+      state.purchaseOrders.push({ id: orderId, poNo: `PO20260715${seq}`, orderDate: '2026-07-15', supplierId: supplier.id || requestLines[0]?.supplierId || '', buyerId: buyer.id || '', plannedArrivalDate: '2026-08-10', totalAmount, status: orderStatus, sourceType: 'priceApproval', sourceId: approvalId, sourceModule: 'priceApproval', sourceOrderId: approvalId, sourceOrderNo: `PA-2026-${seq}`, testDataClassification: 'DEVELOPMENT_TEST_DATA', remark: '模拟采购订单' })
       state.purchaseOrderItems.push(...requestLines.map((line, lineIndex) => {
         const warehouse = pick(warehouses, index + lineIndex)
         const location = pick(getLocationOptions(warehouse.id), lineIndex)

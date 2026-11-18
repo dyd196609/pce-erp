@@ -74,6 +74,7 @@
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { clearTabAuthentication, readTabIdentity } from '@/meta/runtime/tabAuthenticationContext.js'
 import {
     User, Clock, Folder, Goods, Document, DataAnalysis, ShoppingCart,
     ArrowLeft, ArrowRight
@@ -84,7 +85,7 @@ const route = useRoute()
 
 const sidebarCollapsed = ref(false)  // 侧边栏折叠状态
 
-const userInfo = ref(JSON.parse(localStorage.getItem('user') || '{}'))
+const userInfo = ref(readTabIdentity() || {})
 
 const activeMenu = computed(() => {
     const path = route.path
@@ -103,8 +104,7 @@ const handleMenuSelect = (index) => {
 }
 
 const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    clearTabAuthentication()
     router.push('/login')
     ElMessage.success('已退出登录')
 }
