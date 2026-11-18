@@ -3761,7 +3761,7 @@
   },
   {
     "file": "backend/procurement/material_allocation_api.py",
-    "sha256": "c4afa910378c04b5fddec196db43a880b82c40e4b1a08f0da598b4f152d22dc2"
+    "sha256": "fb0692fab4a8279bc396cad54ff132902ef92ea82e556d76dc051df9f15dcbd6"
   },
   {
     "file": "backend/procurement/material_allocation_configuration.py",
@@ -3801,7 +3801,7 @@
   },
   {
     "file": "backend/procurement/material_stock_authority.py",
-    "sha256": "a5c24fd365623b10ccaf1004e3108fdac74341955017ea8f6473cbfef94525fa"
+    "sha256": "8cfb791020e1c272a5064a5e36749dc2eb1a5ef52bf485e2c45d7f9f61eb08df"
   },
   {
     "file": "backend/procurement/migrations/0001_initial.py",
@@ -4037,7 +4037,7 @@
   },
   {
     "file": "backend/procurement/scm_runtime_services.py",
-    "sha256": "191e5a1b5795c5a92bb16697ad61fe1315004c11c7a913ff04d118821676af2c"
+    "sha256": "20e30014fb0c8132f7acddeb3255d082fa78225045e2bc3d981dd6935b2b9e19"
   },
   {
     "file": "backend/procurement/scm_stable_business_trace_design.py",
@@ -4121,7 +4121,7 @@
   },
   {
     "file": "backend/procurement/urls.py",
-    "sha256": "5763519d13b9b841adafc13ca73fd21e0103aace0a605620667ad496266f9ac4"
+    "sha256": "021143517df2b717796af87ff223209001a76c3757aa06b401905f48cb4bb3fc"
   },
   {
     "file": "backend/procurement/views.py",

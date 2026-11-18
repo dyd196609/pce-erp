@@ -290,6 +290,62 @@ def source_context(*,user,action,object_id,purchase_order_item_id=None):
    'qualificationMeaning':'仅原岗位与本次准确来源读取；实际提交事务内重验，不授予其他动作'}}
 
 
+def source_directory(*, user, action, query='', page=1, page_size=20):
+ """Discover only original action-scoped sources; never grant a full-list read."""
+ from django.db.models import Q
+ from .scm_runtime_services import authorize_action, _fulfillment_actor
+ user=actor(user)
+ if action not in {'confirm-receipt','confirm-inbound'}:fail('RAW_DIRECTORY_ACTION_UNKNOWN','仅提供原收货及合格入库来源目录。',404)
+ decision=authorize_action(user=user,action_code=ACTIONS[action],organization_id=user.company_id)
+ if not decision.get('allowed'):fail(decision.get('decisionCode','PERMISSION_DENIED'),decision.get('reason','没有本目录读取资格。'),403)
+ _fulfillment_actor(user=user,action_code=ACTIONS[action],company_id=user.company_id)
+ if not isinstance(query,str) or len(query)>100 or type(page) is not int or page<1 or type(page_size) is not int or not 1<=page_size<=100:
+  fail('RAW_DIRECTORY_INPUT_INVALID','查询文字最多100字，页码须为正整数，每页1至100条。',400)
+ query=query.strip()
+ if action=='confirm-receipt':
+  rows=PurchaseOrder.objects.filter(company_id=user.company_id,status__in=['final_approved','received','inspected','stored']).order_by('pk')
+  if query:rows=rows.filter(po_no__icontains=query)
+ else:
+  rows=PurchaseInspection.objects.filter(source_receipt__source_purchase_order__company_id=user.company_id).select_related('source_receipt__source_purchase_order').order_by('pk')
+  if query:rows=rows.filter(Q(inspection_no__icontains=query)|Q(source_receipt__receipt_no__icontains=query)|Q(source_receipt__source_purchase_order__po_no__icontains=query))
+ scoped=[]
+ for row in rows:
+  order=row if action=='confirm-receipt' else row.source_receipt.source_purchase_order
+  try:_authorize_fulfillment(user=user,action_code=ACTIONS[action],order=order)
+  except ScmRuntimeActionError as exc:
+   if exc.http_status==403:continue
+   raise
+  scoped.append((row,order))
+ result=[]
+ for row,order in scoped[(page-1)*page_size:page*page_size]:
+  item={'sourceType':type(row).__name__,'sourceId':row.pk,'purchaseOrderNo':order.po_no,
+   'receiptNo':row.source_receipt.receipt_no if action=='confirm-inbound' else None,
+   'inspectionNo':row.inspection_no if action=='confirm-inbound' else None,
+   'contextUrl':f'/api/procurement/scm-runtime-actions/{action}/{row.pk}/?usagePurpose={PURPOSE}',
+   'actionEligibilityMustBeReRead':True}
+  try:
+   context=source_context(user=user,action=action,object_id=row.pk)
+   item.update(sourceStatus='PROVIDED',actionAuthorization=context['actionAuthorization'],selectionRequired=context['selectionRequired'])
+   facts=context['source'].get('lineReleaseFacts')
+   if facts:
+    item['summary']={k:facts[k] for k in ['materialCode','materialName','unit','sourcePurchaseRequestNo','sourcePurchaseRequestLineNo','registeredReceivedQuantity','qualifiedQuantity','rejectedQuantity','successfullyInboundQuantity','currentInboundEligibleQuantity','qualityReleaseStatus','blockingReason']}
+    item['statusLabel']='本检验范围不合格' if facts['qualityReleaseStatus']=='REJECTED' else '检验待判' if facts['qualityReleaseStatus']=='PENDING' else '合格量已用尽' if Decimal(facts['currentInboundEligibleQuantity'])==0 else '有本次合格可入量'
+   else:
+    lines=context['source']['lineCandidates'];known=[x for x in lines if x.get('sourceStatus')=='PROVIDED'];unknown=len(lines)-len(known)
+    receivable=order.status in {'final_approved','received'} and any(Decimal(x['remainingReceivableQuantity'])>0 for x in known)
+    item['summary']={'materials':[{k:x[k] for k in ['materialCode','materialName','unit','sourcePurchaseRequestNo','sourcePurchaseRequestLineNo']} for x in known],
+     'sourcePendingLineCount':unknown,'receiptScopeStatus':'RECEIVABLE' if receivable else 'SOURCE_UNKNOWN' if unknown else 'EXHAUSTED' if known and all(Decimal(x['remainingReceivableQuantity'])==0 for x in known) else 'CONDITIONS_UNMET'}
+    item['statusLabel']=('有可收采购行，部分来源待核' if unknown else '有可收采购行') if receivable else '采购行来源待核' if unknown else '本单采购行已收齐' if item['summary']['receiptScopeStatus']=='EXHAUSTED' else '当前收货条件未满足'
+  except SOURCE_ERRORS as exc:
+   if exc.http_status in {403,404}:raise
+   item.update(sourceStatus='SOURCE_UNKNOWN',statusLabel='来源待核',summary=None,
+    actionAuthorization={'allowed':False,'blockingReason':{'code':exc.code,'message':str(exc)}})
+  result.append(item)
+ return {'contractVersion':'PCE-WMS-SCOPED-SOURCE-DIRECTORY-V1','action':action,'usagePurpose':PURPOSE,
+  'results':result,'count':len(scoped),'page':page,'pageSize':page_size,'businessWriteCount':0,
+  'currentStateSource':'server','qualificationMeaning':'仅当前岗位原动作范围内找单；不是完整采购/质检目录授权，选中后必须重读原动作上下文。'}
+
+
 def source_action_result(*,user,action,object_id,key,purchase_order_item_id=None):
  user=actor(user)
  if action not in ACTIONS or not isinstance(key,str) or not 1<=len(key)<=160:fail('RAW_ACTION_RESULT_INPUT_INVALID','须准确原动作及同次请求键。',400)

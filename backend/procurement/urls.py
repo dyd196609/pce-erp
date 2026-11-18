@@ -25,11 +25,12 @@ router.register(r"purchase_orders", PurchaseOrderViewSet)
 router.register(r"purchase-requests", PurchaseRequestViewSet, basename="purchase-request")
 
 from .order_stock_allocation_views import OrderStockAllocateView, OrderStockReleaseView
-from .material_allocation_api import MaterialAllocationView
+from .material_allocation_api import MaterialAllocationView, RawSourceDirectoryView
 from .material_preparation_api import MaterialPreparationView
 from .material_issue_api import MaterialIssueView,MaterialReceiptView
 
 urlpatterns = [
+    path('scm-runtime-actions/<str:action>/sources/', RawSourceDirectoryView.as_view(), name='raw-source-directory'),
     path('material-issues/', MaterialIssueView.as_view(), name='production-material-issue'),
     path('material-receipts/', MaterialReceiptView.as_view(), name='production-material-receipt'),
     path('material-preparations/', MaterialPreparationView.as_view(), name='production-material-preparation'),

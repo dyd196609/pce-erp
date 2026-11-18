@@ -32,6 +32,17 @@ class MaterialAllocationView(APIView):
    return service.confirm(user=request.user,payload=data,key=key)
   return invoke(execute)
 
+class RawSourceDirectoryView(APIView):
+ permission_classes=[IsAuthenticated]
+ def get(self,request,action):
+  def read():
+   from .material_stock_authority import source_directory
+   if set(request.query_params)-{'q','page','pageSize'} or any(len(request.query_params.getlist(k))!=1 for k in request.query_params):service.fail('RAW_DIRECTORY_INPUT_INVALID','目录只接受查询文字及分页，不接受自报身份或范围。',400)
+   try:page=int(request.query_params.get('page','1'));size=int(request.query_params.get('pageSize','20'))
+   except ValueError:service.fail('RAW_DIRECTORY_INPUT_INVALID','页码与每页条数须为整数。',400)
+   return source_directory(user=request.user,action=action,query=request.query_params.get('q',''),page=page,page_size=size)
+  return invoke(read)
+
 def raw_source_response(request,action,object_id):
  from .material_stock_authority import source_context,source_action_result,ACTIONS
  from .scm_runtime_services import PurchaseReceiptService,PurchaseInspectionService,WarehouseInboundService

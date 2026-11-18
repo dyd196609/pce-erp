@@ -1249,9 +1249,15 @@ def _authorize_fulfillment(*, user, action_code, order):
     )
     if not decision.get("allowed"):
         raise ScmRuntimeActionError(decision.get("decisionCode", "PERMISSION_DENIED"), decision.get("reason", "无权执行该业务动作"), 403)
+    employee = _fulfillment_actor(user=user, action_code=action_code, company_id=order.company_id)
+    return decision, employee
+
+
+def _fulfillment_actor(*, user, action_code, company_id):
+    """Original execution identity/duty contract, shared with source discovery."""
     employee = getattr(user, "employee_profile", None)
     position = getattr(employee, "position_ref", None) if employee else None
-    if not is_formal_employee(employee, company_id=order.company_id):
+    if not is_formal_employee(employee, company_id=company_id):
         raise ScmRuntimeActionError("EXECUTION_IDENTITY_INCOMPLETE", "当前账号没有有效的员工—岗位任职关系，禁止形成业务执行事实", 403)
     node = WorkflowNodeDefinition.objects.filter(
         process_definition__definition_code="PROCUREMENT_PURCHASE_REQUEST_TO_ORDER",
@@ -1262,7 +1268,7 @@ def _authorize_fulfillment(*, user, action_code, order):
         responsibility__is_active=True, responsibility__status="ACTIVE",
     ).exists():
         raise ScmRuntimeActionError("POSITION_RESPONSIBILITY_DENIED", "当前岗位没有该正式流程节点的有效职责关系", 403)
-    return decision, employee
+    return employee
 
 
 def _receipt_line_items(order, current):
