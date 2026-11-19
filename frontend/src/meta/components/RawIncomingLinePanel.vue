@@ -128,6 +128,8 @@
       <a v-if="receipt && pending.action==='confirm-receipt'" :href="handoffUrl('quality',receipt.objectId,'a07Receipt')">本次收货的质检办理入口</a>
       <button v-if="receipt" type="button" :disabled="busy" @click="acknowledge">查看当前办理事实</button>
     </section>
+    <IncomingExceptionPanel v-if="mode!=='receipt'" :kind="mode==='quality'?'register':'custody'"
+      :inspection-id="action==='create-inspection' ? null : sourceId" :inventory-facts="inventoryFacts" />
   </section>
 </template>
 
@@ -135,6 +137,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/api/request.js'
+import IncomingExceptionPanel from '@/meta/components/IncomingExceptionPanel.vue'
 import { getTabAuthEpoch, readTabIdentity } from '@/meta/runtime/tabAuthenticationContext.js'
 
 const props = defineProps({mode:{type:String,required:true},qualityRows:{type:Array,default:()=>[]},inventoryFacts:{type:Object,default:()=>({})},initialSourceId:{type:Number,default:null}})

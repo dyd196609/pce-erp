@@ -1,4 +1,4 @@
-"""Native incoming rejected scope -> immutable observations. Only registration and custody; no supplier opinion, disposition or inventory write."""
+"""Native incoming rejected scope -> immutable observations. Append supplier replies only after exact native responsible-buyer proof; no disposition or inventory write."""
 from decimal import Decimal
 from django.db import transaction
 from django.utils import timezone
@@ -16,12 +16,30 @@ from planning.work_order_workshop_receipt_service import _effective
 
 ENTITY='IncomingQualityExceptionFact'
 PROCESS='PROCUREMENT_INCOMING_EXCEPTION'
-CODES={'register':'quality.incoming_exception.register','custody':'warehouse.incoming_exception.custody'}
-LABELS={'register':'已登记不合格范围，待仓管确认','custody':'已记录本人实物保管确认'}
+CODES={'register':'quality.incoming_exception.register','custody':'warehouse.incoming_exception.custody','opinion':'procurement.incoming_exception.opinion'}
+LABELS={'register':'已登记不合格范围，待仓管确认','custody':'已记录本人实物保管确认','opinion':'已记录供应商意见，未作处置'}
 def text(value,label,required=True,limit=1000):
  if value is None and not required:return None
  if not isinstance(value,str) or len(value)>limit or required and not value.strip():fail('INCOMING_EXCEPTION_INPUT_INVALID',label+'须明确填写。',400)
  return value.strip()
+
+def responsible_buyer(order):
+ """Use the explicitly selected native employee and original selection audit, never the maker."""
+ from .purchase_order_approval_service import _origin
+ if not order.buyer_employee_id:fail('INCOMING_EXCEPTION_BUYER_SOURCE_PENDING','本采购未提供正式负责采购员关联，不能按建单人或采购角色推定。')
+ origin=_origin(order)
+ selected=origin.after_snapshot.get('state',{}).get('directCreationIdentity',{})
+ # Only this original production contract currently persists the explicit buyer choice.
+ if (order.purchase_mode!='DIRECT' or selected.get('creationMode')!='DIRECT_SELECTION'
+     or selected.get('purchaseMode')!='DIRECT' or selected.get('supplierId')!=str(order.supplier_id)
+     or selected.get('buyerEmployeeId')!=str(order.buyer_employee_id)):
+  fail('INCOMING_EXCEPTION_BUYER_SOURCE_PENDING','正式采购员关联缺少与当前准确采购、供应商一致的原选择证明，保留待核。')
+ employee=formal_employee_queryset(company_id=order.company_id).filter(pk=order.buyer_employee_id).select_related('user','position_ref','department_ref').first()
+ if not employee or not employee.user_id:fail('INCOMING_EXCEPTION_BUYER_NOT_EFFECTIVE','正式负责采购员当前没有有效员工及账号关系，不能由其他同岗人员代录。',403)
+ return {'employeeId':employee.pk,'employeeNo':employee.employee_no,'employeeName':employee.full_name,'userId':employee.user_id,
+  'relation':'PurchaseOrder.buyer_employee','purchaseOrderId':order.pk,'purchaseOrderNo':order.po_no,'supplierId':order.supplier_id,
+  'originalSelectionAuditId':origin.pk,'originalSelectionPath':'state.directCreationIdentity.buyerEmployeeId',
+  'selectionProofHash':_canonical_hash(selected),'makerUserIdForTraceOnly':order.created_by}
 
 def source(user,inspection_id,kind,lock=False):
  user=actor(user)
@@ -31,15 +49,24 @@ def source(user,inspection_id,kind,lock=False):
  i=q.filter(pk=inspection_id,source_receipt__source_purchase_order__company_id=user.company_id).first()
  if not i:fail('INCOMING_EXCEPTION_NOT_FOUND','本企业没有该准确检验来源。',404)
  order=i.source_receipt.source_purchase_order
+ buyer_hint=formal_employee_queryset(company_id=order.company_id).filter(pk=order.buyer_employee_id).first() if kind=='opinion' and order.buyer_employee_id else None
+ scope_owner=buyer_hint.user_id if buyer_hint else '__NOT_PROVIDED__'
  decision=AuthorizationService.decide(user=user,action_code=CODES[kind],organization_id=user.company_id,
-  business_object={'organizationId':user.company_id,'companyId':user.company_id,'departmentId':order.purchase_department_id or order.department_id,'ownerUserId':order.created_by})
+  business_object={'organizationId':user.company_id,'companyId':user.company_id,'departmentId':order.purchase_department_id or order.department_id,'ownerUserId':scope_owner if kind=='opinion' else order.created_by})
  e=formal_employee_queryset(company_id=user.company_id).filter(user_id=user.pk).select_related('position_ref','department_ref').first()
  today=timezone.now().date()
  links=PositionWorkflowResponsibility.objects.filter(position_id=e.position_ref_id if e else None,active=True,ownership_type='EXECUTOR',workflow_node__process_definition__definition_code=PROCESS,workflow_node__process_definition__active=True,workflow_node__active=True,workflow_node__business_action_code=CODES[kind],responsibility__is_active=True,responsibility__status='ACTIVE')
  link=links.first() if links.count()==1 else None
  if not decision['allowed'] or not e or not link or not PositionResponsibility.objects.filter(position_id=e.position_ref_id,responsibility_id=link.responsibility_id,active=True).exists() or not _effective(e.position_ref,today) or not _effective(e.department_ref,today) or e.hire_date and e.hire_date>today or e.leave_date and e.leave_date<=today or e.resignation_date and e.resignation_date<=today or link.effective_from and link.effective_from>today or link.effective_to and link.effective_to<today:
   fail('INCOMING_EXCEPTION_QUALIFICATION_DENIED','须本人原有效岗位、执行职责和准确单据范围。',403)
+ buyer_proof=None
+ if kind=='opinion':
+  buyer_proof=responsible_buyer(order)
+  if buyer_proof['userId']!=user.pk or buyer_proof['employeeId']!=e.pk:fail('INCOMING_EXCEPTION_NOT_RESPONSIBLE_BUYER','只有本采购正式选择并可证明的负责采购员本人可记录供应商意见。',403)
+  if not _effective(link.responsibility,today):fail('INCOMING_EXCEPTION_DUTY_NOT_EFFECTIVE','原采购异常协调职责不在有效期内。',403)
  facts=inspection_line_facts(i)
+ if buyer_proof:facts={**facts,'responsibleBuyer':buyer_proof}
+
  if facts['rejectedQuantity'] is None:fail('INCOMING_EXCEPTION_QUALITY_PENDING','本次检验尚未最终判定不合格数量。')
  if Decimal(facts['rejectedQuantity'])<=0:fail('INCOMING_EXCEPTION_NO_REJECTED_SCOPE','本次检验没有正式不合格范围。')
  return user,i,order,e,decision,facts
@@ -64,6 +91,8 @@ def context(*,user,inspection_id,kind,registration_id=None):
  selected=[r for r in rows if root and r.registration_id==root.pk]
  return {'inspection':facts,'registrations':[x for x in allfacts if x['kind']=='register'],'history':allfacts,'registrationId':root.pk if root else None,'registeredRejectedQuantity':str(registered),'remainingRegistrableQuantity':str(Decimal(facts['rejectedQuantity'])-registered),
   'custodyFacts':[x for x in allfacts if root and x['registrationId']==root.pk and x['kind']=='custody'],
+  'supplierOpinions':[x for x in allfacts if root and x['registrationId']==root.pk and x['kind']=='opinion'],
+  'supplierStatusLabel':'已有供应商回复，未作处置、未结案' if any(r.kind=='opinion' for r in selected) else '待供应商反馈',
   'custodyStatusLabel':'待仓管确认' if not any(r.kind=='custody' for r in selected) else '按逐次本人核对记录查看；差异及未核范围保留',
   'collectionVersion':_canonical_hash({'facts':allfacts,'source':facts}),'actionAuthorization':{'allowed':kind=='register' and registered<Decimal(facts['rejectedQuantity']) or kind!='register' and root is not None,'permission':CODES[kind]},'businessWriteCount':0,'currentStateSource':'server'}
 
@@ -86,7 +115,7 @@ def execute(*,user,inspection_id,kind,payload):
  if payload['expectedCollectionVersion']!=c['collectionVersion']:fail('INCOMING_EXCEPTION_VERSION_CONFLICT','记录集合已变化，请刷新或查询原动作，不自动重放。')
  root=Fact.objects.filter(pk=root_id,company_id=user.company_id,inspection=i,kind='register').first() if root_id else None
  if kind!='register' and not root:fail('INCOMING_EXCEPTION_REGISTRATION_REQUIRED','须选择本检验的准确异常登记。',400)
- if root and occurred<root.occurred_at:fail('INCOMING_EXCEPTION_TIME_INVALID','后续核对或意见时间不能早于异常登记。',400)
+ if kind=='custody' and root and occurred<root.occurred_at:fail('INCOMING_EXCEPTION_TIME_INVALID','后续核对或意见时间不能早于异常登记。',400)
  qty=None
  if kind=='register':
   if root_id is not None or set(body)!={'quantity','basis'}:fail('INCOMING_EXCEPTION_INPUT_INVALID','异常登记须明确数量和依据，不自报来源。',400)
@@ -109,6 +138,14 @@ def execute(*,user,inspection_id,kind,payload):
   difference=None if qty is None else str(root.quantity-qty)
   if (not confirmed or qty!=root.quantity) and not body['pendingReason']:fail('INCOMING_EXCEPTION_PENDING_REASON_REQUIRED','无法核实或存在数量差异时必须保留具体待核原因。',400)
   body={**body,'confirmedCustodyQuantity':str(qty) if confirmed else None,'confirmedCustodianId':user.pk if confirmed else None,'differenceQuantity':difference,'entireRegistrationConfirmed':confirmed and qty==root.quantity}
+ elif kind=='opinion':
+  if set(body)!={'replyContent','evidenceReferences'}:fail('INCOMING_EXCEPTION_OPINION_INPUT_INVALID','须明确本次供应商回复及已有凭据引用，不自报处置状态。',400)
+  content=text(body['replyContent'],'供应商本次回复',limit=5000)
+  refs=body['evidenceReferences']
+  if not isinstance(refs,list) or len(refs)>20 or any(not isinstance(v,str) or not v.strip() or len(v)>500 for v in refs) or len({v.strip() for v in refs})!=len(refs):
+   fail('INCOMING_EXCEPTION_EVIDENCE_INVALID','已有凭据引用须为不重复的明确原文引用；无凭据可留空，不新建附件。',400)
+  body={'replyContent':content,'repliedAt':occurred.isoformat(),'evidenceReferences':[v.strip() for v in refs],
+   'evidenceStatus':'DECLARED_EXISTING_REFERENCE' if refs else 'NOT_PROVIDED','dispositionAuthorized':False,'inventoryEffect':'NONE'}
  req,created,_=_write_request(user=user,action_code=CODES[kind],entity_type=ENTITY,key=key,request_body=meaning)
  if not created and req.status=='COMMITTED':
   row=Fact.objects.select_related('audit_record').filter(pk=req.result.get('id'),created_by=user,company_id=user.company_id,inspection=i).first()

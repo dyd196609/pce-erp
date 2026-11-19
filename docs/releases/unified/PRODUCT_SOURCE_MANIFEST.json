@@ -3733,11 +3733,11 @@
   },
   {
     "file": "backend/procurement/incoming_exception_configuration.py",
-    "sha256": "959ac65c7e12eb36c1894bc3eaa5e53b03042a25c6bd38bdd8561a9bd0b1939e"
+    "sha256": "7e97cb5905b9bd21284302b750a53f4b3485c3cedd21890d6e0fd103fec4ad9d"
   },
   {
     "file": "backend/procurement/incoming_exception_service.py",
-    "sha256": "1c2a43b665059caaab86c87bfa63b68eb6e85b1e92ee44ee3f40c925bbfeaf09"
+    "sha256": "615553d2724c745365d9e033d55b461bc0240d1e07c9c59a5c82b9315798fe85"
   },
   {
     "file": "backend/procurement/inventory_facts_api.py",
@@ -3976,12 +3976,16 @@
     "sha256": "63f2f4c3a0ad5e70c8333d7b7c82c72d2b70ba9d7a4f43ecadfa33a1c4ea285f"
   },
   {
+    "file": "backend/procurement/migrations/0102_incoming_exception_supplier_opinion.py",
+    "sha256": "4b87e5892ae376e5693c87909ac30831be6333b187501e93b3548f835b2d5fca"
+  },
+  {
     "file": "backend/procurement/migrations/__init__.py",
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   {
     "file": "backend/procurement/models.py",
-    "sha256": "54b8cc6464fe7a657db33518dfb561459d557a6958375fd28dfee1b56ca6be71"
+    "sha256": "c89ca04352a32089ffc8aa3d241cec98bf51a581b1e74c9b94431df416384336"
   },
   {
     "file": "backend/procurement/order_stock_allocation.py",
@@ -9680,6 +9684,10 @@
     "sha256": "660e72da36dcbbf8a403807cccd2816859ad0f035275ce5e2b9605fa8670b1eb"
   },
   {
+    "file": "frontend/src/meta/components/IncomingExceptionPanel.vue",
+    "sha256": "02645ac74e7404871d0a250054f971cc421bd68c20b2715af075e6d334f1a310"
+  },
+  {
     "file": "frontend/src/meta/components/JobFamilyManagementPanel.vue",
     "sha256": "c353b9a36f18270b68fe4264f654b4f98e407abc08cd67453a300edc7b430b8c"
   },
@@ -9893,7 +9901,7 @@
   },
   {
     "file": "frontend/src/meta/components/RawIncomingLinePanel.vue",
-    "sha256": "e7b6bea61252809d9a4908d43f5fb3ab73e60f890e3a69394efbc5a282a08ebd"
+    "sha256": "a7a91c413e8a346e7e3aadaf10e4c1279d7294db99111dcd84f0d06e320bd64f"
   },
   {
     "file": "frontend/src/meta/components/RoomDoorEdgeRequirementPreview.vue",

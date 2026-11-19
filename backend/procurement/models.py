@@ -1165,12 +1165,12 @@ class InventoryTransaction(PurposeSeparatedModel):
 
 
 class IncomingQualityExceptionFact(models.Model):
-    """Append-only rejected-scope registration and personal custody observations; no stock effect."""
+    """Append-only rejected scope, personal custody and supplier reply facts; no stock effect."""
     from planning.fields import ExactDemandQuantityField
     company = models.ForeignKey('system.Company', on_delete=models.PROTECT)
     inspection = models.ForeignKey(PurchaseInspection, on_delete=models.PROTECT, related_name='exception_facts')
     registration = models.ForeignKey('self', null=True, blank=True, on_delete=models.PROTECT, related_name='followups')
-    kind = models.CharField(max_length=16, choices=[('register','异常登记'),('custody','实物保管核对')])
+    kind = models.CharField(max_length=16, choices=[('register','异常登记'),('custody','实物保管核对'),('opinion','供应商意见')])
     quantity = ExactDemandQuantityField(max_digits=20, decimal_places=6, null=True, blank=True)
     intent_id = models.CharField(max_length=120)
     intent_hash = models.CharField(max_length=64)
