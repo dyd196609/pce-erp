@@ -57,6 +57,48 @@
         <IncomingExceptionPanel kind="opinion" :inspection-id="opinionInspectionId" :order-id="facts.order.id" />
       </section>
 
+      <section v-if="String(facts.order.id)===String(orderId)" class="manager-return-entry" aria-label="采购经理退供决定">
+        <h3>采购经理退供决定</h3>
+        <label v-if="facts.inspections?.length">
+          <span id="manager-return-inspection-label">退供决定的检验单</span>
+          <select aria-labelledby="manager-return-inspection-label" :value="managerInspection?.id || ''"
+            @change="changeManagerInspection($event.target.value)">
+            <option value="">请选择本采购订单的检验单</option>
+            <option v-for="row in facts.inspections" :key="row.id" :value="row.id">
+              {{ row.inspectionNo }} · {{ receiptNumber(row.receiptId) }}
+            </option>
+          </select>
+        </label>
+        <p v-else>本采购订单尚无检验单可查。</p>
+        <p v-if="managerLoading" role="status">正在读取本检验单的异常登记。</p>
+        <p v-else-if="managerError" role="alert">{{ managerError }}</p>
+        <template v-else-if="managerDirectory">
+          <p v-if="managerDirectory.count===0" role="status">本检验单没有异常登记候选。</p>
+          <template v-else>
+            <p role="status">本检验单有 {{ managerDirectory.count }} 笔异常登记。</p>
+            <ul class="manager-return-registrations">
+              <li v-for="row in managerDirectory.results" :key="row.registrationId">
+                <p>{{ row.purchaseOrderNo }} · {{ row.receiptNo }} · {{ row.inspectionNo }}</p>
+                <p>{{ visibleValue(row.materialName) }} · {{ visibleValue(row.materialCode) }} · 采购订单行号 {{ visibleValue(row.purchaseOrderLineNo) }}</p>
+                <p>登记不合格量 {{ registeredQuantity(row) }} · 登记时间 {{ visibleValue(row.registeredAt) }}</p>
+                <p>本登记尚待决定的申请 {{ row.pendingRequestCount==null ? '未提供' : row.pendingRequestCount+' 条' }}</p>
+                <p><strong>{{ row.statusLabel }}</strong></p>
+                <p v-if="row.sourceStatus==='SOURCE_UNKNOWN'">{{ row.blockingReason?.message || '本异常登记的来源待核。' }}</p>
+                <button type="button" :aria-pressed="selectedManagerRegistration===row" @click="selectManagerRegistration(row)">
+                  查看本笔退供申请
+                </button>
+              </li>
+            </ul>
+          </template>
+        </template>
+        <button v-if="managerInspection" type="button" :disabled="managerLoading" @click="loadManagerRegistrations">
+          刷新异常登记
+        </button>
+        <IncomingReturnPanel v-if="selectedManagerRegistration" :key="managerDetailKey"
+          kind="return_decide" :inspection-id="managerInspection.id" :registration-id="selectedManagerRegistration.registrationId"
+          :order-id="facts.order.id" @changed="loadManagerRegistrations" />
+      </section>
+
       <h3>库存变动</h3>
       <el-table :data="facts.inventoryTransactions || []" border empty-text="尚无正式库存流水">
         <el-table-column prop="transactionNo" label="流水号" min-width="170" />
@@ -72,12 +114,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getPurchaseOrderFulfillmentFacts, runScmRuntimeAction } from '../../api/scmStandardPageFacts.js'
+import request from '@/api/request.js'
 import ScmNativeOrderApprovalPanel from './ScmNativeOrderApprovalPanel.vue'
 import IncomingExceptionPanel from './IncomingExceptionPanel.vue'
+import IncomingReturnPanel from './IncomingReturnPanel.vue'
 import { quoteFailure } from '../runtime/nativeQuoteRegistration.js'
+import { getTabAuthEpoch } from '../runtime/tabAuthenticationContext.js'
 import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({ orderId: { type: [String, Number], required: true } })
@@ -96,6 +141,73 @@ function receiptNumber(id){return facts.receipts?.find(row=>row.id===id)?.receip
 function selectOpinionInspection(id){
   return router.replace({query:{...route.query,a10OpinionInspection:id || undefined,a10Inspection:undefined,a10Registration:undefined}})
 }
+
+const managerEpoch = getTabAuthEpoch()
+const managerDirectory = ref(null), managerLoading = ref(false), managerError = ref('')
+const managerDetailKey = ref(0)
+let managerReadCycle = 0
+const managerInspection = computed(() => (facts.inspections || []).find(row => String(row.id)===route.query.a10ManagerInspection))
+const selectedManagerRegistration = computed(() => managerDirectory.value?.results
+  .find(row => String(row.registrationId)===route.query.a10ManagerRegistration))
+const decisionUrl = inspectionId => `/api/procurement/incoming-exceptions/${inspectionId}/returns/return_decide/`
+
+function visibleValue(value) {
+  return value==null || value==='' ? '未提供' : String(value)
+}
+function registeredQuantity(row) {
+  return row.registeredRejectedQuantity==null ? '未提供' : `${row.registeredRejectedQuantity} ${visibleValue(row.unit)}`
+}
+function changeManagerInspection(id) {
+  return router.replace({query:{...route.query,a10ManagerInspection:id || undefined,
+    a10ManagerRegistration:undefined,a10ReturnDecide:undefined,a10ReturnDecideRequest:undefined}})
+}
+function selectManagerRegistration(row) {
+  if (!managerDirectory.value?.results.includes(row)) return
+  managerDetailKey.value++
+  const root=String(row.registrationId)
+  return router.replace({query:{...route.query,a10ManagerRegistration:root,a10ReturnDecide:root,
+    a10ReturnDecideRequest:undefined}})
+}
+function managerReadFailure(reply) {
+  const status=reply?.meta?.status
+  const label=status===401 ? '请登录后读取异常登记'
+    : status===403 ? '无权读取采购经理退供决定的异常登记'
+      : status===404 ? '未找到本授权范围内的检验来源'
+        : status===409 ? '本检验来源待核' : '异常登记读取失败'
+  return reply?.error?.message ? `${label}：${reply.error.message}` : label
+}
+async function loadManagerRegistrations() {
+  const ticket=++managerReadCycle, inspection=managerInspection.value, order=facts.order
+  managerDirectory.value=null
+  managerError.value=''
+  managerLoading.value=false
+  if (getTabAuthEpoch()!==managerEpoch || !inspection || !order || String(order.id)!==String(props.orderId)) return
+  const url=decisionUrl(inspection.id)
+  managerLoading.value=true
+  const reply=await request({url,meta:{module:'SCM',readOnly:true,factLoad:true}}).catch(()=>null)
+  if (ticket!==managerReadCycle || getTabAuthEpoch()!==managerEpoch) return
+  managerLoading.value=false
+  const data=reply?.data
+  const matches=row => row?.inspectionId===inspection.id && row.purchaseOrderId===order.id
+    && row.inspectionNo===inspection.inspectionNo && row.purchaseOrderNo===order.poNo
+    && row.receiptId===inspection.receiptId
+  if (!reply?.success || data?.contractVersion!=='PCE-NEVER-STOCKED-INCOMING-ONSITE-RETURN-V1'
+    || data.projection!=='EXACT_INSPECTION_RETURN_REGISTRATIONS'
+    || data.countScope!=='THIS_AUTHORIZED_INSPECTION_REGISTRATIONS_ONLY'
+    || data.selectionGrantsExecution!==false || data.requiresSelectedDetailReload!==true
+    || !matches(data.inspection) || !Array.isArray(data.results) || data.count!==data.results.length
+    || data.results.some(row => !matches(row) || !Number.isSafeInteger(row.registrationId) || row.registrationId<=0
+      || row.detailUrl!==`${url}?registrationId=${row.registrationId}`
+      || typeof row.statusLabel!=='string' || !row.statusLabel.trim()
+      || !['PROVIDED','SOURCE_UNKNOWN'].includes(row.sourceStatus))
+    || new Set(data.results.map(row=>row.registrationId)).size!==data.results.length) {
+    managerError.value=managerReadFailure(reply)
+    return
+  }
+  managerDirectory.value=data
+}
+watch([managerInspection,()=>props.orderId],loadManagerRegistrations,{immediate:true})
+onBeforeUnmount(()=>{managerReadCycle++})
 
 const auth = code => facts.authorization?.[code] || { allowed: false, disabledReason: '授权事实未读取' }
 const currentActions = computed(() => {
@@ -163,8 +275,12 @@ defineExpose({ load })
 .actions { margin: 16px 0; }
 .identity-proof { margin-top: 14px; }
 .actions .el-select { width: 300px; }
-.opinion-entry { min-width: 0; overflow-wrap: anywhere; }
-.opinion-entry>label { display: grid; gap: 4px; max-width: 480px; }
-.opinion-entry>label>select { width: 100%; min-height: 44px; min-width: 0; }
+.opinion-entry, .manager-return-entry { min-width: 0; overflow-wrap: anywhere; }
+:is(.opinion-entry,.manager-return-entry)>label { display: grid; gap: 4px; max-width: 480px; }
+:is(.opinion-entry,.manager-return-entry)>label>select { width: 100%; min-height: 44px; min-width: 0; }
+.manager-return-registrations { padding: 0; list-style: none; }
+.manager-return-registrations li { border-top: 1px solid #d6e0ee; padding: 8px 0; }
+.manager-return-registrations p { margin: 4px 0; }
+.manager-return-entry button { min-height: 44px; max-width: 100%; }
 h3 { margin: 18px 0 10px; }
 </style>

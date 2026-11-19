@@ -3729,7 +3729,7 @@
   },
   {
     "file": "backend/procurement/incoming_exception_api.py",
-    "sha256": "a54968d1e6960b706a3a1dc8ef8b32e254f9aa1ae55ce6b9525607103d2768ba"
+    "sha256": "610a8a35acd93aa4057f0ecc88938d83404ef628e9502f263ce620108f2b4f86"
   },
   {
     "file": "backend/procurement/incoming_exception_configuration.py",
@@ -3745,7 +3745,7 @@
   },
   {
     "file": "backend/procurement/incoming_return_service.py",
-    "sha256": "a63e3b0ffecf99246167f1ae3189c85c224bc3d7bbc94e012239f80770750f94"
+    "sha256": "3e51f6233652ee1c7598109c924a693161d69e62428d2ded171ee030851914b5"
   },
   {
     "file": "backend/procurement/inventory_facts_api.py",
@@ -9697,11 +9697,15 @@
   },
   {
     "file": "frontend/src/meta/components/IncomingCustodyDirectory.vue",
-    "sha256": "32b2185c8192b438018faa60d8958f184fbb4cdfd3abd58d5064b2b3ad1cd046"
+    "sha256": "ee09158ce7f2d46e25f165ee6e3c3dc0dedcbd03c20615da5c7c0b3b7b97cb1c"
   },
   {
     "file": "frontend/src/meta/components/IncomingExceptionPanel.vue",
-    "sha256": "b36bdf20703c2f7232f7c96fd931f07f9dc29a26990d4bd2f439d03f99f46da3"
+    "sha256": "c0aecab20b5157b4ea33f5855000d765138a5240b2ea7f7e7e8b6937d115f384"
+  },
+  {
+    "file": "frontend/src/meta/components/IncomingReturnPanel.vue",
+    "sha256": "f74c2e5c608067af4b0b0718c5fd353a8132e64587aeb05e4323f876e267a233"
   },
   {
     "file": "frontend/src/meta/components/JobFamilyManagementPanel.vue",
@@ -9913,7 +9917,7 @@
   },
   {
     "file": "frontend/src/meta/components/PurchaseOrderFulfillmentPanelV1.vue",
-    "sha256": "7cce0e4512742dbf169f31bf829731b4be75ac3b0e4b5aaa174e60d74622c53f"
+    "sha256": "b6cb278f3f678c7b7be5cff48af3a149d28bc6c551984b007244262c73ad37ad"
   },
   {
     "file": "frontend/src/meta/components/RawIncomingLinePanel.vue",

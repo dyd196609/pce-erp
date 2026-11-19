@@ -33,6 +33,8 @@ class IncomingReturnView(APIView):
  def get(self,request,inspection_id,kind):
   def read():
    if set(request.query_params)-{'registrationId','returnRequestId','resultKey','intentId'} or any(len(request.query_params.getlist(k))!=1 for k in request.query_params):return_service.fail('INCOMING_RETURN_INPUT_INVALID','只接受准确登记、申请或同次查询，不接受自报身份及范围。',400)
+   if kind=='return_decide' and not request.query_params:
+    return return_service.registration_sources(user=request.user,inspection_id=inspection_id)
    try:
     root=int(request.query_params['registrationId']);selected=int(request.query_params['returnRequestId']) if 'returnRequestId' in request.query_params else None
    except (ValueError,KeyError):return_service.fail('INCOMING_RETURN_INPUT_INVALID','须从原登记选择准确异常和申请。',400)

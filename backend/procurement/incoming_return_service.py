@@ -258,6 +258,43 @@ def _available_handover(user,request,decision,root,rows,line,handovers,sums):
  return latest,min(physical,decision.quantity-sums[request.pk])
 
 @transaction.atomic
+def registration_sources(*,user,inspection_id):
+ """Discover exact-inspection roots using the existing decision qualification.
+
+ Selection is read-only and grants neither a decision nor its current eligibility.
+ The original detail/write paths revalidate the selected root and request.
+ """
+ user=actor(user)
+ inspection=PurchaseInspection.objects.select_related('source_receipt__source_purchase_order').filter(
+  pk=identifier(inspection_id,'检验单'),source_receipt__source_purchase_order__company_id=user.company_id).first()
+ if not inspection:fail('INCOMING_RETURN_NOT_FOUND','本授权企业没有该准确检验来源。',404)
+ qualification(user,'return_decide',inspection.source_receipt.source_purchase_order)
+ line=inspection_line_facts(inspection)
+ if line['rejectedQuantity'] is None:
+  fail('INCOMING_EXCEPTION_QUALITY_PENDING','本次检验尚未最终判定不合格数量，不能据此认定没有异常。')
+ roots=Fact.objects.select_related('audit_record').filter(company_id=user.company_id,inspection=inspection,kind='register',registration__isnull=True).order_by('pk')
+ identity={k:line.get(k) for k in ('purchaseOrderId','purchaseOrderNo','purchaseOrderItemId','purchaseOrderLineNo',
+  'receiptId','receiptNo','inspectionId','inspectionNo','materialId','materialCode','materialName','unit')}
+ results=[]
+ for root in roots:
+  item={**identity,'registrationId':root.pk,'registeredRejectedQuantity':None,'registeredAt':None,
+   'pendingRequestCount':None,'returnSummary':None,'sourceStatus':'SOURCE_UNKNOWN','statusLabel':'本登记来源或历史待核','blockingReason':None,
+   'detailUrl':f'/api/procurement/incoming-exceptions/{inspection.pk}/returns/return_decide/?registrationId={root.pk}'}
+  try:
+   proof=original.receipt(root)
+   item.update(registeredRejectedQuantity=proof['quantity'],registeredAt=proof['registeredAt'])
+   current=context(user=user,inspection_id=inspection.pk,kind='return_decide',registration_id=root.pk)
+   item.update(sourceStatus='PROVIDED',statusLabel='本检验异常登记，可选择后查看准确申请',returnSummary=current['returnSummary'],
+    pendingRequestCount=sum(1 for r in current['returnSummary']['requests'] if r['decisionVersion']==0))
+  except Exception as exc:
+   if not hasattr(exc,'http_status') or exc.http_status!=409:raise
+   item['blockingReason']={'code':exc.code,'message':str(exc),'httpStatus':exc.http_status}
+  results.append(item)
+ return {'contractVersion':CONTRACT,'projection':'EXACT_INSPECTION_RETURN_REGISTRATIONS',
+  'inspection':identity,'results':results,'count':len(results),'countScope':'THIS_AUTHORIZED_INSPECTION_REGISTRATIONS_ONLY',
+  'selectionGrantsExecution':False,'businessWriteCount':0,'requiresSelectedDetailReload':True}
+
+@transaction.atomic
 def context(*,user,inspection_id,kind,registration_id,request_id=None):
  user,i,order,e,authorization,definition,root,rows,line=_load(user,inspection_id,kind,registration_id)
  requests,decisions,handovers,sums,total,outstanding,workflows=_history(root,rows)

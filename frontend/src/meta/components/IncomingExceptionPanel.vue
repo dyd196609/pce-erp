@@ -73,7 +73,11 @@
               <dl class="exception-facts">
                 <div><dt>本笔登记量</dt><dd>{{ count(root?.quantity) }}</dd></div>
                 <div><dt>最近登记的实点量</dt><dd>{{ count(latest?.payload?.actualQuantity) }}</dd></div>
-                <div><dt>当前确认保管量</dt><dd>{{ count(latest?.payload?.confirmedCustodyQuantity) }}</dd></div>
+                <div><dt>{{ context.custodySummary?.historicalObservationOnly ? '历史实点确认量' : '当前确认保管量' }}</dt><dd>{{ count(latest?.payload?.confirmedCustodyQuantity) }}</dd></div>
+                <template v-if="context.custodySummary?.historicalObservationOnly">
+                  <div><dt>原仓管当前剩余责任范围</dt><dd>{{ count(context.custodySummary.currentWarehouseResponsibilityQuantity) }}</dd></div>
+                  <div><dt>当前仓管核实量</dt><dd>{{ count(context.custodySummary.currentWarehouseVerifiedQuantity) }}</dd></div>
+                </template>
                 <div><dt>本次差异待核</dt><dd>{{ count(latest?.payload?.differenceQuantity) }}</dd></div>
                 <div><dt>实物位置</dt><dd>{{ locationText(latest) }}</dd></div>
                 <div><dt>隔离情况</dt><dd>{{ isolatedText(latest?.payload?.isolated) }}</dd></div>
@@ -139,6 +143,9 @@
         </form>
       </template>
     </template>
+    <IncomingReturnPanel v-if="kind!=='register' && root"
+      :kind="isOpinion ? 'return_request' : 'return_handover'"
+      :inspection-id="inspectionId" :registration-id="registrationId" :order-id="orderId" @changed="readContext" />
   </section>
 </template>
 
@@ -146,6 +153,7 @@
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/api/request.js'
+import IncomingReturnPanel from '@/meta/components/IncomingReturnPanel.vue'
 import { getTabAuthEpoch, readTabIdentity } from '@/meta/runtime/tabAuthenticationContext.js'
 
 const props = defineProps({kind:{type:String,required:true},inspectionId:{type:Number,default:null},orderId:{type:Number,default:null},inventoryFacts:{type:Object,default:()=>({})}})

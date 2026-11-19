@@ -34,9 +34,13 @@
               </p>
               <dl class="custody-quantities">
                 <div><dt>登记不合格量</dt><dd>{{ quantity(row.custodySummary.registeredRejectedQuantity, row.unit) }}</dd></div>
-                <div><dt>最近核对确认保管量</dt><dd>{{ quantity(row.custodySummary.confirmedCustodyQuantity, row.unit) }}</dd></div>
+                <div><dt>{{ row.custodySummary.historicalObservationOnly ? '历史实点确认量' : '最近核对确认保管量' }}</dt><dd>{{ quantity(row.custodySummary.confirmedCustodyQuantity, row.unit) }}</dd></div>
                 <div><dt>尚待完整确认的登记范围</dt><dd>{{ quantity(row.custodySummary.pendingConfirmationQuantity, row.unit) }}</dd></div>
                 <div><dt>最近核对差异量</dt><dd>{{ quantity(row.custodySummary.differenceQuantity, row.unit) }}</dd></div>
+                <template v-if="row.custodySummary.historicalObservationOnly">
+                  <div><dt>原仓管当前剩余责任范围</dt><dd>{{ quantity(row.currentSourceStatus==='PROVIDED' ? row.custodySummary.currentWarehouseResponsibilityQuantity : null, row.unit) }}</dd></div>
+                  <div><dt>当前仓管核实量</dt><dd>{{ quantity(row.currentSourceStatus==='PROVIDED' ? row.custodySummary.currentWarehouseVerifiedQuantity : null, row.unit) }}</dd></div>
+                </template>
               </dl>
               <button type="button" :aria-current="isCurrent(row) ? 'true' : undefined"
                 @click="openDetail(row)">查看保管明细</button>
