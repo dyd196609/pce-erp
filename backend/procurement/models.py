@@ -1170,7 +1170,7 @@ class IncomingQualityExceptionFact(models.Model):
     company = models.ForeignKey('system.Company', on_delete=models.PROTECT)
     inspection = models.ForeignKey(PurchaseInspection, on_delete=models.PROTECT, related_name='exception_facts')
     registration = models.ForeignKey('self', null=True, blank=True, on_delete=models.PROTECT, related_name='followups')
-    kind = models.CharField(max_length=16, choices=[('register','异常登记'),('custody','实物保管核对'),('opinion','供应商意见')])
+    kind = models.CharField(max_length=16, choices=[('register','异常登记'),('custody','实物保管核对'),('opinion','供应商意见'),('return_request','企业退供申请'),('return_decide','企业退供决定'),('return_handover','现场签收交付')])
     quantity = ExactDemandQuantityField(max_digits=20, decimal_places=6, null=True, blank=True)
     intent_id = models.CharField(max_length=120)
     intent_hash = models.CharField(max_length=64)

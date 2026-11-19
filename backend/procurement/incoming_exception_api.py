@@ -25,3 +25,19 @@ class IncomingCustodyDirectoryView(APIView):
    except ValueError:service.fail('INCOMING_EXCEPTION_DIRECTORY_INPUT_INVALID','页码和每页条数须为整数。',400)
    return service.custody_directory(user=request.user,query=request.query_params.get('q',''),page=page,page_size=size,category=request.query_params.get('category','all'))
   return invoke(read)
+
+
+from . import incoming_return_service as return_service
+class IncomingReturnView(APIView):
+ permission_classes=[IsAuthenticated]
+ def get(self,request,inspection_id,kind):
+  def read():
+   if set(request.query_params)-{'registrationId','returnRequestId','resultKey','intentId'} or any(len(request.query_params.getlist(k))!=1 for k in request.query_params):return_service.fail('INCOMING_RETURN_INPUT_INVALID','只接受准确登记、申请或同次查询，不接受自报身份及范围。',400)
+   try:
+    root=int(request.query_params['registrationId']);selected=int(request.query_params['returnRequestId']) if 'returnRequestId' in request.query_params else None
+   except (ValueError,KeyError):return_service.fail('INCOMING_RETURN_INPUT_INVALID','须从原登记选择准确异常和申请。',400)
+   if 'resultKey' in request.query_params:return return_service.result_query(user=request.user,inspection_id=inspection_id,kind=kind,registration_id=root,key=request.query_params['resultKey'],intent_id=request.query_params.get('intentId'))
+   return return_service.context(user=request.user,inspection_id=inspection_id,kind=kind,registration_id=root,request_id=selected)
+  return invoke(read)
+ def post(self,request,inspection_id,kind):
+  return invoke(lambda:return_service.execute(user=request.user,inspection_id=inspection_id,kind=kind,payload=dict(request.data)))

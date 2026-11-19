@@ -18,6 +18,7 @@ ENTITY='IncomingQualityExceptionFact'
 PROCESS='PROCUREMENT_INCOMING_EXCEPTION'
 CODES={'register':'quality.incoming_exception.register','custody':'warehouse.incoming_exception.custody','opinion':'procurement.incoming_exception.opinion'}
 LABELS={'register':'已登记不合格范围，待仓管确认','custody':'已记录本人实物保管确认','opinion':'已记录供应商意见，未作处置'}
+LABELS.update({'return_request':'已申请企业退供，尚未交出','return_decide':'已记录企业退供决定，尚不证明交出','return_handover':'已记录供应商授权代表现场签收'})
 def text(value,label,required=True,limit=1000):
  if value is None and not required:return None
  if not isinstance(value,str) or len(value)>limit or required and not value.strip():fail('INCOMING_EXCEPTION_INPUT_INVALID',label+'须明确填写。',400)
@@ -93,7 +94,7 @@ def custody_summary(root,observations):
  confirmed=body.get('confirmedCustodyQuantity')
  complete=bool(latest and body.get('entireRegistrationConfirmed'))
  difference=body.get('differenceQuantity')
- return {'registeredRejectedQuantity':str(root.quantity),
+ result={'registeredRejectedQuantity':str(root.quantity),
   'confirmedCustodyQuantity':confirmed,'confirmedCustodyQuantityStatus':'PROVIDED' if confirmed is not None else 'NOT_PROVIDED',
   'pendingConfirmationQuantity':str(root.quantity-Decimal(confirmed)) if confirmed is not None else str(root.quantity) if latest is None else None,
   'pendingConfirmationMeaning':'尚未被本人完整确认保管的登记范围，不表示实物短缺数量',
@@ -105,6 +106,20 @@ def custody_summary(root,observations):
   'actualQuantity':body.get('actualQuantity'),
   'occurredAt':latest['occurredAt'] if latest else None,'registeredAt':latest['registeredAt'] if latest else None,
   'pendingReason':body.get('pendingReason'),'observationCount':len(observations),'observationsAreCumulative':False}
+ # Retain the observation at its actual historical time; newly signed return
+ # quantities have a separate, server-verified current responsibility meaning.
+ if Fact.objects.filter(registration=root,kind__in=['return_request','return_decide','return_handover']).exists():
+  from .incoming_return_service import summary as return_summary
+  rows=list(Fact.objects.filter(registration=root,company_id=root.company_id,inspection=root.inspection).select_related('audit_record').order_by('pk'))
+  ret=return_summary(root,rows)
+  result.update(returnSummary=ret,historicalObservationOnly=True,
+   currentWarehouseResponsibilityQuantity=ret['notHandedRegisteredQuantity'],
+   currentWarehouseVerifiedQuantity=ret['currentWarehouseVerifiedQuantity'])
+  if Decimal(ret['cumulativeHandedQuantity'])>0:
+   result['statusLabel']=ret['statusLabel']
+   result['statusCode']='HANDED_OVER' if Decimal(ret['notHandedRegisteredQuantity'])==0 else 'PARTIAL_HANDOVER'
+ return result
+
 
 def context(*,user,inspection_id,kind,registration_id=None):
  user,i,order,e,decision,facts=source(user,inspection_id,kind)
@@ -119,7 +134,7 @@ def context(*,user,inspection_id,kind,registration_id=None):
   'custodyFacts':[x for x in allfacts if root and x['registrationId']==root.pk and x['kind']=='custody'],
   'custodySummary':custody_summary(root,[x for x in allfacts if x['registrationId']==root.pk and x['kind']=='custody']) if root else None,
   'supplierOpinions':[x for x in allfacts if root and x['registrationId']==root.pk and x['kind']=='opinion'],
-  'supplierStatusLabel':'已有供应商回复，未作处置、未结案' if any(r.kind=='opinion' for r in selected) else '待供应商反馈',
+  'supplierStatusLabel':'已有供应商回复；回复本身不授予处置或结案资格' if any(r.kind=='opinion' for r in selected) else '待供应商反馈',
   'custodyStatusLabel':'待仓管确认' if not any(r.kind=='custody' for r in selected) else '按逐次本人核对记录查看；差异及未核范围保留',
   'collectionVersion':_canonical_hash({'facts':allfacts,'source':facts}),'actionAuthorization':{'allowed':kind=='register' and registered<Decimal(facts['rejectedQuantity']) or kind!='register' and root is not None,'permission':CODES[kind]},'businessWriteCount':0,'currentStateSource':'server'}
 

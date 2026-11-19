@@ -3729,7 +3729,7 @@
   },
   {
     "file": "backend/procurement/incoming_exception_api.py",
-    "sha256": "b556c3422af7383baf6a39eadfb097b01ffbff2f7b6773835fe6b5ac7856600b"
+    "sha256": "a54968d1e6960b706a3a1dc8ef8b32e254f9aa1ae55ce6b9525607103d2768ba"
   },
   {
     "file": "backend/procurement/incoming_exception_configuration.py",
@@ -3737,7 +3737,15 @@
   },
   {
     "file": "backend/procurement/incoming_exception_service.py",
-    "sha256": "cccae1d73955962d8bbe44a399328fefe238b906180391543dd6f667ad48e0ca"
+    "sha256": "9f0172a8c475f3acb9061bce5ec6c2a7394626802133255ead26cbbfb517a2bf"
+  },
+  {
+    "file": "backend/procurement/incoming_return_configuration.py",
+    "sha256": "b6180061b5ffc31ce60ba42f27f9e24451b90db0ac3ff81a169e4f20b5cc5eb6"
+  },
+  {
+    "file": "backend/procurement/incoming_return_service.py",
+    "sha256": "a63e3b0ffecf99246167f1ae3189c85c224bc3d7bbc94e012239f80770750f94"
   },
   {
     "file": "backend/procurement/inventory_facts_api.py",
@@ -3980,12 +3988,16 @@
     "sha256": "4b87e5892ae376e5693c87909ac30831be6333b187501e93b3548f835b2d5fca"
   },
   {
+    "file": "backend/procurement/migrations/0103_incoming_exception_return.py",
+    "sha256": "b9c2a7b096d0740f5985fd737f84cd9983ccca980c6079069a8e0fbfe59559a4"
+  },
+  {
     "file": "backend/procurement/migrations/__init__.py",
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   {
     "file": "backend/procurement/models.py",
-    "sha256": "c89ca04352a32089ffc8aa3d241cec98bf51a581b1e74c9b94431df416384336"
+    "sha256": "7b23ce6f53f00bd7a32c0d637d7d82c06b6c688f936b8277007c85185126fd2a"
   },
   {
     "file": "backend/procurement/order_stock_allocation.py",
@@ -4141,7 +4153,7 @@
   },
   {
     "file": "backend/procurement/urls.py",
-    "sha256": "38efa1a46e0f31b839fa437101a965ced3cfa3b992abd7d0d916b6204e66e4da"
+    "sha256": "5f80a848581a8cdaad9beb71bc1d70ea8db51c753df12ab6be8f7dbd4a7a9104"
   },
   {
     "file": "backend/procurement/views.py",

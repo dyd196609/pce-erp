@@ -1,3 +1,4 @@
+from .incoming_exception_api import IncomingReturnView
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import SupplierViewSet, PurchaseOrderViewSet, ReportViewSet
@@ -31,6 +32,7 @@ from .material_issue_api import MaterialIssueView,MaterialReceiptView
 from .incoming_exception_api import IncomingExceptionView, IncomingCustodyDirectoryView
 
 urlpatterns = [
+    path("incoming-exceptions/<int:inspection_id>/returns/<str:kind>/", IncomingReturnView.as_view(), name="incoming-exception-return"),
     path("incoming-exceptions/custody-directory/", IncomingCustodyDirectoryView.as_view(), name="incoming-exception-custody-directory"),
     path('incoming-exceptions/<int:inspection_id>/<str:kind>/', IncomingExceptionView.as_view(), name='incoming-quality-exception'),
     path('scm-runtime-actions/<str:action>/sources/', RawSourceDirectoryView.as_view(), name='raw-source-directory'),
