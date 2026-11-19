@@ -557,7 +557,9 @@ for _schedule_action, _schedule_permission, _schedule_states in (
 ):
     POLICIES[('formal-production-schedule', _schedule_action)] = ActionPermissionPolicy(
         actionCode=_schedule_action, moduleCode='formal-production-schedule',
-        requiredPermission=_schedule_permission, role=('superadmin',), organizationScope=ORGANIZATION_SCOPE,
+        requiredPermission=_schedule_permission,
+        role=('superadmin', 'PLAN_OPERATOR_V1') if _schedule_action == 'commit' else ('superadmin',),
+        organizationScope=ORGANIZATION_SCOPE,
         serverValidator=SERVER_VALIDATOR, allowedStatuses=_schedule_states, scope='single')
 
 

@@ -5,7 +5,10 @@ from decimal import Decimal
 from system.models import OrganizationOperatingAuditRecord
 from workflow_runtime.models import BusinessStateTransition
 from .models import FormalProductionSchedule as Schedule,ProcessingReservation as Reservation
-from .scheduling_primitives import _hash,_instant,_read_instantfrom .services import PlanningBusinessErrordef _fail(code,message,status=409,data=None):    raise PlanningBusinessError(code,message,http_status=status,data=data)
+from .scheduling_primitives import _hash,_instant,_read_instant
+from .services import PlanningBusinessError
+def _fail(code,message,status=409,data=None):
+    raise PlanningBusinessError(code,message,http_status=status,data=data)
 
 MODULE='formal-production-schedule'
 OBJECT='FormalProductionSchedule'
@@ -244,9 +247,11 @@ class _PlanPermissions:
 
     def read(self, user, legal_entity_id):
         decision = _plan_start_decision(self.actor, self.plan, self.permission)
+        scope_matches = str(legal_entity_id) == str(self.actor.company_id)
+        allowed = bool(scope_matches and decision["allowed"])
         return {"provider": "system.AuthorizationService", "repository": decision["authoritySource"],
-            "legalEntityId": str(legal_entity_id), "roleCodes": decision["roleCodes"] if decision["allowed"] else [],
-            "permissionCodes": [self.permission] if decision["allowed"] else [], "serverDerived": True}
+            "legalEntityId": str(self.actor.company_id), "roleCodes": decision["roleCodes"] if allowed else [],
+            "permissionCodes": [self.permission] if allowed else [], "serverDerived": True}
 
 def _decision(actor, plan, action, schedule=None):
     native = _plan_start_decision(actor, plan, PERMISSIONS[action])
@@ -670,7 +675,8 @@ def commit_formal_schedule(*, user, production_plan_id, payload):
         revision = (Schedule.objects.filter(production_plan=plan).aggregate(value=models.Max("revision"))["value"] or 0) + 1
         preview = admission["preview"]
         row = create_business_object_with_initial_state(model=Schedule, initial_state="draft",
-            company_id=actor.company_id, production_plan=plan, usage_purpose='PRODUCTION_USE', revision=revision, version=0,            start_at=_db_instant(_instant(preview["start"])), end_at=_db_instant(_instant(preview["end"])), saved_start_date=plan.planned_start_date,
+            company_id=actor.company_id, production_plan=plan, usage_purpose='PRODUCTION_USE', revision=revision, version=0,
+            start_at=_db_instant(_instant(preview["start"])), end_at=_db_instant(_instant(preview["end"])), saved_start_date=plan.planned_start_date,
             timezone=preview["timezone"], snapshot=_json(frozen), snapshot_hash=_hash(frozen),
             admission_token=admission["admissionToken"], idempotency_key=idem, request_hash=request_hash, created_by=actor)
         initial = _audit(actor, plan, row, "planning.schedule.initialize", {},
