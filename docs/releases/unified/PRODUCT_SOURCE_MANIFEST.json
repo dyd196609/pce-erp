@@ -3737,7 +3737,7 @@
   },
   {
     "file": "backend/procurement/incoming_exception_service.py",
-    "sha256": "b7b635b3f9d159f13d37a7ebf26bb1f337651128b0f632817ef9d956abb7d297"
+    "sha256": "cccae1d73955962d8bbe44a399328fefe238b906180391543dd6f667ad48e0ca"
   },
   {
     "file": "backend/procurement/inventory_facts_api.py",

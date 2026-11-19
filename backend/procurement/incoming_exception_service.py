@@ -69,7 +69,7 @@ def source(user,inspection_id,kind,lock=False):
  if kind=='opinion':
   buyer_proof=responsible_buyer(order)
   if buyer_proof['userId']!=user.pk or buyer_proof['employeeId']!=e.pk:fail('INCOMING_EXCEPTION_NOT_RESPONSIBLE_BUYER','只有本采购正式选择并可证明的负责采购员本人可记录供应商意见。',403)
-  if not _effective(link.responsibility,today):fail('INCOMING_EXCEPTION_DUTY_NOT_EFFECTIVE','原采购异常协调职责不在有效期内。',403)
+  if not _effective(link.responsibility,timezone.now().date()):fail('INCOMING_EXCEPTION_DUTY_NOT_EFFECTIVE','原采购异常协调职责不在有效期内。',403)
  facts=inspection_line_facts(i)
  if buyer_proof:facts={**facts,'responsibleBuyer':buyer_proof}
 
