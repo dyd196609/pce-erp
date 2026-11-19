@@ -14,3 +14,14 @@ class IncomingExceptionView(APIView):
   return invoke(read)
  def post(self,request,inspection_id,kind):
   return invoke(lambda:service.execute(user=request.user,inspection_id=inspection_id,kind=kind,payload=dict(request.data)))
+
+
+class IncomingCustodyDirectoryView(APIView):
+ permission_classes=[IsAuthenticated]
+ def get(self,request):
+  def read():
+   if set(request.query_params)-{'q','page','pageSize','category'} or any(len(request.query_params.getlist(k))!=1 for k in request.query_params):service.fail('INCOMING_EXCEPTION_DIRECTORY_INPUT_INVALID','只接受查询、分类及分页，不接受自报身份或范围。',400)
+   try:page=int(request.query_params.get('page','1'));size=int(request.query_params.get('pageSize','20'))
+   except ValueError:service.fail('INCOMING_EXCEPTION_DIRECTORY_INPUT_INVALID','页码和每页条数须为整数。',400)
+   return service.custody_directory(user=request.user,query=request.query_params.get('q',''),page=page,page_size=size,category=request.query_params.get('category','all'))
+  return invoke(read)

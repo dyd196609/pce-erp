@@ -41,6 +41,21 @@ def responsible_buyer(order):
   'originalSelectionAuditId':origin.pk,'originalSelectionPath':'state.directCreationIdentity.buyerEmployeeId',
   'selectionProofHash':_canonical_hash(selected),'makerUserIdForTraceOnly':order.created_by}
 
+def qualification(user,kind,order=None):
+ """Same real employee, permission, workflow duty and native object scope as execution."""
+ user=actor(user)
+ buyer_hint=formal_employee_queryset(company_id=order.company_id).filter(pk=order.buyer_employee_id).first() if order and kind=='opinion' and order.buyer_employee_id else None
+ scope_owner=buyer_hint.user_id if buyer_hint else '__NOT_PROVIDED__'
+ decision=AuthorizationService.decide(user=user,action_code=CODES[kind],organization_id=user.company_id,
+  business_object={'organizationId':user.company_id,'companyId':user.company_id,'departmentId':order.purchase_department_id or order.department_id,'ownerUserId':scope_owner if kind=='opinion' else order.created_by} if order else None)
+ e=formal_employee_queryset(company_id=user.company_id).filter(user_id=user.pk).select_related('position_ref','department_ref').first()
+ today=timezone.now().date()
+ links=PositionWorkflowResponsibility.objects.filter(position_id=e.position_ref_id if e else None,active=True,ownership_type='EXECUTOR',workflow_node__process_definition__definition_code=PROCESS,workflow_node__process_definition__active=True,workflow_node__active=True,workflow_node__business_action_code=CODES[kind],responsibility__is_active=True,responsibility__status='ACTIVE')
+ link=links.first() if links.count()==1 else None
+ if not decision['allowed'] or not e or not link or not PositionResponsibility.objects.filter(position_id=e.position_ref_id,responsibility_id=link.responsibility_id,active=True).exists() or not _effective(e.position_ref,today) or not _effective(e.department_ref,today) or e.hire_date and e.hire_date>today or e.leave_date and e.leave_date<=today or e.resignation_date and e.resignation_date<=today or link.effective_from and link.effective_from>today or link.effective_to and link.effective_to<today:
+  fail('INCOMING_EXCEPTION_QUALIFICATION_DENIED','须本人原有效岗位、执行职责和准确单据范围。',403)
+ return user,e,decision,link
+
 def source(user,inspection_id,kind,lock=False):
  user=actor(user)
  if kind not in CODES:fail('INCOMING_EXCEPTION_ACTION_UNKNOWN','没有该异常动作。',404)
@@ -49,16 +64,7 @@ def source(user,inspection_id,kind,lock=False):
  i=q.filter(pk=inspection_id,source_receipt__source_purchase_order__company_id=user.company_id).first()
  if not i:fail('INCOMING_EXCEPTION_NOT_FOUND','本企业没有该准确检验来源。',404)
  order=i.source_receipt.source_purchase_order
- buyer_hint=formal_employee_queryset(company_id=order.company_id).filter(pk=order.buyer_employee_id).first() if kind=='opinion' and order.buyer_employee_id else None
- scope_owner=buyer_hint.user_id if buyer_hint else '__NOT_PROVIDED__'
- decision=AuthorizationService.decide(user=user,action_code=CODES[kind],organization_id=user.company_id,
-  business_object={'organizationId':user.company_id,'companyId':user.company_id,'departmentId':order.purchase_department_id or order.department_id,'ownerUserId':scope_owner if kind=='opinion' else order.created_by})
- e=formal_employee_queryset(company_id=user.company_id).filter(user_id=user.pk).select_related('position_ref','department_ref').first()
- today=timezone.now().date()
- links=PositionWorkflowResponsibility.objects.filter(position_id=e.position_ref_id if e else None,active=True,ownership_type='EXECUTOR',workflow_node__process_definition__definition_code=PROCESS,workflow_node__process_definition__active=True,workflow_node__active=True,workflow_node__business_action_code=CODES[kind],responsibility__is_active=True,responsibility__status='ACTIVE')
- link=links.first() if links.count()==1 else None
- if not decision['allowed'] or not e or not link or not PositionResponsibility.objects.filter(position_id=e.position_ref_id,responsibility_id=link.responsibility_id,active=True).exists() or not _effective(e.position_ref,today) or not _effective(e.department_ref,today) or e.hire_date and e.hire_date>today or e.leave_date and e.leave_date<=today or e.resignation_date and e.resignation_date<=today or link.effective_from and link.effective_from>today or link.effective_to and link.effective_to<today:
-  fail('INCOMING_EXCEPTION_QUALIFICATION_DENIED','须本人原有效岗位、执行职责和准确单据范围。',403)
+ user,e,decision,link=qualification(user,kind,order)
  buyer_proof=None
  if kind=='opinion':
   buyer_proof=responsible_buyer(order)
@@ -80,6 +86,26 @@ def receipt(row):
  label=LABELS[row.kind]
  return {'id':row.pk,**proof,'registeredAt':row.created_at.isoformat(),'statusLabel':label,'auditId':audit.pk,'historicalFactOnly':True,'inventoryEffect':'NONE'}
 
+def custody_summary(root,observations):
+ """A later observation is not another delivered quantity. Keep all earlier receipts."""
+ latest=observations[-1] if observations else None
+ body=latest['payload'] if latest else {}
+ confirmed=body.get('confirmedCustodyQuantity')
+ complete=bool(latest and body.get('entireRegistrationConfirmed'))
+ difference=body.get('differenceQuantity')
+ return {'registeredRejectedQuantity':str(root.quantity),
+  'confirmedCustodyQuantity':confirmed,'confirmedCustodyQuantityStatus':'PROVIDED' if confirmed is not None else 'NOT_PROVIDED',
+  'pendingConfirmationQuantity':str(root.quantity-Decimal(confirmed)) if confirmed is not None else str(root.quantity) if latest is None else None,
+  'pendingConfirmationMeaning':'尚未被本人完整确认保管的登记范围，不表示实物短缺数量',
+  'differenceQuantity':difference,'differenceQuantityStatus':'PROVIDED' if difference is not None else 'NOT_PROVIDED',
+  'statusCode':'CONFIRMED' if complete else 'WAITING_CONFIRMATION' if latest is None else 'DIFFERENCE_PENDING' if difference is not None and Decimal(difference)!=0 else 'CONFIRMATION_PENDING',
+  'statusLabel':'本次登记范围已确认保管' if complete else '待仓管确认' if latest is None else '数量差异待核' if difference is not None and Decimal(difference)!=0 else '实物保管依据待核',
+  'requiresConfirmation':not complete,'latestCustodyFactId':latest['id'] if latest else None,
+  'confirmedCustodianId':body.get('confirmedCustodianId'),
+  'actualQuantity':body.get('actualQuantity'),
+  'occurredAt':latest['occurredAt'] if latest else None,'registeredAt':latest['registeredAt'] if latest else None,
+  'pendingReason':body.get('pendingReason'),'observationCount':len(observations),'observationsAreCumulative':False}
+
 def context(*,user,inspection_id,kind,registration_id=None):
  user,i,order,e,decision,facts=source(user,inspection_id,kind)
  rows=list(Fact.objects.filter(inspection=i,company_id=user.company_id).select_related('audit_record').order_by('pk'))
@@ -91,6 +117,7 @@ def context(*,user,inspection_id,kind,registration_id=None):
  selected=[r for r in rows if root and r.registration_id==root.pk]
  return {'inspection':facts,'registrations':[x for x in allfacts if x['kind']=='register'],'history':allfacts,'registrationId':root.pk if root else None,'registeredRejectedQuantity':str(registered),'remainingRegistrableQuantity':str(Decimal(facts['rejectedQuantity'])-registered),
   'custodyFacts':[x for x in allfacts if root and x['registrationId']==root.pk and x['kind']=='custody'],
+  'custodySummary':custody_summary(root,[x for x in allfacts if x['registrationId']==root.pk and x['kind']=='custody']) if root else None,
   'supplierOpinions':[x for x in allfacts if root and x['registrationId']==root.pk and x['kind']=='opinion'],
   'supplierStatusLabel':'已有供应商回复，未作处置、未结案' if any(r.kind=='opinion' for r in selected) else '待供应商反馈',
   'custodyStatusLabel':'待仓管确认' if not any(r.kind=='custody' for r in selected) else '按逐次本人核对记录查看；差异及未核范围保留',
@@ -166,3 +193,61 @@ def result_query(*,user,inspection_id,kind,key,intent_id=None):
   row=Fact.objects.select_related('audit_record').filter(company_id=user.company_id,inspection=i,kind=kind,intent_id=intent_id,created_by=user).first()
  if req and not row:fail('INCOMING_EXCEPTION_RESULT_NOT_FOUND','原结果不属于本次身份、检验或动作。',404)
  return {'resultState':'COMMITTED' if row else 'UNKNOWN','result':receipt(row) if row else None,'businessWriteCount':0,'automaticReplayAllowed':False,'historicalReceiptOnly':True}
+
+
+@transaction.atomic
+def custody_directory(*,user,query='',page=1,page_size=20,category='all'):
+ """Authorized registered roots, across inspections, with server-side pagination.
+
+ Only scope denials are omitted. Unknown source proof stays visible as pending;
+ database/history failures are never turned into successful empty directories.
+ """
+ from .material_stock_authority import SOURCE_ERRORS
+ user,_,_,_=qualification(user,'custody')
+ if not isinstance(query,str) or len(query)>100 or type(page) is not int or page<1 or type(page_size) is not int or not 1<=page_size<=100 or category not in {'all','waiting','difference','confirmed','registered'}:
+  fail('INCOMING_EXCEPTION_DIRECTORY_INPUT_INVALID','查询文字最多100字，页码须为正整数，每页1至100条，分类限待办、未核对、数量差异、已确认或全部登记。',400)
+ roots=list(Fact.objects.filter(company_id=user.company_id,kind='register',registration__isnull=True).select_related('audit_record','inspection__source_receipt__source_purchase_order').order_by('pk'))
+ results=[];contexts={}
+ stable=('purchaseOrderId','purchaseOrderItemId','receiptId','inspectionId','materialId','unit','inspectionScopeQuantity','qualifiedQuantity','rejectedQuantity','qualityReleaseStatus')
+ for root in roots:
+  i=root.inspection;order=i.source_receipt.source_purchase_order
+  if order.company_id!=user.company_id:fail('INCOMING_EXCEPTION_SCOPE_CONFLICT','登记企业与准确来源企业不一致，保留待核。')
+  try:qualification(user,'custody',order)
+  except SOURCE_ERRORS as exc:
+   if exc.http_status==403:continue
+   raise
+  if i.pk not in contexts:
+   try:contexts[i.pk]=(context(user=user,inspection_id=i.pk,kind='custody'),None)
+   except SOURCE_ERRORS as exc:
+    if exc.http_status!=409:raise
+    contexts[i.pk]=(None,{'code':exc.code,'message':str(exc)})
+  c,blocking=contexts[i.pk]
+  root_receipt=receipt(root)
+  if c:
+   observations=[x for x in c['history'] if x['registrationId']==root.pk and x['kind']=='custody']
+   current=c['inspection'];original=root.source_snapshot.get('lineFacts',{})
+   if any(current.get(k)!=original.get(k) for k in stable):blocking={'code':'INCOMING_EXCEPTION_SOURCE_CHANGED','message':'登记依据与当前准确检验来源发生变化，历史保留，当前保管资格待核。'}
+  else:
+   observations=[receipt(x) for x in Fact.objects.filter(company_id=user.company_id,inspection=i,registration=root,kind='custody').select_related('audit_record').order_by('pk')]
+   current=None
+  summary=custody_summary(root,observations)
+  if not summary['requiresConfirmation'] and not blocking and category not in {'confirmed','registered'}:continue
+  if category=='confirmed' and (summary['requiresConfirmation'] or blocking):continue
+  historical=root_receipt['source']['lineFacts'];identity=current or historical
+  if category=='waiting' and observations:continue
+  if category=='difference' and summary['statusCode']!='DIFFERENCE_PENDING':continue
+  display={k:identity.get(k) for k in ('purchaseOrderId','purchaseOrderNo','purchaseOrderItemId','purchaseOrderLineNo','purchaseRequestItemId','sourcePurchaseRequestNo','sourcePurchaseRequestLineNo','purchaseOrderLineNoStatus','receiptId','receiptNo','inspectionId','inspectionNo','materialId','materialCode','materialName','unit')}
+  if query.strip() and query.strip().casefold() not in ' '.join(str(x) for x in display.values() if x is not None).casefold():continue
+  results.append({**display,'registrationId':root.pk,'registrationOccurredAt':root_receipt['occurredAt'],'registrationRecordedAt':root_receipt['registeredAt'],
+   'custodySummary':summary,'statusLabel':'来源待核，保留历史核对' if blocking else summary['statusLabel'],
+   'currentSourceStatus':'SOURCE_UNKNOWN' if blocking else 'PROVIDED','blockingReason':blocking,
+   'currentCustodyQualification':'UNKNOWN' if blocking else summary['statusCode'],
+   'custodySummaryTimepoint':'LATEST_REGISTERED_OBSERVATION_NOT_CURRENT_EXECUTION_QUALIFICATION',
+   'identityTimepoint':'REGISTRATION_HISTORY' if current is None else 'CURRENT_NATIVE_SOURCE',
+   'historicalRegistration':root_receipt,'latestCustodyObservation':observations[-1] if observations else None,
+   'detailUrl':f'/api/procurement/incoming-exceptions/{i.pk}/custody/?registrationId={root.pk}',
+   'requiresExactContextReload':True,'directoryGrantsExecution':False})
+ count=len(results);start=(page-1)*page_size
+ return {'results':results[start:start+page_size],'count':count,'page':page,'pageSize':page_size,'hasNext':start+page_size<count,
+  'factLoadStatus':'loaded' if count else 'empty_valid','scope':'ORIGINAL_CUSTODY_AUTHORIZATION','quantityMeaning':'各登记及最近一次核对事实；不累计历次实点，不跨单位合计',
+  'currentStateSource':'server','businessWriteCount':0,'inventoryEffect':'NONE','loadedAt':timezone.now().isoformat()}

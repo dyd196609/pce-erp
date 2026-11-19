@@ -28,9 +28,10 @@ from .order_stock_allocation_views import OrderStockAllocateView, OrderStockRele
 from .material_allocation_api import MaterialAllocationView, RawSourceDirectoryView
 from .material_preparation_api import MaterialPreparationView
 from .material_issue_api import MaterialIssueView,MaterialReceiptView
-from .incoming_exception_api import IncomingExceptionView
+from .incoming_exception_api import IncomingExceptionView, IncomingCustodyDirectoryView
 
 urlpatterns = [
+    path("incoming-exceptions/custody-directory/", IncomingCustodyDirectoryView.as_view(), name="incoming-exception-custody-directory"),
     path('incoming-exceptions/<int:inspection_id>/<str:kind>/', IncomingExceptionView.as_view(), name='incoming-quality-exception'),
     path('scm-runtime-actions/<str:action>/sources/', RawSourceDirectoryView.as_view(), name='raw-source-directory'),
     path('material-issues/', MaterialIssueView.as_view(), name='production-material-issue'),

@@ -42,6 +42,21 @@
         </el-tag>
       </div>
 
+      <section v-if="String(facts.order.id)===String(orderId)" class="opinion-entry" aria-label="采购订单的供应商意见">
+        <h3>来料异常的供应商意见</h3>
+        <p>采购订单 {{ facts.order.poNo }} · 供应商 {{ facts.order.supplierName }}</p>
+        <label v-if="facts.inspections?.length">相关检验单
+          <select :value="opinionInspectionId || ''" @change="selectOpinionInspection($event.target.value)">
+            <option value="">请选择本采购订单的检验单</option>
+            <option v-for="row in facts.inspections" :key="row.id" :value="row.id">
+              {{ row.inspectionNo }} · {{ receiptNumber(row.receiptId) }}
+            </option>
+          </select>
+        </label>
+        <p v-else>本采购订单尚无检验单可查。</p>
+        <IncomingExceptionPanel kind="opinion" :inspection-id="opinionInspectionId" :order-id="facts.order.id" />
+      </section>
+
       <h3>库存变动</h3>
       <el-table :data="facts.inventoryTransactions || []" border empty-text="尚无正式库存流水">
         <el-table-column prop="transactionNo" label="流水号" min-width="170" />
@@ -61,10 +76,13 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getPurchaseOrderFulfillmentFacts, runScmRuntimeAction } from '../../api/scmStandardPageFacts.js'
 import ScmNativeOrderApprovalPanel from './ScmNativeOrderApprovalPanel.vue'
+import IncomingExceptionPanel from './IncomingExceptionPanel.vue'
 import { quoteFailure } from '../runtime/nativeQuoteRegistration.js'
+import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps({ orderId: { type: [String, Number], required: true } })
 const emit = defineEmits(['changed'])
+const route = useRoute(), router = useRouter()
 const facts = reactive({})
 const loading = ref(false)
 const submitting = ref(false)
@@ -72,6 +90,12 @@ const error = ref('')
 const quantity = ref(2)
 const warehouseCode = ref('')
 let readGeneration = 0
+const opinionInspectionId = computed(()=>(facts.inspections || []).find(row=>String(row.id)===route.query.a10OpinionInspection)?.id || null)
+
+function receiptNumber(id){return facts.receipts?.find(row=>row.id===id)?.receiptNo || '收货单号未提供'}
+function selectOpinionInspection(id){
+  return router.replace({query:{...route.query,a10OpinionInspection:id || undefined,a10Inspection:undefined,a10Registration:undefined}})
+}
 
 const auth = code => facts.authorization?.[code] || { allowed: false, disabledReason: '授权事实未读取' }
 const currentActions = computed(() => {
@@ -139,5 +163,8 @@ defineExpose({ load })
 .actions { margin: 16px 0; }
 .identity-proof { margin-top: 14px; }
 .actions .el-select { width: 300px; }
+.opinion-entry { min-width: 0; overflow-wrap: anywhere; }
+.opinion-entry>label { display: grid; gap: 4px; max-width: 480px; }
+.opinion-entry>label>select { width: 100%; min-height: 44px; min-width: 0; }
 h3 { margin: 18px 0 10px; }
 </style>

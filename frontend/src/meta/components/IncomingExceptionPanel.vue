@@ -3,7 +3,10 @@
     <h3>{{ title }}</h3>
     <p v-if="error" role="alert">{{ error }}</p>
     <template v-if="pending">
-      <p v-if="confirmed" role="status">{{ confirmed.statusLabel }} · {{ count(confirmed.quantity) }}</p>
+      <template v-if="confirmed">
+        <p role="status">{{ confirmed.statusLabel }}<template v-if="!isOpinion"> · {{ count(confirmed.quantity) }}</template></p>
+        <p v-if="isOpinion" class="reply">{{ confirmed.payload.replyContent }}</p>
+      </template>
       <p v-else role="status">本次提交结果待核。可查询同一次回执。</p>
       <button v-if="!confirmed" type="button" :disabled="busy" @click="queryResult">查询同一次回执</button>
       <button v-else type="button" :disabled="busy" @click="acknowledge">返回当前事实</button>
@@ -21,6 +24,8 @@
           <div><dt>检验判定依据</dt><dd>本次正式检验 {{ shown(context.inspection.inspectionNo) }} · {{ shown(context.inspection.qualityReleaseStatusLabel) }}</dd></div>
           <div><dt>正式不合格量</dt><dd>{{ count(context.inspection.rejectedQuantity) }}</dd></div>
           <div v-if="kind==='register'"><dt>本次最多可登记</dt><dd>{{ count(context.remainingRegistrableQuantity) }}</dd></div>
+          <div v-if="isOpinion"><dt>原负责采购员</dt><dd>{{ shown(context.inspection.responsibleBuyer?.employeeName) }} · {{ shown(context.inspection.responsibleBuyer?.employeeNo) }}</dd></div>
+          <div v-if="isOpinion"><dt>责任依据</dt><dd>采购订单的原正式选择及审计 · {{ shown(context.inspection.responsibleBuyer?.originalSelectionAuditId) }}</dd></div>
         </dl>
         <template v-if="kind==='register'">
           <p v-if="!context.registrations.length">本次检验尚无异常登记。</p>
@@ -34,7 +39,7 @@
           <p v-if="!context.actionAuthorization.allowed">本次正式不合格范围已登记完毕。</p>
         </template>
         <template v-else>
-          <p v-if="!context.registrations.length">本次检验尚无异常登记，待质检登记后核对。</p>
+          <p v-if="!context.registrations.length">本次检验尚无异常登记，待质检登记。</p>
           <template v-else>
             <label>本次异常登记
               <select :value="registrationId || ''" @change="selectRegistration($event.target.value)">
@@ -45,6 +50,25 @@
               </select>
             </label>
             <template v-if="registrationId">
+              <template v-if="isOpinion">
+                <h4>供应商回复</h4>
+                <p role="status">{{ shown(context.supplierStatusLabel) }}</p>
+                <ul v-if="context.supplierOpinions.length" class="exception-history">
+                  <li v-for="row in context.supplierOpinions" :key="row.id">
+                    <p class="reply">{{ row.payload.replyContent }}</p>
+                    <p>实际回复 {{ shown(row.occurredAt) }} · 登记 {{ shown(row.registeredAt) }}</p>
+                    <p>记录人 {{ shown(row.source?.employeeName) }}</p>
+                    <p v-if="!row.payload.evidenceReferences.length">已有凭据引用 未提供</p>
+                    <template v-else>
+                      <p>已登记的凭据原文引用</p>
+                      <ul><li v-for="ref in row.payload.evidenceReferences" :key="ref">{{ ref }}</li></ul>
+                    </template>
+                  </li>
+                </ul>
+                <h4>企业实际处置</h4>
+                <p>企业实际处置另行办理。此处保存供应商回复原文。</p>
+                <h4>原仓管保管核对</h4>
+              </template>
               <p role="status">{{ shown(context.custodyStatusLabel) }}</p>
               <dl class="exception-facts">
                 <div><dt>本笔登记量</dt><dd>{{ count(root?.quantity) }}</dd></div>
@@ -73,10 +97,14 @@
           </template>
         </template>
         <form v-if="context.actionAuthorization.allowed" class="exception-form" @submit.prevent="submit">
-          <label>实际发生时间（业务当地时间）
+          <label>{{ isOpinion ? '供应商实际回复时间（业务当地时间）' : '实际发生时间（业务当地时间）' }}
             <input v-model="form.occurredAt" type="datetime-local" step="1" required />
           </label>
-          <label v-if="kind==='register'">本次登记不合格量（{{ unit }})
+          <template v-if="isOpinion">
+            <label>供应商回复原文<textarea v-model.trim="form.reply" maxlength="5000" required /></label>
+            <label>已有凭据原文引用（每行一条，可留空）<textarea v-model="form.references" /></label>
+          </template>
+          <label v-else-if="kind==='register'">本次登记不合格量（{{ unit }})
             <input v-model.trim="form.quantity" inputmode="decimal" required />
           </label>
           <template v-else>
@@ -107,7 +135,7 @@
             <label>待核原因（有差异或无法核实时填写）<textarea v-model.trim="form.pendingReason" maxlength="1000" /></label>
           </template>
           <label>本次办理依据<textarea v-model.trim="form.basis" maxlength="300" required /></label>
-          <button type="submit" :disabled="busy">{{ kind==='register' ? '登记本次不合格范围' : '提交本人保管核对' }}</button>
+          <button type="submit" :disabled="busy">{{ isOpinion ? '保存本次供应商回复' : kind==='register' ? '登记本次不合格范围' : '提交本人保管核对' }}</button>
         </form>
       </template>
     </template>
@@ -120,18 +148,20 @@ import { useRoute, useRouter } from 'vue-router'
 import request from '@/api/request.js'
 import { getTabAuthEpoch, readTabIdentity } from '@/meta/runtime/tabAuthenticationContext.js'
 
-const props = defineProps({kind:{type:String,required:true},inspectionId:{type:Number,default:null},inventoryFacts:{type:Object,default:()=>({})}})
+const props = defineProps({kind:{type:String,required:true},inspectionId:{type:Number,default:null},orderId:{type:Number,default:null},inventoryFacts:{type:Object,default:()=>({})}})
 const route=useRoute(), router=useRouter()
-const title=props.kind==='register'?'来料不合格登记':'来料不合格保管核对'
-const permission=props.kind==='register'?'quality.incoming_exception.register':'warehouse.incoming_exception.custody'
+const isOpinion=props.kind==='opinion'
+const title=isOpinion?'记录供应商意见':props.kind==='register'?'来料不合格登记':'来料不合格保管核对'
+const permission=isOpinion?'procurement.incoming_exception.opinion':props.kind==='register'?'quality.incoming_exception.register':'warehouse.incoming_exception.custody'
+const module=isOpinion?'SCM':props.kind==='register'?'QMS':'WMS'
 const identity=readTabIdentity()
 const epoch=getTabAuthEpoch()
 const storageKey=identity?.username ? 'pce-a10-action:'+identity.username+':'+props.kind : null
 const context=ref(null), error=ref(''), loading=ref(false), busy=ref(false), pending=ref(null), confirmed=ref(null)
-const defaults=()=>({occurredAt:'',quantity:'',verified:false,warehouseId:null,locationId:null,description:'',isolated:null,pendingReason:'',basis:''})
+const defaults=()=>({occurredAt:'',quantity:'',verified:false,warehouseId:null,locationId:null,description:'',isolated:null,pendingReason:'',basis:'',reply:'',references:''})
 const form=reactive(defaults())
 const registrationId=computed(()=>{
-  if(props.kind!=='custody'||!props.inspectionId||route.query.a10Inspection!==String(props.inspectionId))return null
+  if(props.kind==='register'||!props.inspectionId||route.query.a10Inspection!==String(props.inspectionId))return null
   const id=route.query.a10Registration
   return typeof id==='string' && /^[1-9]\d*$/.test(id) && Number.isSafeInteger(Number(id)) ? Number(id) : null
 })
@@ -160,12 +190,13 @@ function custodyLink(row){
 }
 function selectRegistration(id){
   context.value=null
-  return router.push({query:{...route.query,a10Inspection:id ? String(props.inspectionId) : undefined,a10Registration:id || undefined}})
+  const target={query:{...route.query,a10Inspection:id ? String(props.inspectionId) : undefined,a10Registration:id || undefined}}
+  return isOpinion ? router.replace(target) : router.push(target)
 }
 function owned(){return getTabAuthEpoch()===epoch}
 function url(id){return '/api/procurement/incoming-exceptions/'+id+'/'+props.kind+'/'}
 function read(id,params){
-  return request({url:url(id),params,meta:{module:props.kind==='register'?'QMS':'WMS',readOnly:true,factLoad:true}}).catch(()=>null)
+  return request({url:url(id),params,meta:{module,readOnly:true,factLoad:true}}).catch(()=>null)
 }
 function remember(value){
   if(!storageKey)throw Error('Missing tab identity')
@@ -193,6 +224,7 @@ async function readContext(){
   const value=response?.data
   if(!response?.success || value?.currentStateSource!=='server' || value.inspection?.inspectionId!==id ||
     value.registrationId!==target || !Array.isArray(value.registrations) || !Array.isArray(value.custodyFacts) ||
+    (isOpinion && (value.inspection.purchaseOrderId!==props.orderId || !Array.isArray(value.supplierOpinions))) ||
     typeof value.collectionVersion!=='string' || typeof value.actionAuthorization?.allowed!=='boolean' ||
     value.actionAuthorization.permission!==permission){
     error.value=response?.error?.message || '未取得本次检验一致的异常事实和办理资格。'
@@ -216,7 +248,8 @@ async function submit(){
     return
   }
   const original={kind:props.kind,id:props.inspectionId,registrationId:registrationId.value,key:crypto.randomUUID(),intent:crypto.randomUUID()}
-  const details=props.kind==='register' ? {quantity:qty,basis:form.basis} : {
+  const details=isOpinion ? {replyContent:form.reply,evidenceReferences:form.references.split(/\r?\n/).map(line=>line.trim()).filter(Boolean)} :
+    props.kind==='register' ? {quantity:qty,basis:form.basis} : {
     actualQuantity:qty || null,warehouseId:form.warehouseId,locationId:form.locationId,
     locationDescription:form.description,isolated:form.isolated,quantityVerified:form.verified,
     pendingReason:form.pendingReason,basis:form.basis,
@@ -232,7 +265,7 @@ async function submit(){
   error.value=''
   try {
     const response=await request({method:'POST',url:url(original.id),data:payload,
-      meta:{module:props.kind==='register'?'QMS':'WMS',actionCode:permission,explicitBusinessAction:true}})
+      meta:{module,actionCode:permission,explicitBusinessAction:true}})
     if(!owned())return
     if(response?.success && exactReceipt(response.data,original))confirmed.value=response.data
     else if([400,401,403,404,409].includes(response?.meta?.status) && response?.error?.code!=='MATERIAL_CONCURRENCY_CONFLICT'){
@@ -280,6 +313,7 @@ onBeforeUnmount(()=>{readCycle++})
 .exception-form .exception-check{display:flex;align-items:center}
 .exception-history{padding-inline-start:22px}
 .exception-history p{margin-block:4px}
+.reply{white-space:pre-wrap}
 .exception-panel details{margin-block:12px}
 .exception-form{margin-top:12px;align-items:end}
 @media(max-width:600px){.exception-form{grid-template-columns:1fr}.exception-facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
