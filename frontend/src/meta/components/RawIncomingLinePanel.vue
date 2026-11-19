@@ -128,16 +128,20 @@
       <a v-if="receipt && pending.action==='confirm-receipt'" :href="handoffUrl('quality',receipt.objectId,'a07Receipt')">本次收货的质检办理入口</a>
       <button v-if="receipt" type="button" :disabled="busy" @click="acknowledge">查看当前办理事实</button>
     </section>
-    <IncomingExceptionPanel v-if="mode!=='receipt'" :kind="mode==='quality'?'register':'custody'"
-      :inspection-id="action==='create-inspection' ? null : sourceId" :inventory-facts="inventoryFacts" />
+    <IncomingCustodyDirectory v-if="mode==='inbound'" @open-detail="openCustodyDetail" />
+    <div v-if="mode!=='receipt'" ref="exceptionDetail" tabindex="-1">
+      <IncomingExceptionPanel :key="custodyRefresh" :kind="mode==='quality'?'register':'custody'"
+        :inspection-id="action==='create-inspection' ? null : sourceId" :inventory-facts="inventoryFacts" />
+    </div>
   </section>
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/api/request.js'
 import IncomingExceptionPanel from '@/meta/components/IncomingExceptionPanel.vue'
+import IncomingCustodyDirectory from '@/meta/components/IncomingCustodyDirectory.vue'
 import { getTabAuthEpoch, readTabIdentity } from '@/meta/runtime/tabAuthenticationContext.js'
 
 const props = defineProps({mode:{type:String,required:true},qualityRows:{type:Array,default:()=>[]},inventoryFacts:{type:Object,default:()=>({})},initialSourceId:{type:Number,default:null}})
@@ -158,6 +162,7 @@ const identity = readTabIdentity()
 const actor = identity?.username || identity?.userId || identity?.id
 const cache = actor ? `pce-a07-original-action:${props.mode}:${actor}` : null
 const facts = ref(null), error = ref(''), loading = ref(false), busy = ref(false), receipt = ref(null), pending = ref(null)
+const exceptionDetail = ref(null), custodyRefresh = ref(0)
 const handoff = ref(''), quantity = ref(''), reason = ref(''), warehouse = ref(''), location = ref(''), lot = ref(''), inspectionAction = ref('')
 const positiveId = value => typeof value === 'string' && /^[1-9]\d{0,14}$/.test(value) && Number.isSafeInteger(Number(value)) ? Number(value) : null
 const creationSource = computed(()=>props.mode==='quality'?positiveId(route.query.a07Receipt):null)
@@ -209,6 +214,17 @@ function openHandoff(){
 }
 function chooseLine(id){router.replace({query:{...route.query,a07Line:id||undefined}})}
 function chooseInspection(id){router.replace({query:{...route.query,a07Inspection:id||undefined,a07Receipt:undefined}})}
+
+async function openCustodyDetail(row) {
+  const inspection = String(row.inspectionId), registration = String(row.registrationId)
+  if (route.query.a07Inspection===inspection && route.query.a10Inspection===inspection && route.query.a10Registration===registration) {
+    custodyRefresh.value++
+  } else {
+    await router.push({ query: { ...route.query, a07Inspection:inspection, a10Inspection:inspection, a10Registration:registration } })
+  }
+  await nextTick()
+  exceptionDetail.value?.focus()
+}
 
 function directoryBlockingReason(row){
   return row.summary?.blockingReason?.message ||

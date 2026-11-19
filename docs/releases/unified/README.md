@@ -3,8 +3,8 @@
 This fixed branch stores verified, loaded product source snapshots.
 Product paths are `backend/` and `frontend/`; no duplicate deployment tree is included.
 
-- Source manifest SHA256: `fba249415da1bbaf19e95420bbbc7f05b67dbcb34323d242dc22a1e7c9ba4ec5`
-- Product files: 4217; backend: 1390; frontend: 2827; migration files: 252.
+- Source manifest SHA256: `85c2ae8cf3d9ed4e109ea63b34b8655bd25d0d1f460f7d42769bd41d86c145cb`
+- Product files: 4218; backend: 1390; frontend: 2828; migration files: 252.
 - Manifest: `PRODUCT_SOURCE_MANIFEST.json` (exact bytes of the loaded source manifest).
 - Existing repository history and project documentation are retained.
 - Databases, private credentials, sessions, backups, dependencies and build outputs are excluded.
