@@ -16,6 +16,11 @@
     <template v-if="state.facts">
       <dl class="scheduling-facts" data-section="formal-scheduling-summary">
         <div><dt>当前计划</dt><dd>{{ state.facts.productionPlanNo }}</dd></div>
+        <template v-if="state.facts.activeSchedule">
+          <div><dt>排程记录ID</dt><dd>{{ state.facts.activeSchedule.id }}</dd></div>
+          <div><dt>当前修订</dt><dd>{{ state.facts.activeSchedule.revision }}</dd></div>
+          <div><dt>当前版本</dt><dd>{{ state.facts.activeSchedule.version }}</dd></div>
+        </template>
         <div><dt>正式状态</dt><dd><PceBusinessStatus :status-label="state.facts.statusLabel" /></dd></div>
         <div><dt>计划开始日期</dt><dd>{{ state.facts.savedStartDateLabel }}</dd></div>
         <div><dt>需求日期</dt><dd>{{ state.facts.requiredDateLabel }}</dd></div>
@@ -59,17 +64,31 @@
         <h3>正式版本与步骤回读</h3>
         <p v-if="!state.facts.activeSchedule">当前没有生效的正式排程版本。</p>
         <label v-if="state.facts.history.length">查看正式版本<select v-model="state.selectedScheduleId" aria-label="正式排程版本" :disabled="busy">
-          <option v-for="schedule in state.facts.history" :key="schedule.id" :value="String(schedule.id)">修订 {{ schedule.revision }} · {{ schedule.statusLabel }}</option>
+          <option v-for="schedule in state.facts.history" :key="schedule.id" :value="String(schedule.id)">排程记录ID {{ schedule.id }} · 修订 {{ schedule.revision }} · 版本 {{ schedule.version }} · {{ schedule.statusLabel }}</option>
         </select></label>
         <template v-if="selectedSchedule">
           <PceBusinessStatus :status-label="selectedSchedule.statusLabel" />
           <dl class="scheduling-facts"><div><dt>正式开始时间</dt><dd>{{ selectedSchedule.startLabel }}</dd></div><div><dt>正式完工时间</dt><dd>{{ selectedSchedule.endLabel }}</dd></div></dl>
-          <dl class="scheduling-facts"><div><dt>本版本步骤数</dt><dd>{{ selectedSchedule.stepCount }}</dd></div><div><dt>本版本加工分段数</dt><dd>{{ selectedSchedule.processingSegmentCount }}</dd></div></dl>
+          <p class="scheduling-coverage" data-section="formal-scheduling-coverage">
+            本版本路线 {{ selectedSchedule.stepCount }} 道工序 · {{ selectedSchedule.activeReservationCount }} 段有效加工占用
+          </p>
+          <p v-if="selectedSchedule.processingSegmentCount !== selectedSchedule.activeReservationCount">
+            本版本历史加工分段共 {{ selectedSchedule.processingSegmentCount }} 段，含已释放分段。
+          </p>
           <label>工序日期与用时明细<select v-model="selectedStepId" aria-label="正式排程工序明细"><option value="">请选择工序</option>
             <option v-for="step in stepRows" :key="step.stepId" :value="String(step.stepId)">{{ step.stepLabel }}</option></select></label>
           <section v-if="selectedStep" class="scheduling-readback" data-section="formal-scheduling-step-detail">
             <h4>{{ selectedStep.stepLabel }}</h4><PceBusinessStatus :status-label="selectedStep.statusLabel" />
             <dl class="scheduling-facts"><div v-for="field in stepDetailFields" :key="field.key"><dt>{{ field.label }}</dt><dd>{{ selectedStep[field.key] }}</dd></div></dl>
+            <h5>本工序加工占用</h5>
+            <p v-if="!selectedStepReservations.length">所看版本没有本工序的加工占用记录。</p>
+            <ol v-else class="scheduling-segments" aria-label="本工序加工占用时段">
+              <li v-for="segment in selectedStepReservations" :key="segment.id">
+                <strong>{{ segment.workCenterLabel }}</strong>
+                <span>{{ segment.startLabel }} 至 {{ segment.endLabel }}</span>
+                <span>{{ segment.minutesLabel }} · {{ segment.statusLabel }}</span>
+              </li>
+            </ol>
           </section>
           <PceEnterpriseListTable :ref="element => stepsTable.tableRef = element" :contract="stepsContract" page-id="formal-scheduling-steps" table-id="formal-scheduling-steps-table"
             :rows="stepRows" :table-rows="stepsTable.filteredRows" :filter-schema="stepFilters" :filters="stepsTable.filters"
@@ -129,6 +148,14 @@ const selectedSchedule = computed(() => state.facts?.history.find(row => String(
 const stepRows = computed(() => selectedSchedule.value?.steps || [])
 const reservationRows = computed(() => selectedSchedule.value?.reservations || [])
 const selectedStep = computed(() => stepRows.value.find(row => String(row.stepId) === selectedStepId.value) || null)
+const selectedStepReservations = computed(() => {
+  const step = selectedStep.value
+  if (!step) return []
+  // Saved occupancy stores the root route step, including when the effective step was amended.
+  const rootStepId = step.rootStepId ?? step.stepId
+  return reservationRows.value.filter(segment => segment.scheduleId === selectedSchedule.value.id
+    && segment.stepId === rootStepId && segment.sequence === step.sequence)
+})
 const stepDetailFields = Object.freeze([{ key: 'processingTimeLabel', label: '加工时间' }, { key: 'preparationTimeLabel', label: '准备时间' },
   { key: 'transferTimeLabel', label: '转运时间' }, { key: 'totalWorkTimeLabel', label: '合计工作分钟' },
   { key: 'startLabel', label: '步骤开始时间' }, { key: 'endLabel', label: '步骤结束时间' }])
@@ -180,4 +207,8 @@ onBeforeUnmount(() => { controller.invalidate(); globalThis.window?.removeEventL
 <style scoped>
 .formal-scheduling-panel{min-width:0;scroll-margin-top:12px}.formal-scheduling-panel p{line-height:1.6}.scheduling-controls,.scheduling-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:12px 0}.formal-scheduling-panel label{display:block;max-width:540px;margin:12px 0;font-weight:600}.formal-scheduling-panel select,.formal-scheduling-panel textarea{display:block;box-sizing:border-box;width:100%;margin-top:6px;padding:9px;border:1px solid #cbd5e1;border-radius:7px;font:inherit}.formal-scheduling-panel textarea{min-height:65px}.formal-scheduling-panel button{padding:9px 12px;border:1px solid #3568dc;border-radius:7px;background:#3568dc;color:#fff;cursor:pointer}.formal-scheduling-panel button:disabled{opacity:.55;cursor:not-allowed}.scheduling-readback{margin-top:16px;padding-top:12px;border-top:1px solid #dce4ef;min-width:0}.scheduling-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 20px;margin:12px 0}.scheduling-facts dt{font-size:12px;color:#64748b}.scheduling-facts dd{margin:4px 0 0;font-weight:600;overflow-wrap:anywhere}.scheduling-error{padding:9px;background:#fff2f0;color:#9f241d;border-radius:7px}.scheduling-message{padding:9px;background:#eef9f3;color:#146141;border-radius:7px}@media(max-width:540px){.scheduling-facts{grid-template-columns:1fr}.scheduling-controls{display:block}}
 .scheduling-actions{align-items:start}.scheduling-action{flex:1 1 250px;min-width:0}.scheduling-action-explanation{margin:6px 0 0;font-size:13px;color:#475569;overflow-wrap:anywhere}
+.scheduling-coverage{font-weight:600}
+.scheduling-segments{padding-left:1.5rem;margin:0}
+.scheduling-segments li{margin:8px 0;overflow-wrap:anywhere}
+.scheduling-segments span{display:block}
 </style>
