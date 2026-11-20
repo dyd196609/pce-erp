@@ -25,7 +25,7 @@
         <div><dt>计划开始日期</dt><dd>{{ state.facts.savedStartDateLabel }}</dd></div>
         <div><dt>需求日期</dt><dd>{{ state.facts.requiredDateLabel }}</dd></div>
         <div><dt>显示时区</dt><dd>{{ state.facts.timezoneLabel }}</dd></div>
-        <div><dt>当前环境</dt><dd>{{ state.facts.modeLabel }}</dd></div>
+        <div><dt>排程执行模式</dt><dd>{{ state.facts.modeLabel }}</dd></div>
         <div><dt>正式版本数</dt><dd>{{ state.facts.scheduleCount }}</dd></div>
         <div><dt>当前有效加工占用</dt><dd>{{ state.facts.activeReservationCount }}</dd></div>
       </dl>
