@@ -1369,7 +1369,7 @@
   },
   {
     "file": "backend/pde/bom_version_release_preflight.py",
-    "sha256": "5837402270259dfd0e1805da8278c066994f934b2d2680a92e2621c15663b962"
+    "sha256": "0ccd4194c86795cb83b33604dd95c7ed30a5a57aa97f3cdd22cafff750f6ce3e"
   },
   {
     "file": "backend/pde/cabinet_calculation_adapter.py",

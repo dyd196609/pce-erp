@@ -13,4 +13,4 @@ Product paths are `backend/` and `frontend/`; no duplicate deployment tree is in
 Subsequent verified snapshots append commits on `release/unified`.
 
 
-Current loaded product manifest SHA256: 5dc69ab36fdb365cebb6de99a53edab9e0a3d4dd4a905e98b56d311e4016929c
+Current loaded product manifest SHA256: 47defeb5ab440f6d674d65fa9920bdc432b835360bbbe8808be6b990806cad95
