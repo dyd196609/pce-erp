@@ -1361,7 +1361,7 @@
   },
   {
     "file": "backend/pde/bom_version_control_service.py",
-    "sha256": "100e13b4bdd4d849c71f47ae938173ac46cefe39262b95f677f87f51c8542723"
+    "sha256": "55de5373ffa948df351dc1a9dc1518560b6023793a38c2e67b2cc21113dd048e"
   },
   {
     "file": "backend/pde/bom_version_permission_catalog.py",
@@ -1369,7 +1369,7 @@
   },
   {
     "file": "backend/pde/bom_version_release_preflight.py",
-    "sha256": "816d8643eea8f9b8d3cd3c70f887494b899af2aeb53eb4de3a08e8513800b7a2"
+    "sha256": "5837402270259dfd0e1805da8278c066994f934b2d2680a92e2621c15663b962"
   },
   {
     "file": "backend/pde/cabinet_calculation_adapter.py",
@@ -1836,6 +1836,10 @@
     "sha256": "63a78f3bfb23ef778866d182fc7c0e4ddee15cb99d335de1d9c666616ed9d109"
   },
   {
+    "file": "backend/pde/material_supply_authority.py",
+    "sha256": "ddc211817f9bc0d556d7e035e1e6edea6e94750e2077e17b2da0f9cb92eff447"
+  },
+  {
     "file": "backend/pde/migrations/0001_initial.py",
     "sha256": "6f341959bd343b0827772772d26566d0d30658991bbbd50203129e55e0e9871d"
   },
@@ -2105,7 +2109,7 @@
   },
   {
     "file": "backend/pde/models.py",
-    "sha256": "fecb49287a3d6bc84e5fe93d3b08c9f08a5d805fed179c0378ebf0995b29ca6b"
+    "sha256": "997e62218c132bbe5c36a0fb4ca5270d0805f4cb1925535755000e0eea07f78b"
   },
   {
     "file": "backend/pde/native_design_calculation_adapter.py",
@@ -2349,7 +2353,7 @@
   },
   {
     "file": "backend/pde/saved_fact_material_requirement_service.py",
-    "sha256": "ca2d9727abd14cb4a01041ae17a6cd305425678c91a5047d17b7a8c8db509372"
+    "sha256": "b6a366d77a18fb63125cfdd3dff21053915860f937ebceb46e4e55359585d7d7"
   },
   {
     "file": "backend/pde/semi_finished_configuration_preview.py",

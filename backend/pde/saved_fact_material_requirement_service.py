@@ -698,6 +698,8 @@ def _resolve_context(
 
 
 def _serialize_preview(contract, context, *, authorizations=None) -> dict:
+    from .material_supply_authority import material_supply_fact
+
     calculation = context["calculation"]
     material = context["material"]
     facts = [{
@@ -749,6 +751,7 @@ def _serialize_preview(contract, context, *, authorizations=None) -> dict:
         "sourceExternalIdentity": (
             context["orderSpecification"].get("sourceExternalIdentity")
         ),
+        "materialSupplyFact": material_supply_fact(material, contract.supply_type),
         "purpose": contract.purpose_code,
         "quantityBasis": contract.quantity_basis,
         "quantityScope": "PRODUCT_DESIGN_ITEM",
@@ -1177,6 +1180,18 @@ def _apply_saved_fact_material_requirement(*, user, contract, _development_conte
             business_object=business_object,
         ),
     }
+    historical = MasterDataWriteRequest.objects.filter(
+        organization_id=context["order"].company_id,
+        entity_type="EngineeringMaterialRequirement",
+        action_code=REQUIREMENT_ACTION_CODE,
+        idempotency_key=contract.requirement_idempotency_key,
+        status=MasterDataWriteRequest.Status.COMMITTED,
+    ).exists()
+    if not historical:
+        from .material_supply_authority import material_supply_fact
+        supply = material_supply_fact(context["material"], contract.supply_type)
+        if not supply["allowed"]:
+            _fail(supply["code"], supply["message"], materialSupplyFact=supply)
     mapping_result = _ensure_released_mapping(
         user=user, contract=contract, context=context,
     )

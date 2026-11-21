@@ -3414,6 +3414,13 @@ class EngineeringMaterialRequirement(models.Model):
             errors["material"] = "物料需求与正式物料必须属于同一公司"
         if self.material.company_id != self.uom.company_id:
             errors["uom"] = "物料需求单位必须与物料属于同一公司"
+        # Saved instances are also checked by frozen-source read paths.
+        # Current supply qualification belongs to new facts and release gates.
+        if self._state.adding:
+            from .material_supply_authority import material_supply_fact
+            supply = material_supply_fact(self.material, self.supply_type)
+            if not supply["allowed"]:
+                errors["supply_type"] = supply["message"]
         if self.material.base_uom_id and self.material.base_uom_id != self.uom_id:
             errors["uom"] = "物料需求单位必须等于物料正式基本单位；不得隐式换算"
         if self.scrap_rate_status == "maintained":
@@ -4298,6 +4305,13 @@ class BOMItem(models.Model):
             errors["material"] = "BOM物料必须属于BOM所在公司"
         if self.uom.company_id != self.material.company_id:
             errors["uom"] = "BOM单位必须属于物料所在公司"
+        # Saved instances are also checked by frozen-source read paths.
+        # Current supply qualification belongs to new facts and release gates.
+        if self._state.adding:
+            from .material_supply_authority import material_supply_fact
+            supply = material_supply_fact(self.material, self.supply_type)
+            if not supply["allowed"]:
+                errors["supply_type"] = supply["message"]
         if self.scrap_rate_status == self.ScrapRateStatus.MAINTAINED:
             if self.scrap_rate is None or self.scrap_rate < 0 or self.scrap_rate >= 1:
                 errors["scrap_rate"] = "损耗率已维护时必须填写0（含）到1（不含）的值"

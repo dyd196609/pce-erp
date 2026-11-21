@@ -219,6 +219,12 @@ def project_bom_version_release_preflight(version, *, material_details):
         and int(baseline_reference.get("id") or 0) == int(baseline_id or 0)
     )
 
+    from .material_supply_authority import material_supply_fact
+    material_supply_issues = [
+        fact for item in version.items.filter(is_active=True).select_related("material")
+        if not (fact := material_supply_fact(item.material, item.supply_type))["allowed"]
+    ]
+
     item_ids = [row["bomItemId"] for row in material_details]
     source_rows = list(
         BOMItemSourceRequirement.objects.select_related(
@@ -407,6 +413,7 @@ def project_bom_version_release_preflight(version, *, material_details):
         _gate("BASELINE_CURRENT", "当前正式工程基线一致", baseline_current, f"{baseline.baseline_no if baseline else '未解析'}；confirmed候选 {len(confirmed_baselines)}。"),
         _gate("CALCULATION_CURRENT", "来源工程核算完成且未被替代", calculation_current, f"{calculation.calculation_no} rev{calculation.revision} / {calculation.status}；后续候选 {len(later_calculations)}。"),
         _gate("BOM_ITEMS_COMPLETE", f"BOMItem完整（当前{len(material_details)}项）", item_integrity, f"读取 {len(material_details)} 项；BOMItem身份唯一。"),
+        _gate("MATERIAL_SUPPLY_QUALIFIED", "BOM供给方式与正式物料资格一致", not material_supply_issues, material_supply_issues or "明确MAKE/BUY均符合现有物料供给事实。"),
         _gate("SOURCE_REQUIREMENTS_COMPLETE", f"Requirement来源完整（当前{len(source_rows)}条）", source_integrity, f"读取 {len(source_rows)} 条；唯一Requirement {len(set(source_requirement_ids))} 条。"),
         _gate("NO_COMPETING_VERSION", "无同ProductBOM竞争版本", not competing_versions, f"其他版本 {len(competing_versions)} 个。"),
         _gate("NO_RELEASED_VERSION_CONFLICT", "无冲突已发布版本", not conflicting_released_versions, f"冲突已发布版本 {len(conflicting_released_versions)} 个。"),
