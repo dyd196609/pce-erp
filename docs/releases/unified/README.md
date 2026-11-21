@@ -11,3 +11,6 @@ Product paths are `backend/` and `frontend/`; no duplicate deployment tree is in
 - Historical deployment documentation is retained for reference. The source snapshot does not deploy a service or grant enterprise pilot approval.
 
 Subsequent verified snapshots append commits on `release/unified`.
+
+
+Current loaded product manifest SHA256: 5743471fbc28fe1f62cb117d99ef395d5ff110e9c487a4c5e0a50f886b517fbd

@@ -160,7 +160,7 @@ def order_progress_facts(order,completion_facts):
         item=items[fact['salesOrderItemId']]
         line={'salesOrderItemId':item.pk,'lineNo':item.line_no,'materialId':item.material_id,
             'materialCode':item.material.code,'materialName':item.material.name,'uomId':item.uom_id,
-            'uomLabel':item.uom.name,'quantity':fact['quantity'],'requiredDate':fact['requiredDate'],
+            'uomLabel':item.uom.name if item.uom_id is not None else None,'quantity':fact['quantity'],'requiredDate':fact['requiredDate'],
             'completionStatus':fact['completionStatus'],'completionReady':fact['ready'],
             'supplyCoverage':deepcopy(fact.get('supplyCoverage')),'blockingReasons':deepcopy(fact['blockingReasons']),
             'workOrders':[]}

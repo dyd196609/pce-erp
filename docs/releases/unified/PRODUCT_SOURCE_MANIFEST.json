@@ -4661,7 +4661,7 @@
   },
   {
     "file": "backend/sales/order_progress_projection.py",
-    "sha256": "5c8b1c6d9942995b229a2a2752a7c7087fcdc62ba85f04c56e0e41af095de457"
+    "sha256": "6696428678d5165a31faea96ea33b3b32616f69e202a2267861d53e3d2c7a295"
   },
   {
     "file": "backend/sales/order_review_views.py",
