@@ -46,7 +46,22 @@ def planning_quantity_facts(*, demand_qty, requirement=None, plan=None):
         }
 
     calculation = requirement.calculation_facts if isinstance(requirement.calculation_facts, dict) else {}
-    snapshot = _decimal(requirement.available_qty)
+    if isinstance(calculation.get("purchaseArrangement"), dict):
+        recorded_plan = _recorded_plan_quantity(plan)
+        return {
+            "orderDemandQty": str(demand),
+            "inventorySnapshotQty": None, "inventorySnapshotSource": None,
+            "inventoryAllocationStatus": "UNPROVEN", "inventoryAllocationProofStatus": "NOT_CHECKED",
+            "effectiveInventoryCoverageQty": None, "netRequiredQty": None,
+            "actualPurchaseQty": str(requirement.net_required_qty),
+            "quantityMeaningLabel": "计划岗明确登记的采购数量；不是库存抵扣后的净缺口",
+            "recordedPlanQty": str(recorded_plan), "effectivePlanQty": None,
+            "pendingNetPlanQty": None, "uncoveredDemandQty": None,
+            "overPlannedQty": None,
+            "netRequirementPlanCoverageStatus": "EXPLICIT_PURCHASE_ARRANGEMENT",
+            "orderCoverageStatus": "INVENTORY_ALLOCATION_UNCONFIRMED",
+        }
+    snapshot = None if requirement.available_qty is None else _decimal(requirement.available_qty)
     net_required = _decimal(requirement.net_required_qty)
     recorded_plan = _recorded_plan_quantity(plan)
     effective_plan = recorded_plan if plan and plan.status in EFFECTIVE_PLAN_STATUSES else Decimal("0")
@@ -71,8 +86,8 @@ def planning_quantity_facts(*, demand_qty, requirement=None, plan=None):
 
     return {
         "orderDemandQty": str(demand),
-        "inventorySnapshotQty": str(snapshot),
-        "inventorySnapshotSource": calculation.get("inventorySource") or "procurement.InventoryBalance",
+        "inventorySnapshotQty": str(snapshot) if snapshot is not None else None,
+        "inventorySnapshotSource": (calculation.get("inventorySource") or "procurement.InventoryBalance") if snapshot is not None else None,
         "inventorySnapshotCapturedAt": calculation.get("inventorySnapshotCapturedAt"),
         "inventoryAllocationStatus": allocation_status,
         "inventoryAllocationProofStatus": "UNPROVEN" if asserted_status == "ALLOCATED" else "NOT_CHECKED",

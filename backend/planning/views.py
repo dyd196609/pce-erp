@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models
+from django.db import models, OperationalError, IntegrityError
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -89,8 +89,9 @@ def requirement_row(row):
         "departmentCode": demand.department.code,
         "departmentName": demand.department.name,
         "demandQty": str(row.demand_qty),
-        "availableQty": str(row.available_qty),
-        "netRequiredQty": str(row.net_required_qty),
+        "availableQty": str(row.available_qty) if row.available_qty is not None else None,
+        "netRequiredQty": None if row.calculation_facts.get("purchaseArrangement") else str(row.net_required_qty),
+        "actualPurchaseQty": str(row.net_required_qty) if row.calculation_facts.get("purchaseArrangement") else None,
         "quantityFacts": quantity_facts,
         "inventorySnapshotQty": quantity_facts["inventorySnapshotQty"],
         "inventoryAllocationStatus": quantity_facts["inventoryAllocationStatus"],
@@ -102,7 +103,7 @@ def requirement_row(row):
         "supplyType": row.supply_type,
         "supplyTypeLabel": row.get_supply_type_display(),
         "status": row.status,
-        "statusLabel": row.get_status_display(),
+        "statusLabel": ({"calculated":"已登记采购数量安排","confirmed":"采购数量安排已确认"}.get(row.status,row.get_status_display()) if row.calculation_facts.get("purchaseArrangement") else row.get_status_display()),
         "planType": "PurchasePlan" if purchase_plan else ("ProductionPlan" if production_plan else ""),
         "planId": plan.pk if plan else None,
         "planNo": plan.plan_no if plan else "",
@@ -548,6 +549,18 @@ class DemandCreateView(AuthorizedPlanningView):
                 return envelope(error={'code':'MATERIAL_SOURCE_SELECTION_REQUIRED','message':'请选择准确生产计划及本次批准范围。'},http_status=400)
             return self.material_call(lambda:native.source_candidates(user=request.user,plan_id=plan_id,
                 range_start=request.query_params['rangeStart'],range_end=request.query_params['rangeEnd']))
+        if request.query_params.get('purchaseResultKey') is not None:
+            from .material_purchase_service import result_query
+            try: demand_id=int(request.query_params.get('demandId',''))
+            except (TypeError,ValueError):
+                return envelope(error={'code':'MATERIAL_PURCHASE_DEMAND_REQUIRED','message':'须选择准确需求。'},http_status=400)
+            return self.material_call(lambda:result_query(user=request.user,demand_id=demand_id,key=request.query_params['purchaseResultKey']))
+        if request.query_params.get('purchaseContext') == '1':
+            from .material_purchase_service import context
+            try: demand_id=int(request.query_params.get('demandId',''))
+            except (TypeError,ValueError):
+                return envelope(error={'code':'MATERIAL_PURCHASE_DEMAND_REQUIRED','message':'须选择准确需求。'},http_status=400)
+            return self.material_call(lambda:context(user=request.user,demand_id=demand_id))
         if request.query_params.get("demandId") is not None and not request.query_params.get("resultKey"):
             try:
                 demand_id=int(request.query_params["demandId"])
@@ -605,8 +618,13 @@ class RequirementCalculateView(AuthorizedPlanningView):
             return denied
         try:
             row, audit = calculate_requirement(
-                user=request.user, demand_id=demand_id, authorization=decision
+                user=request.user, demand_id=demand_id, authorization=decision, purchase_arrangement=request.data or {}
             )
+        except (OperationalError,IntegrityError) as error:
+            if not demand or demand.source_type!='production_material':raise
+            concurrent=isinstance(error,IntegrityError) or 'locked' in str(error).lower()
+            return envelope(error={'code':'MATERIAL_PURCHASE_CONCURRENT_CHANGE' if concurrent else 'MATERIAL_PURCHASE_WRITE_FAILED',
+                'message':'并发结果待核，请查询同一次动作，不自动重放。' if concurrent else '供应安排提交失败，未取得成功事实。'},http_status=409 if concurrent else 500)
         except PlanningBusinessError as error:
             return self.fail(error)
         row = PlanningRequirement.objects.select_related("demand__department", "material").get(pk=row.pk)

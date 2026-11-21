@@ -1,3 +1,4 @@
+from procurement.quantity_contract import exact_total
 from decimal import Decimal
 
 from django.db.models import Sum
@@ -113,7 +114,7 @@ class PurchaseOrderFulfillmentFactsView(APIView):
         transactions = InventoryTransaction.objects.filter(
             source_inbound__source_inspection__source_receipt__source_purchase_order=order
         ).select_related("warehouse", "material", "operator_employee").order_by("id")
-        planned = order.items.aggregate(total=Sum("quantity"))["total"] or Decimal("0")
+        planned = exact_total(order.items,'quantity')
         received = sum((row.quantity for row in receipts), Decimal("0"))
         qualified = sum((row.qualified_quantity for row in inspections if row.status == "qualified"), Decimal("0"))
         rejected = sum((row.rejected_quantity for row in inspections), Decimal("0"))

@@ -126,7 +126,8 @@ def requirement_supply_type_for(demand):
 
 
 def available_inventory(material):
-    value = InventoryBalance.objects.filter(material=material).aggregate(total=Sum("quantity"))["total"]
+    from procurement.quantity_contract import exact_total
+    value = exact_total(InventoryBalance.objects.filter(material=material))
     return value or Decimal("0")
 
 
@@ -209,7 +210,8 @@ def convert_purchase_plan_to_request(*, user, purchase_plan_id, authorization):
     if not plan:
         raise PlanningBusinessError("PURCHASE_PLAN_NOT_FOUND", "采购计划不存在。", http_status=404)
     if plan.planning_requirement.demand.source_type == "production_material":
-        raise PlanningBusinessError("MATERIAL_AVAILABILITY_CONTRACT_PENDING", "正式生产用料尚未开放后续采购承接，不能按旧快照或计划推定准入。", http_status=409)
+        from .material_purchase_service import validate_arrangement
+        validate_arrangement(plan.planning_requirement)
     existing = PurchaseRequest.objects.select_for_update().filter(source_purchase_plan=plan).first()
     if existing:
         raise PlanningBusinessError(
@@ -228,7 +230,8 @@ def convert_purchase_plan_to_request(*, user, purchase_plan_id, authorization):
         raise PlanningBusinessError("PURCHASE_PLAN_QTY_INVALID", "采购计划净需求必须大于 0。", http_status=409)
     if requirement.supply_type != "purchase":
         raise PlanningBusinessError("PURCHASE_PLAN_SUPPLY_TYPE_INVALID", "来源计划需求不是采购供应类型。", http_status=409)
-    if not plan.material_id or not plan.material.is_active or not plan.material.is_purchased:
+    from .material_purchase_service import material_allowed
+    if not plan.material_id or not material_allowed(plan.material,plan=plan):
         raise PlanningBusinessError("PURCHASE_PLAN_MATERIAL_INVALID", "采购计划物料不存在、已停用或不是采购件。", http_status=409)
     if requirement.material_id != plan.material_id or demand.material_id != plan.material_id:
         raise PlanningBusinessError("PURCHASE_PLAN_SOURCE_MATERIAL_MISMATCH", "需求、计划需求与采购计划物料不一致。", http_status=409)
@@ -274,7 +277,7 @@ def convert_purchase_plan_to_request(*, user, purchase_plan_id, authorization):
         material_code=plan.material.code,
         material_name=plan.material.name,
         specification=plan.material.specification or "",
-        unit=plan.material.purchase_unit or plan.material.unit,
+        unit=(plan.material.base_uom.code if demand.source_type=="production_material" else plan.material.purchase_unit or plan.material.unit),
         material_category=plan.material.category.name if plan.material.category_id else "",
         purchase_attribute="可采购",
         demand_reason=demand.reason,
@@ -663,12 +666,13 @@ def generate_mrp_proposal(*, user, mps_run_id, payload, authorization):
 
 
 @transaction.atomic
-def calculate_requirement(*, user, demand_id, authorization):
+def calculate_requirement(*, user, demand_id, authorization, purchase_arrangement=None):
     demand = Demand.objects.select_for_update().select_related("material", "department").filter(pk=demand_id).first()
     if not demand:
         raise PlanningBusinessError("DEMAND_NOT_FOUND", "需求不存在。", http_status=404)
     if demand.source_type == "production_material":
-        raise PlanningBusinessError("MATERIAL_AVAILABILITY_CONTRACT_PENDING", "正式用料需求尚无原料可用及分配证明，不采用库存快照自动抵扣或生成供应。", http_status=409)
+        from .material_purchase_service import prepare_requirement
+        return prepare_requirement(user=user,demand_id=demand_id,payload=purchase_arrangement)
     demand_qty = Decimal(demand.quantity_text)
     existing = PlanningRequirement.objects.filter(demand=demand).first()
     if existing:
@@ -772,7 +776,8 @@ def confirm_supply_plan(*, user, requirement_id, authorization):
     if not requirement:
         raise PlanningBusinessError("REQUIREMENT_NOT_FOUND", "计划需求不存在。", http_status=404)
     if requirement.demand.source_type == "production_material":
-        raise PlanningBusinessError("MATERIAL_AVAILABILITY_CONTRACT_PENDING", "正式用料确认尚不构成库存可用或供应计划依据。", http_status=409)
+        from .material_purchase_service import confirm_purchase_plan
+        return confirm_purchase_plan(user=user,requirement=requirement)
     if requirement.net_required_qty <= 0:
         raise PlanningBusinessError(
             "NET_REQUIREMENT_ZERO", "净需求为 0，不生成采购计划或生产计划。", http_status=409
@@ -926,8 +931,13 @@ def validation_for(requirement):
         plan_qty = plan.net_required_qty
     elif isinstance(plan, ProductionPlan):
         plan_qty = plan.planned_qty
-    expected_net = (requirement.demand_qty if demand.batch_key else
-                    max(requirement.demand_qty - requirement.available_qty, Decimal("0")))
+    if demand.source_type == "production_material":
+        from .material_purchase_service import validate_arrangement
+        validate_arrangement(requirement)
+        expected_net = requirement.net_required_qty
+    else:
+        expected_net = (requirement.demand_qty if demand.batch_key else
+                        max(requirement.demand_qty - requirement.available_qty, Decimal("0")))
     purchase_request = None
     purchase_orders = []
     if isinstance(plan, PurchasePlan):
@@ -947,7 +957,8 @@ def validation_for(requirement):
         ),
         "materialValid": bool(requirement.material_id and requirement.material.is_active),
         "inventoryRead": requirement.calculation_facts.get("inventorySource") == "procurement.InventoryBalance",
-        "netRequirementCorrect": requirement.net_required_qty == expected_net,
+        "netRequirementCorrect": None if demand.source_type=="production_material" else requirement.net_required_qty == expected_net,
+        "explicitPurchaseQuantityCorrect": requirement.net_required_qty == expected_net if demand.source_type=="production_material" else None,
         "supplyTypeValid": requirement.supply_type in {"purchase", "production"},
         "planQuantityCorrect": plan_qty == requirement.net_required_qty if plan else False,
         "sourceTraceComplete": bool(plan and plan.source_id == str(requirement.pk)),

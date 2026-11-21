@@ -52,11 +52,11 @@ def text(value, name, limit=240):
     return value.strip()
 
 
-def number(value):
+def number(value, *, places=4):
     try:
         if isinstance(value, bool):raise ValueError()
         result = Decimal(str(value))
-        if not result.is_finite() or result <= 0 or result != result.quantize(Decimal(".0001")):
+        if not result.is_finite() or result <= 0 or result != result.quantize(Decimal(1).scaleb(-places)):
             raise ValueError()
         return result
     except (InvalidOperation, ValueError, TypeError):
@@ -113,7 +113,7 @@ def _line(items, request_item):
         fail("COMPARISON_MATERIAL_MISMATCH", "原申请与原生报价的物料或规格不一致。")
     if not request_item.unit or row.get("unit") != request_item.unit:
         fail("COMPARISON_UNIT_MISMATCH", "报价单位与原申请不一致或未提供，不能换算猜配。")
-    if number(row.get("quantity")) != request_item.quantity:
+    if number(row.get("quantity"),places=6) != request_item.quantity:
         fail("COMPARISON_QUANTITY_MISMATCH", "报价数量与本次批准申请行不一致。")
     return row
 

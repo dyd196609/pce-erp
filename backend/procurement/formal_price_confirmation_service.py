@@ -1,3 +1,5 @@
+from procurement.quantity_contract import exact_total
+from planning.material_purchase_service import material_allowed, purchasing_unit
 """Explicit native price confirmation; existing result/price and STANDARD order service."""
 import copy
 from datetime import date
@@ -114,14 +116,14 @@ def _source(p,*,lock=False):
  quotes=[x for x in snapshot['quotations'] if x['supplierCode']==selected]
  if len(quotes)!=1:fail('FORMAL_PRICE_SUPPLIER_UNPROVEN','审核候选未唯一对应准确已接收原生报价。')
  quote=quotes[0];raw=quote['lineSnapshot'].get('commercialTerms')
- if not Supplier.objects.filter(pk=quote['supplierMasterId'],company_id=scope['organizationId'],is_active=True).exists() or not item.material.is_active or not item.material.is_purchased:
+ if not Supplier.objects.filter(pk=quote['supplierMasterId'],company_id=scope['organizationId'],is_active=True).exists() or not material_allowed(item.material,request_item=item):
   fail('FORMAL_PRICE_MASTER_INACTIVE','供应商或物料原生主数据当前未启用或不适用采购。')
  if raw is None:fail('FORMAL_PRICE_CONDITIONS_MISSING','原生报价未提供结构化价格适用条件，不采用默认税率或日期。')
  terms=normalize_terms(raw)
  if any(v is None for v in terms.values()):fail('FORMAL_PRICE_CONDITIONS_MISSING','税率、含税、有效期、运费或交期存在未提供条件，不能确认适用价格。')
  if terms['freightIncluded'] is not True:
   fail('FORMAL_PRICE_FREIGHT_NOT_APPLICABLE','本报价运费未包含；原订单尚无独立运费承接依据，不能默认运费为零。')
- if (quote['unit']!=item.unit or item.material.unit!=item.unit or decimal(quote['quantity'])!=item.quantity):
+ if (quote['unit']!=item.unit or purchasing_unit(item)!=item.unit or decimal(quote['quantity'])!=item.quantity):
   fail('FORMAL_PRICE_UNIT_QUANTITY_UNPROVEN','原生报价计价单位或适用数量与申请不符；不作无依据换算。')
  commercial={'supplierId':quote['supplierMasterId'],'supplierCode':quote['supplierCode'],'materialId':item.material_id,
   'materialCode':item.material_code,'unit':quote['unit'],'quantity':quote['quantity'],'unitPrice':quote['unitPrice'],
@@ -329,7 +331,7 @@ def validate_standard_line(*,result,price,item,quantity,unit,order_date,raw,payl
  identity=f"PRICE-CONFIRMATION:{proof['writeRequestId']}"
  if (payload.get('requestId')!=identity or payload.get('gateId')!=identity or payload.get('admissionResultId')!=proof['proofHash']):
   fail('FORMAL_PRICE_ORDER_SOURCE_CHANGED','标准订单上下文未绑定本次真实价格确认来源。')
- consumed=PurchaseOrderItem.objects.filter(source_purchase_request_item=item).exclude(po__status='cancelled').aggregate(q=Sum('quantity'))['q'] or Decimal('0')
+ consumed=exact_total(PurchaseOrderItem.objects.filter(source_purchase_request_item=item).exclude(po__status='cancelled'),'quantity')
  if consumed+quantity>decimal(c['quantity']):fail('FORMAL_PRICE_QUANTITY_ALREADY_USED','原订单已占用本来源适用数量，不能重复覆盖。')
  return proof
 

@@ -3152,6 +3152,10 @@
     "sha256": "044670911fb34a813bb2d00fca3ed44eadfddf91ef8e0724d86d67d8bef6935e"
   },
   {
+    "file": "backend/planning/material_purchase_service.py",
+    "sha256": "c4e780c1501815cfc9f0b1c0f192360dd2009e393db15f20e365fe372c09eedf"
+  },
+  {
     "file": "backend/planning/mes_evidence_graph.py",
     "sha256": "f0017653a0141a4d1e09bf65bfc2f5c7599ecc4456c0e1de5c55ebcda954a827"
   },
@@ -3284,12 +3288,16 @@
     "sha256": "d6385fe991f05edfa9d4666fce358d77b287c7bff553240519d04a9a36cefdcc"
   },
   {
+    "file": "backend/planning/migrations/0096_exact_material_purchase_quantities.py",
+    "sha256": "49bb3b8355ae7288d869eac41336cabeed6b8cdfe1c58c34b0bbb4ba40ff81e4"
+  },
+  {
     "file": "backend/planning/migrations/__init__.py",
     "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
   },
   {
     "file": "backend/planning/models.py",
-    "sha256": "388a343efe08bd7ef5a31ea521654ad7028837dff9215d00d6454c99fd83ed8d"
+    "sha256": "d172157b49e37136e93d93687a82aa5f5e8d504a4a683078be3ec95c63c7579a"
   },
   {
     "file": "backend/planning/operation_completion_configuration.py",
@@ -3517,7 +3525,7 @@
   },
   {
     "file": "backend/planning/quantity_semantics.py",
-    "sha256": "4497f94071789a2ca47ccb1cde18d28f23fea4ab386b3d6a48d9438aaf982729"
+    "sha256": "fd665603cf3e5dfe3e6e504bee34ad709da70349a2c26863e08bc750e9a01f43"
   },
   {
     "file": "backend/planning/scheduling_primitives.py",
@@ -3529,7 +3537,7 @@
   },
   {
     "file": "backend/planning/services.py",
-    "sha256": "11c56e774c14f48c87fa77c0bb1b350cb56bd0fb207d66093d5dd8a7665202b6"
+    "sha256": "ebfcd2ae8b827fb00edce6705dce9637cb1185b546f0749de8cbe1b9a5229f53"
   },
   {
     "file": "backend/planning/test_assignee_entry.py",
@@ -3621,7 +3629,7 @@
   },
   {
     "file": "backend/planning/views.py",
-    "sha256": "32e30454e9ccaae22bf885c48b23b16bfd0dd759508f59b103b95d37086ebb0c"
+    "sha256": "cfbb52c9c91c92c20eebb56ecb53e9792d56667514db02e9f4bfe8c861938bb1"
   },
   {
     "file": "backend/planning/work_order_execution_service.py",
@@ -3717,19 +3725,27 @@
   },
   {
     "file": "backend/procurement/comparison_registration_service.py",
-    "sha256": "29a61760ccd623c9ac8903c441d2fa38f17210b8a5ed4fac4314b359b91445b6"
+    "sha256": "0d92a8883f416b9fb9e52d29eef36b5eb55d1a7499665a05749a96631ea2a880"
   },
   {
     "file": "backend/procurement/data_recovery_application_service.py",
     "sha256": "ab700b2448e95a47781412db6e1cd726e00d5c749b39061ef474b170dd4fad5e"
   },
   {
+    "file": "backend/procurement/exact_quantity_migration.py",
+    "sha256": "4a28dc3249cab447b1190025a6669621527fa6f453da3c66f98f8e4ab566a326"
+  },
+  {
     "file": "backend/procurement/fact_read_access.py",
     "sha256": "59c5b1ef37466b0c53a835cde8589390c9eb92d348158d318772e80eda6befff"
   },
   {
+    "file": "backend/procurement/fields.py",
+    "sha256": "b6d409fe60b0d354d847507cc38e369a97f839cb7c1812d8471422cd66728f9f"
+  },
+  {
     "file": "backend/procurement/formal_price_confirmation_service.py",
-    "sha256": "4c29b5130a32346eaf23384e49448ebff8ae71116cdc9faa1e938659bf3ac47e"
+    "sha256": "5a7eeb53ecc731788199d6ef6ebe2bfb49cf66672066908c509893ef9d7eafff"
   },
   {
     "file": "backend/procurement/incoming_exception_api.py",
@@ -3753,7 +3769,7 @@
   },
   {
     "file": "backend/procurement/inventory_facts_api.py",
-    "sha256": "3c9ad4fc13dbb8e14667c5174e125683c3ac53a405a084fa35ef17d5899398b0"
+    "sha256": "1b5a048c48cccc5eaaf55405f8c366f0666c17df854d6a9320999d3927720048"
   },
   {
     "file": "backend/procurement/inventory_posting.py",
@@ -3825,7 +3841,7 @@
   },
   {
     "file": "backend/procurement/material_stock_authority.py",
-    "sha256": "8cfb791020e1c272a5064a5e36749dc2eb1a5ef52bf485e2c45d7f9f61eb08df"
+    "sha256": "6a20f7192b3f68502c8f90b5eb10e568bf6520bb1ab9f67ff7f40019a63362fa"
   },
   {
     "file": "backend/procurement/migrations/0001_initial.py",
@@ -3996,12 +4012,16 @@
     "sha256": "b9c2a7b096d0740f5985fd737f84cd9983ccca980c6079069a8e0fbfe59559a4"
   },
   {
+    "file": "backend/procurement/migrations/0104_exact_purchase_stock_quantities.py",
+    "sha256": "606d2f6b47bf88a29e632929305b6e1378832d9c44a87b7a3d8a3d9c67981aac"
+  },
+  {
     "file": "backend/procurement/migrations/__init__.py",
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   {
     "file": "backend/procurement/models.py",
-    "sha256": "7b23ce6f53f00bd7a32c0d637d7d82c06b6c688f936b8277007c85185126fd2a"
+    "sha256": "7aac5902e4d87fecaeb1285d99f1770e1e86a939c5de6a156bec60516a73e056"
   },
   {
     "file": "backend/procurement/order_stock_allocation.py",
@@ -4029,7 +4049,7 @@
   },
   {
     "file": "backend/procurement/purchase_fulfillment_api.py",
-    "sha256": "cab718fec2776942cb3f9007bb42fc04b2fda54a97d956916bb26ca2e263a2c7"
+    "sha256": "ed42fe269db4d7f2237c35cfc7b915e04888aad3d9ca7ebc8e85b4d6d3f8a33c"
   },
   {
     "file": "backend/procurement/purchase_inquiry_api.py",
@@ -4052,6 +4072,10 @@
     "sha256": "49964be8fac4f3a0ee91a60c883865c70952da0cf49d95e60eeea749de20d7d7"
   },
   {
+    "file": "backend/procurement/quantity_contract.py",
+    "sha256": "cd615a0457830ea1e04368c3fcaf85e57d1b7a114a38efbd36b8054853cef708"
+  },
+  {
     "file": "backend/procurement/quote_comparison_fact_service.py",
     "sha256": "7df41f991a49bd305b12f19516d79fc3723eeb8a849ec14ed7314fa12b5483e3"
   },
@@ -4061,7 +4085,7 @@
   },
   {
     "file": "backend/procurement/scm_page_facts.py",
-    "sha256": "ba31c7870b9ab2c8fb9b553bb7d3068634eca3f244a71b8f50ee7d863834e0d9"
+    "sha256": "41161b9cbf8e13caf9865478ae2b9ff0c0b0216d16e0f6dfda19085808b8d7e0"
   },
   {
     "file": "backend/procurement/scm_read_permission_catalog.py",
@@ -4073,7 +4097,7 @@
   },
   {
     "file": "backend/procurement/scm_runtime_services.py",
-    "sha256": "20e30014fb0c8132f7acddeb3255d082fa78225045e2bc3d981dd6935b2b9e19"
+    "sha256": "b86a9fde46d7790a856ad7f4e70b7c950bbb5519bc40896e98c92fbf9866995c"
   },
   {
     "file": "backend/procurement/scm_stable_business_trace_design.py",
@@ -4081,7 +4105,7 @@
   },
   {
     "file": "backend/procurement/serializers.py",
-    "sha256": "9ad3447c8ce2bc90275e03869d8634e57879330f1421b2440dd47a75a959a9f1"
+    "sha256": "03f550025dd2d6e6c07715337b78bbcd8d4e8c1ece04696ca62a3117dcbc6389"
   },
   {
     "file": "backend/procurement/supplier_material_fact_resolver.py",

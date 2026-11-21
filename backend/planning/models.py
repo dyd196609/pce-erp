@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from .fields import ExactDemandQuantityField
+from procurement.fields import ExactNativeQuantityField
 
 
 class SchedulingCompanyMutex(models.Model):
@@ -423,9 +425,9 @@ class PlanningRequirement(models.Model):
     material = models.ForeignKey(
         "masterdata.Material", on_delete=models.PROTECT, related_name="planning_requirements"
     )
-    demand_qty = models.DecimalField(max_digits=18, decimal_places=4)
-    available_qty = models.DecimalField(max_digits=18, decimal_places=4)
-    net_required_qty = models.DecimalField(max_digits=18, decimal_places=4)
+    demand_qty = ExactNativeQuantityField(max_digits=20, decimal_places=6)
+    available_qty = ExactNativeQuantityField(max_digits=20, decimal_places=6, null=True, blank=True)
+    net_required_qty = ExactNativeQuantityField(max_digits=20, decimal_places=6)
     required_date = models.DateField()
     supply_type = models.CharField(max_length=20, choices=SUPPLY_TYPE_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="calculated")
@@ -467,9 +469,9 @@ class PurchasePlan(models.Model):
     material = models.ForeignKey(
         "masterdata.Material", on_delete=models.PROTECT, related_name="purchase_plans"
     )
-    required_qty = models.DecimalField(max_digits=18, decimal_places=4)
-    available_qty = models.DecimalField(max_digits=18, decimal_places=4)
-    net_required_qty = models.DecimalField(max_digits=18, decimal_places=4)
+    required_qty = ExactNativeQuantityField(max_digits=20, decimal_places=6)
+    available_qty = ExactNativeQuantityField(max_digits=20, decimal_places=6, null=True, blank=True)
+    net_required_qty = ExactNativeQuantityField(max_digits=20, decimal_places=6)
     required_date = models.DateField()
     source_type = models.CharField(max_length=80, default="PlanningRequirement")
     source_id = models.CharField(max_length=80)

@@ -1,3 +1,4 @@
+from procurement.quantity_contract import exact_total
 import re
 
 from django.db.models import Sum
@@ -219,7 +220,7 @@ def _normalized_object(value, read_user=None):
         else STATUS_LABELS.get(status_code, value.get_status_display())
     )
     if isinstance(value, PurchaseOrder):
-        quantity = value.items.aggregate(total=Sum("quantity"))["total"] or 0
+        quantity = exact_total(value.items,'quantity')
         amount = value.total_amount
         items = [_purchase_order_item_fact(value, row, read_user=read_user)
                  for row in value.items.select_related(

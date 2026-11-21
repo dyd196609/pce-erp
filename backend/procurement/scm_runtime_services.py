@@ -1,3 +1,5 @@
+from planning.material_purchase_service import material_allowed
+from .quantity_contract import exact_total
 from datetime import date
 from decimal import Decimal, InvalidOperation
 
@@ -471,7 +473,7 @@ class PurchaseOrderCreationService:
                     "AGREED_PRICE_ITEM_SELECTION_REQUIRED", f"第{item.line_no}行尚未选择正式价格。"
                 )
             material = item.material
-            if not material or not material.is_active or not material.is_purchased:
+            if not material_allowed(material,request_item=item):
                 raise ScmRuntimeActionError(
                     "MATERIAL_MASTER_NOT_PURCHASABLE", f"第{item.line_no}行物料不存在、未启用或不允许采购。"
                 )
@@ -1060,7 +1062,7 @@ class PurchaseOrderCreationService:
                         "MATERIAL_MASTER_NOT_MAINTAINED",
                         f"物料{material_code}主数据未维护",
                     )
-                if not material.is_active or not material.is_purchased:
+                if not material_allowed(material,request_item=source_item):
                     raise ScmRuntimeActionError(
                         "MATERIAL_MASTER_NOT_PURCHASABLE",
                         f"物料{material_code}不是启用的可采购物料",
@@ -1323,11 +1325,11 @@ class PurchaseOrderExecutionService:
         action_code = "procurement.purchase_order.complete"
         if order.status != "stored":
             raise ScmRuntimeActionError("PURCHASE_ORDER_NOT_STORED", "采购订单只有完成正式入库后才能正常结案")
-        planned = order.items.aggregate(total=Sum("quantity"))["total"] or Decimal("0")
-        received = order.scm_receipts.aggregate(total=Sum("quantity"))["total"] or Decimal("0")
-        qualified = PurchaseInspection.objects.filter(source_receipt__source_purchase_order=order, status="qualified").aggregate(total=Sum("qualified_quantity"))["total"] or Decimal("0")
-        inbound = WarehouseInbound.objects.filter(source_inspection__source_receipt__source_purchase_order=order, status="completed").aggregate(total=Sum("quantity"))["total"] or Decimal("0")
-        rejected = PurchaseInspection.objects.filter(source_receipt__source_purchase_order=order).aggregate(total=Sum("rejected_quantity"))["total"] or Decimal("0")
+        planned = exact_total(order.items,'quantity')
+        received = exact_total(order.scm_receipts,'quantity')
+        qualified = exact_total(PurchaseInspection.objects.filter(source_receipt__source_purchase_order=order, status="qualified"),'qualified_quantity')
+        inbound = exact_total(WarehouseInbound.objects.filter(source_inspection__source_receipt__source_purchase_order=order, status="completed"),'quantity')
+        rejected = exact_total(PurchaseInspection.objects.filter(source_receipt__source_purchase_order=order),'rejected_quantity')
         if not (planned > 0 and received == qualified == inbound == planned and rejected == 0):
             raise ScmRuntimeActionError("PURCHASE_ORDER_QUANTITY_NOT_CLOSED", "收货、合格、入库数量尚未与订单数量完全闭合，禁止正常结案")
         decision, _ = _authorize_fulfillment(user=user, action_code=action_code, order=order)
@@ -1358,8 +1360,8 @@ class PurchaseReceiptService:
         decision, employee = _authorize_fulfillment(
             user=user, action_code="procurement.receipt.receive", order=order
         )
-        received = order.scm_receipts.aggregate(total=Sum("quantity"))["total"] or Decimal("0")
-        planned = order.items.aggregate(total=Sum("quantity"))["total"] or Decimal("0")
+        received = exact_total(order.scm_receipts,'quantity')
+        planned = exact_total(order.items,'quantity')
         current = _decimal(quantity, "收货数量", positive=True)
         if current + received > planned:
             raise ScmRuntimeActionError("RECEIPT_QUANTITY_EXCEEDED", f"无法确认收货：累计收货数量{current + received}超过订单数量{planned}")
@@ -1528,7 +1530,7 @@ class WarehouseInboundService:
                 )
         lot_numbers = lot_numbers or {}
         current = _decimal(quantity, "入库数量", positive=True)
-        completed = inspection.warehouse_inbounds.aggregate(total=Sum("quantity"))["total"] or Decimal("0")
+        completed = exact_total(inspection.warehouse_inbounds,'quantity')
         if current + completed > inspection.qualified_quantity:
             raise ScmRuntimeActionError("INBOUND_QUANTITY_EXCEEDED", f"无法确认入库：累计入库数量{current + completed}超过检验合格数量{inspection.qualified_quantity}")
         source_lines = inspection.items or []
@@ -1584,10 +1586,10 @@ class WarehouseInboundService:
             from .inventory_posting import post_inbound_stock
             post_inbound_stock(inbound=inbound,warehouse=warehouse,location=location,material_id=material_id,
                 lot=lot,quantity=material_quantity,employee=employee,user=user)
-        total_inbound = WarehouseInbound.objects.filter(
+        total_inbound = exact_total(WarehouseInbound.objects.filter(
             source_inspection__source_receipt__source_purchase_order=order, status="completed"
-        ).aggregate(total=Sum("quantity"))["total"] or Decimal("0")
-        planned = order.items.aggregate(total=Sum("quantity"))["total"] or Decimal("0")
+        ),'quantity')
+        planned = exact_total(order.items,'quantity')
         if total_inbound == planned:
             order.status = "stored"
             order.save(update_fields=["status", "updated_at"])

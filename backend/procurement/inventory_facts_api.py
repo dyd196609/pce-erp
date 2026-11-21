@@ -4,6 +4,7 @@ These endpoints expose the existing procurement inventory and inspection facts.
 They intentionally contain no demo/fixture/localStorage fallback and perform no
 business write.
 """
+from procurement.quantity_contract import exact_total
 
 from django.db.models import Sum
 from django.db import DatabaseError
@@ -72,7 +73,7 @@ class FormalInventoryFactsView(APIView):
         transactions = InventoryTransaction.objects.filter(warehouse__company_id=company_id).select_related(
             "warehouse", "material", "location", "lot", "source_inbound", "material_issue",
         )
-        total_quantity = balances.aggregate(total=Sum("quantity"))["total"] or 0
+        total_quantity = exact_total(balances,'quantity')
         return Response({
             "success": True,
             "factSource": "server",

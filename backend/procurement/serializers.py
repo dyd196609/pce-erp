@@ -1,3 +1,5 @@
+from planning.material_purchase_service import material_allowed
+from .quantity_contract import quantity_text
 from rest_framework import serializers
 from datetime import date
 from decimal import Decimal, InvalidOperation
@@ -12,10 +14,13 @@ from .models import PurchaseRequest, PurchaseRequestItem, Supplier, PurchaseOrde
 
 
 class PurchaseRequestLegacySerializer(serializers.ModelSerializer):
+    def get_totalQuantity(self,obj):
+        return quantity_text(obj.quantity)
+
     requestNo = serializers.CharField(source="request_no", read_only=True)
     requestDate = serializers.DateField(source="request_date")
     purchaseDepartment = serializers.CharField(source="purchase_department", allow_blank=True, required=False)
-    totalQuantity = serializers.DecimalField(source="quantity", max_digits=18, decimal_places=4, read_only=True)
+    totalQuantity = serializers.SerializerMethodField()
     requiredDate = serializers.DateField(source="required_date", allow_null=True, required=False)
     statusLabel = serializers.CharField(source="get_status_display", read_only=True)
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
@@ -77,6 +82,9 @@ class PurchaseRequestLegacySerializer(serializers.ModelSerializer):
 
 
 class PurchaseRequestSerializer(serializers.ModelSerializer):
+    def get_totalQuantity(self,obj):
+        return quantity_text(obj.quantity)
+
     requestNo = serializers.CharField(source="request_no", read_only=True)
     requestDate = serializers.DateField(source="request_date")
     requesterEmployeeId = serializers.IntegerField(write_only=True)
@@ -121,7 +129,7 @@ class PurchaseRequestSerializer(serializers.ModelSerializer):
     sourcePlanningRequirementNo = serializers.SerializerMethodField()
     sourceDemandNo = serializers.SerializerMethodField()
     items = serializers.ListField(write_only=True, allow_empty=False)
-    totalQuantity = serializers.DecimalField(source="quantity", max_digits=18, decimal_places=4, read_only=True)
+    totalQuantity = serializers.SerializerMethodField()
     requiredDate = serializers.DateField(source="required_date", allow_null=True, required=False)
     statusLabel = serializers.CharField(source="get_status_display", read_only=True)
     createdAt = serializers.DateTimeField(source="created_at", read_only=True)
@@ -147,21 +155,26 @@ class PurchaseRequestSerializer(serializers.ModelSerializer):
         read_only_fields = ["requester", "department", "status"]
 
     @staticmethod
-    def _normalize_items(items):
+    def _normalize_items(items,source_plan=None):
         normalized = []
         for index, item in enumerate(items, start=1):
             try:
                 material = Material.objects.select_related("category").get(
-                    pk=item.get("materialId"), is_active=True, is_purchased=True
+                    pk=item.get("materialId"), is_active=True
                 )
             except (Material.DoesNotExist, TypeError, ValueError):
                 raise serializers.ValidationError({"items": f"第{index}行必须选择有效的可采购物料主数据"})
+            if not material_allowed(material,plan=source_plan):
+                raise serializers.ValidationError({"items": f"第{index}行缺少正式可采购资格或本需求准确批准。"})
             try:
                 quantity = Decimal(str(item.get("quantity")))
             except (InvalidOperation, TypeError, ValueError):
                 raise serializers.ValidationError({"items": f"第{index}行数量无效"})
             if quantity <= 0:
                 raise serializers.ValidationError({"items": f"第{index}行数量必须大于0"})
+            if source_plan and source_plan.planning_requirement.demand.source_type=="production_material":
+                if len(items)!=1 or material.pk!=source_plan.material_id or quantity!=source_plan.net_required_qty:
+                    raise serializers.ValidationError({"items":"原生产用料采购计划须保持准确物料及已确认数量，不接受借用或改量。"})
             required_date = item.get("requiredDate")
             try:
                 parsed_date = date.fromisoformat(str(required_date))
@@ -185,7 +198,7 @@ class PurchaseRequestSerializer(serializers.ModelSerializer):
                 "materialCode": material.code,
                 "materialName": material.name,
                 "specification": material.specification or "",
-                "unit": material.purchase_unit or material.unit,
+                "unit": material.base_uom.code if source_plan and source_plan.planning_requirement.demand.source_type=="production_material" else material.purchase_unit or material.unit,
                 "materialCategory": material.category.name if material.category else "",
                 "suggestedSupplier": suggested_supplier,
                 "suggestedSupplierId": suggested_supplier.pk if suggested_supplier else None,
@@ -200,7 +213,7 @@ class PurchaseRequestSerializer(serializers.ModelSerializer):
                 "substituteMaterialCode": substitute_material.code if substitute_material else "",
                 "substituteMaterialName": substitute_material.name if substitute_material else "",
                 "purchaseRemark": str(item.get("purchaseRemark") or "").strip(),
-                "purchaseAttribute": "可采购" if material.is_purchased else "不可采购",
+                "purchaseAttribute": "可采购" if material.is_purchased else "本需求已批准外购",
                 "quantity": quantity,
                 "requiredDate": parsed_date,
                 "remark": str(item.get("remark") or "").strip(),
@@ -223,7 +236,7 @@ class PurchaseRequestSerializer(serializers.ModelSerializer):
                 CostCenter.DoesNotExist, ExpenseCategory.DoesNotExist, BudgetCategory.DoesNotExist,
                 KeyError, TypeError, ValueError):
             raise serializers.ValidationError("申请人、申请部门和采购部门必须来自有效基础资料")
-        normalized_items = self._normalize_items(attrs.pop("items"))
+        normalized_items = self._normalize_items(attrs.pop("items"),source_plan=self.instance.source_purchase_plan if self.instance else None)
         attrs.update({
             "requester_employee_id": employee.pk,
             "requester_employee_no": employee.employee_no,

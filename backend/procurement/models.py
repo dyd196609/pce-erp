@@ -1,4 +1,6 @@
+from procurement.quantity_contract import exact_total
 from django.db import models
+from procurement.fields import ExactNativeQuantityField
 from django.utils import timezone
 from datetime import date
 from django.core.exceptions import ValidationError
@@ -27,6 +29,7 @@ class ScmBusinessObjectBase(models.Model):
 
 
 class PurchaseRequest(ScmBusinessObjectBase):
+    quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6, default=0)
     PURCHASE_MODE_CHOICES = [
         ("STANDARD", "标准采购"),
         ("AGREED_PRICE", "既定价格采购"),
@@ -185,7 +188,7 @@ class PurchaseRequestItem(models.Model):
     substitute_material_code = models.CharField(max_length=50, blank=True, default="")
     substitute_material_name = models.CharField(max_length=200, blank=True, default="")
     purchase_remark = models.CharField(max_length=500, blank=True, default="")
-    quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6)
     required_date = models.DateField()
     remark = models.CharField(max_length=500, blank=True, default="")
     line_no = models.PositiveIntegerField(default=1)
@@ -219,6 +222,7 @@ class PurchaseRequestApprovalRecord(models.Model):
 
 
 class PurchaseInquiry(ScmBusinessObjectBase):
+    quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6, default=0)
     STATUS_CHOICES = [
         ("draft", "草稿"), ("sent", "已发送"), ("quoted", "已报价"),
         ("approved", "已审批"), ("closed", "已关闭"),
@@ -242,6 +246,7 @@ class PurchaseInquiry(ScmBusinessObjectBase):
 
 
 class SupplierQuotation(ScmBusinessObjectBase):
+    quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6, default=0)
     STATUS_CHOICES = [
         ("draft", "草稿"), ("saved", "已保存"), ("submitted", "已提交"),
         ("received", "已接收"), ("closed", "已关闭"), ("cancelled", "已取消"),
@@ -300,7 +305,7 @@ class QuoteComparisonFact(models.Model):
     supplier_quote_evidence = models.JSONField(default=list)
     material_code = models.CharField(max_length=100)
     material_name = models.CharField(max_length=240)
-    quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6)
     # 一个比较事实含多家供应商报价；本字段保存逐报价金额集合，禁止仅保存最低价供应商。
     quotation_amount = models.JSONField(default=list)
     lowest_price = models.DecimalField(max_digits=18, decimal_places=4)
@@ -753,9 +758,9 @@ class PurchaseOrder(models.Model):
             return False
 
         # 检查所有明细的实际交货数量总和是否等于计划数量总和
-        total_planned = self.items.aggregate(total=models.Sum("quantity"))["total"] or 0
+        total_planned = exact_total(self.items,'quantity')
         total_actual = (
-            self.items.aggregate(total=models.Sum("actual_quantity"))["total"] or 0
+            exact_total(self.items,'actual_quantity')
         )
 
         return total_planned > 0 and total_actual >= total_planned
@@ -806,16 +811,14 @@ class PurchaseOrderItem(models.Model):
     )
 
     # 计划字段（只定义一次，添加 verbose_name）
-    quantity = models.DecimalField("计划数量", max_digits=12, decimal_places=2)
+    quantity = ExactNativeQuantityField("计划数量", max_digits=16, decimal_places=6, legacy_decimal_places=2)
     unit_price = models.DecimalField(
         "计划单价", max_digits=12, decimal_places=4, default=0
     )
     amount = models.DecimalField("计划金额", max_digits=12, decimal_places=2, default=0)
 
     # 实际交货字段（新增）
-    actual_quantity = models.DecimalField(
-        "实际交货数量", max_digits=12, decimal_places=2, null=True, blank=True
-    )
+    actual_quantity = ExactNativeQuantityField("实际交货数量", max_digits=16, decimal_places=6, legacy_decimal_places=2, null=True, blank=True)
     actual_unit_price = models.DecimalField(
         "实际交货单价", max_digits=12, decimal_places=4, null=True, blank=True
     )
@@ -839,6 +842,7 @@ class PurchaseOrderItem(models.Model):
 
 
 class PurchaseReceipt(ScmBusinessObjectBase):
+    quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6, default=0)
     STATUS_CHOICES = [
         ("draft", "草稿"), ("receiving", "收货中"),
         ("received", "已收货"), ("closed", "已关闭"),
@@ -866,6 +870,7 @@ class PurchaseReceipt(ScmBusinessObjectBase):
 
 
 class PurchaseInspection(ScmBusinessObjectBase):
+    quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6, default=0)
     STATUS_CHOICES = [
         ("pending", "待检验"), ("inspecting", "检验中"),
         ("qualified", "合格"), ("rejected", "不合格"),
@@ -875,8 +880,8 @@ class PurchaseInspection(ScmBusinessObjectBase):
     source_receipt = models.ForeignKey(
         PurchaseReceipt, on_delete=models.PROTECT, related_name="inspections"
     )
-    qualified_quantity = models.DecimalField(max_digits=18, decimal_places=4, default=0)
-    rejected_quantity = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    qualified_quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6, default=0)
+    rejected_quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6, default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     inspection_date = models.DateField(null=True, blank=True)
     inspector_employee = models.ForeignKey(
@@ -987,6 +992,7 @@ class InventoryLot(PurposeSeparatedModel):
 
 
 class WarehouseInbound(PurposeSeparatedModel,ScmBusinessObjectBase):
+    quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6, default=0)
     STATUS_CHOICES = [
         ("planned", "待入库"), ("processing", "入库中"),
         ("completed", "已入库"), ("closed", "已关闭"),
@@ -1050,7 +1056,7 @@ class InventoryBalance(PurposeSeparatedModel):
         InventoryLot, on_delete=models.PROTECT, null=True, blank=True,
         related_name="inventory_balances",
     )
-    quantity = models.DecimalField(max_digits=18, decimal_places=4, default=0)
+    quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -1117,9 +1123,9 @@ class InventoryTransaction(PurposeSeparatedModel):
         related_name="inventory_transactions",
     )
     direction = models.CharField(max_length=8, choices=DIRECTION_CHOICES, default="IN")
-    quantity = models.DecimalField(max_digits=18, decimal_places=4)
-    before_quantity = models.DecimalField(max_digits=18, decimal_places=4)
-    after_quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6)
+    before_quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6)
+    after_quantity = ExactNativeQuantityField(max_digits=20, decimal_places=6)
     operator_employee = models.ForeignKey(
         "pfm.Employee", on_delete=models.PROTECT, related_name="inventory_transactions"
     )

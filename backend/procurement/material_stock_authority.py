@@ -1,3 +1,4 @@
+from .quantity_contract import quantity_text
 """Native raw-stock provenance on the existing receipt/inspection/inbound services."""
 from decimal import Decimal,InvalidOperation
 from django.db import transaction
@@ -17,7 +18,7 @@ CONTRACT='PCE-NATIVE-PRODUCTION-RAW-STOCK-V1'
 PURPOSE='PRODUCTION_USE'
 ACTIONS={'confirm-receipt':'procurement.receipt.receive','create-inspection':'quality.purchase.inspect','transition-inspection':'quality.purchase.inspect','confirm-inbound':'warehouse.purchase.putaway'}
 def fail(code,message,status=409):raise ScmRuntimeActionError(code,message,status)
-def quantity(raw,places=4,*,zero=False):
+def quantity(raw,places=6,*,zero=False):
  if isinstance(raw,(float,bool)):fail('RAW_QUANTITY_INVALID','数量须为准确十进制字符串，不接收float。',400)
  try:
   value=Decimal(str(raw));q=Decimal(1).scaleb(-places)
@@ -47,10 +48,10 @@ def warehouse_resource(warehouse,location):
   audits.append(event.pk)
  return audits
 def row_facts(row):
- result={'type':type(row).__name__,'id':row.pk,'status':row.status,'quantity':format(row.quantity,'.4f'),'items':row.items}
+ result={'type':type(row).__name__,'id':row.pk,'status':row.status,'quantity':quantity_text(row.quantity),'items':row.items}
  for name in ['source_purchase_order_id','source_receipt_id','source_inspection_id','production_transfer_id','warehouse_id','location_id','operator_account_id','inspector_account_id','usage_purpose','qualified_quantity','rejected_quantity']:
   if hasattr(row,name):
-   x=getattr(row,name);result[name]=format(Decimal(str(x)),'.4f') if name in {'qualified_quantity','rejected_quantity'} else x
+   x=getattr(row,name);result[name]=quantity_text(Decimal(str(x))) if name in {'qualified_quantity','rejected_quantity'} else x
  return result
 
 def _numeric_state(state):
@@ -58,7 +59,7 @@ def _numeric_state(state):
  # facts without rewriting the original audit content or its recorded hash.
  result=dict(state)
  for field in ('quantity','qualified_quantity','rejected_quantity'):
-  if field in result:result[field]=format(quantity(result[field],zero=True),'.4f')
+  if field in result:result[field]=quantity_text(quantity(result[field],zero=True))
  return result
 def audit_step(row,action,user,decision,target,reason,source=''):
  state={**row_facts(row),'status':target}
