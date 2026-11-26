@@ -1,0 +1,31 @@
+{
+  "templateCode": "PCE-SCM-BUSINESS-PAGE-ACCEPTANCE-V2",
+  "version": "V1.14.2.8.4.23",
+  "extends": "PCE-ENTERPRISE-PAGE-ACCEPTANCE-MASTER-V1",
+  "extendsFile": "enterprise_page_master_template.json",
+  "moduleCode": "SCM",
+  "executionMode": "read_only",
+  "requiredResultVocabulary": ["PASS", "FAIL", "N/A", "UNKNOWN"],
+  "checks": [
+    { "id": "SCM-001", "name": "对象身份", "facts": ["pageCode", "businessObject"], "evidenceType": "page_identity" },
+    { "id": "SCM-002", "name": "生命周期", "facts": ["currentStatus"], "evidenceType": "status" },
+    { "id": "SCM-003", "name": "Trace", "facts": ["sourceObject", "targetObject", "relationshipType", "traceId", "direction"], "evidenceType": "relationship" },
+    { "id": "SCM-004", "name": "Action", "facts": ["button", "permission", "state"], "evidenceType": "action" },
+    { "id": "SCM-005", "name": "数据边界", "facts": ["writeScope"], "evidenceType": "database_protection" },
+    { "id": "SCM-006", "name": "资金边界", "facts": ["financeImpact"], "evidenceType": "security" },
+    { "id": "SCM-007", "name": "上下游关系", "facts": ["relationship"], "evidenceType": "relationship" },
+    { "id": "SCM-008", "name": "Canary隔离", "facts": ["dataMode"], "evidenceType": "database_protection" }
+  ],
+  "canaryIsolation": {
+    "dataMode": "canary_acceptance",
+    "readOnly": true,
+    "productionApiCallCount": 0,
+    "businessWriteCount": 0,
+    "productionUserDataWritten": false
+  },
+  "releaseRequirements": {
+    "FAIL": 0,
+    "UNKNOWN": 0,
+    "productionUserDataWritten": false
+  }
+}

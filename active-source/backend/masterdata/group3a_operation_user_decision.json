@@ -1,0 +1,22 @@
+{
+  "version": "GROUP3A-OPERATION-USER-DECISION-V2",
+  "userValidated": true,
+  "newOperation": {
+    "name": "拼皮",
+    "sequencePreview": ["开料", "拼皮", "后续工序由具体RoutingStep决定"]
+  },
+  "transitionConfiguration": {
+    "kittingOperationNames": ["白坯检验", "试装", "成品检"],
+    "allOtherCurrentOperations": "GENERAL",
+    "latestDecision": {
+      "operationName": "试装",
+      "from": "GENERAL",
+      "to": "KITTING",
+      "dataProvenance": ["REAL", "USER_VALIDATED"]
+    }
+  },
+  "operationAlias": {
+    "sourceValue": "拉丝",
+    "formalOperationName": "拉丝/打磨"
+  }
+}

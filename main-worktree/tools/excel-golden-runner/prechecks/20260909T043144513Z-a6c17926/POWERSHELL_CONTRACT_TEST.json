@@ -1,0 +1,297 @@
+{
+    "native_excel_executed":  false,
+    "fixture_kind":  "SYNTHETIC_CONTRACT_TEST_ONLY",
+    "checks":  [
+                   {
+                       "name":  "Native script parses under delivered PowerShell",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Normal Open uses exactly three arguments; no repair fallback",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Open uses unchanged isolated path",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Open disables external link update",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Open requires ReadOnly true",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Open returns actual workbook object",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Open failure propagates without repair or repeated attempts",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Workbooks.Open native HRESULT retained",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Calculation stage follows workbook open",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Automatic input variable is not repurposed",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "No workbook save path",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Technical sheet has one fixed isolated identity",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Never reuse or overwrite an existing source sheet for probes",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Reject arbitrary source sheet target",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Owned workbook closed without saving",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Variant type: blank",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "JSON variant roundtrip: blank",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Variant type: boolean",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "JSON variant roundtrip: boolean",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Variant type: number",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "JSON variant roundtrip: number",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Variant type: text",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "JSON variant roundtrip: text",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Variant type: text",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "JSON variant roundtrip: text",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Variant type: error",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "JSON variant roundtrip: error",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Narrow column CVError identity: #DIV/0!",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Raw variant and displayed hashes both retained",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Narrow column CVError identity: #VALUE!",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Raw variant and displayed hashes both retained",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Narrow column CVError identity: #REF!",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Raw variant and displayed hashes both retained",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Missing native error identity never falls back to display text",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Empty text override is not a blank",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Literal quotes escaped",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Zero remains numeric",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "False remains boolean",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Blank override clears only cell contents",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: Double:100",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: Int32:100",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: Int64:100",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: Decimal:0.2",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: Single:1.5",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: Double:0",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: Boolean:False",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: Boolean:True",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: blank",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: String:001",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: String:=not-a-formula",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Typed saved-state restore: String:a\"b",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore preserves original number format",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Empty-string source formula restored as formula",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Restore rejects FALSE silently coerced to numeric zero",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Native restoration never passes an untyped saved object to COM setter",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Actual Native case loop uses tested restoration function",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Native case commits only after verified restoration",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Native failure diagnostics expose case phase",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Session HRESULT retained",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "Exactly one declared PID identity interop",
+                       "status":  "PASS"
+                   },
+                   {
+                       "name":  "PID identity declaration compiles without creating Excel",
+                       "status":  "PASS"
+                   }
+               ],
+    "powershell":  "5.1.26100.9168",
+    "count":  72,
+    "status":  "PASS"
+}

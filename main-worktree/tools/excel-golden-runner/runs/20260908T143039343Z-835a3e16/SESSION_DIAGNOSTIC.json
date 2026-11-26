@@ -1,0 +1,63 @@
+{
+    "run_id":  "20260908T143039343Z-835a3e16",
+    "windows_user":  "PCE-FZG\\DAODA",
+    "runner_pid":  6192,
+    "runner_session":  3,
+    "explorer_processes":  [
+                               {
+                                   "Id":  15792,
+                                   "SessionId":  3
+                               }
+                           ],
+    "excel_registration":  [
+                               {
+                                   "key":  "Registry::HKEY_CLASSES_ROOT\\Excel.Application\\CLSID",
+                                   "value":  "{00024500-0000-0000-C000-000000000046}"
+                               },
+                               {
+                                   "key":  "Registry::HKEY_CLASSES_ROOT\\CLSID\\{00024500-0000-0000-C000-000000000046}\\LocalServer32",
+                                   "value":  "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE /automation"
+                               },
+                               {
+                                   "key":  "Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\excel.exe",
+                                   "value":  "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE"
+                               },
+                               {
+                                   "key":  "Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\excel.exe",
+                                   "value":  "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE"
+                               }
+                           ],
+    "excel_paths":  [
+                        "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE"
+                    ],
+    "errors":  [
+                   {
+                       "time":  "2026-09-08T22:30:53.0427430+08:00",
+                       "chain":  [
+                                     {
+                                         "type":  "System.Runtime.InteropServices.COMException",
+                                         "message":  "不能取得类 Workbooks 的 Open 属性",
+                                         "hresult":  "0x800A03EC"
+                                     }
+                                 ],
+                       "position":  "At D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\native_excel_runner.ps1:72 char:5\r\n+     $workingBook = $books.Open($resolvedCopy,0,$true,$missing,\u0027\u0027,\u0027\u0027,$ ...\r\n+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+                   },
+                   {
+                       "time":  "2026-09-08T22:30:53.6365144+08:00",
+                       "chain":  [
+                                     {
+                                         "type":  "System.Management.Automation.RuntimeException",
+                                         "message":  "NATIVE EXCEL EXECUTION BLOCKED; diagnostics saved",
+                                         "hresult":  "0x80131501"
+                                     }
+                                 ],
+                       "position":  "At D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\run_excel_golden_validation.ps1:87 char:49\r\n+ ... e \u0027PASS\u0027) { throw \u0027NATIVE EXCEL EXECUTION BLOCKED; diagnostics saved\u0027 ...\r\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+                   }
+               ],
+    "elevated":  false,
+    "excel_process":  {
+                          "pid":  14136,
+                          "session":  3,
+                          "started":  "2026-09-08T22:30:44.8261959+08:00"
+                      }
+}

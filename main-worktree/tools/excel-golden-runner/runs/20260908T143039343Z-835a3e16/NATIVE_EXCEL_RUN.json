@@ -1,0 +1,41 @@
+{
+    "run_id":  "20260908T143039343Z-835a3e16",
+    "mode":  "USER_SESSION_NATIVE",
+    "execution_status":  "BLOCKED",
+    "validation_status":  "BLOCKED",
+    "source_sha":  "7ED132C13F6F7B13F5805F3872EC06528D9342A8E821A4D6F3D8B571243FB122",
+    "source_sha_after":  "7ED132C13F6F7B13F5805F3872EC06528D9342A8E821A4D6F3D8B571243FB122",
+    "run_copy_sha":  "7ED132C13F6F7B13F5805F3872EC06528D9342A8E821A4D6F3D8B571243FB122",
+    "run_copy_sha_after":  "7ED132C13F6F7B13F5805F3872EC06528D9342A8E821A4D6F3D8B571243FB122",
+    "original_unchanged":  true,
+    "windows_user":  "PCE-FZG\\DAODA",
+    "session_id":  3,
+    "excel_pid":  14136,
+    "excel_version":  "16.0",
+    "calculation_start":  null,
+    "calculation_end":  null,
+    "result_count":  0,
+    "exit_code":  2,
+    "started_at":  "2026-09-08T22:30:39.3715700+08:00",
+    "finished_at":  "2026-09-08T22:30:53.6676391+08:00",
+    "workbook_copy":  "D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\runs\\20260908T143039343Z-835a3e16\\source-readonly-copy.xlsx",
+    "update_links":  0,
+    "macros_disabled":  true,
+    "original_saved":  false,
+    "package_manifest_sha":  "B3B3B8ADB81922D6D4FF390A94C95F05565F313F7E563E73505312DE4F10A905",
+    "plan_sha":  "69B13474D189376EAB39FD510417BA3085386009BAE57CFAD10871168BBEFE0F",
+    "error":  {
+                  "time":  "2026-09-08T22:30:53.6365144+08:00",
+                  "chain":  [
+                                {
+                                    "type":  "System.Management.Automation.RuntimeException",
+                                    "message":  "NATIVE EXCEL EXECUTION BLOCKED; diagnostics saved",
+                                    "hresult":  "0x80131501"
+                                }
+                            ],
+                  "position":  "At D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\run_excel_golden_validation.ps1:87 char:49\r\n+ ... e \u0027PASS\u0027) { throw \u0027NATIVE EXCEL EXECUTION BLOCKED; diagnostics saved\u0027 ...\r\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+              },
+    "cleanup_errors":  [
+
+                       ]
+}

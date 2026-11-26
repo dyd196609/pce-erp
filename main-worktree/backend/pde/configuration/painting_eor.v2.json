@@ -1,0 +1,4682 @@
+{
+  "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+  "companyId": 1,
+  "version": "V2",
+  "modes": [],
+  "rules": [
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC16",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000016",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 16,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1150,
+            "sequence": 13,
+            "operationId": 16
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 236,
+            "standardCapacityCode": "CAP202610000236",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!S12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 17,
+          "standardCapacityId": 236,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC17",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000017",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 17,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1151,
+            "sequence": 14,
+            "operationId": 17
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 237,
+            "standardCapacityCode": "CAP202610000237",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!T12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 18,
+          "standardCapacityId": 237,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC18",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000018",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 18,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1152,
+            "sequence": 15,
+            "operationId": 18
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 238,
+            "standardCapacityCode": "CAP202610000238",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!U12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 19,
+          "standardCapacityId": 238,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC20",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000020",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 20,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1153,
+            "sequence": 16,
+            "operationId": 20
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 239,
+            "standardCapacityCode": "CAP202610000239",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!W12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 21,
+          "standardCapacityId": 239,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC21",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000021",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 21,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1154,
+            "sequence": 17,
+            "operationId": 21
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 240,
+            "standardCapacityCode": "CAP202610000240",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!X12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 22,
+          "standardCapacityId": 240,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC22",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000022",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 22,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1155,
+            "sequence": 18,
+            "operationId": 22
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 241,
+            "standardCapacityCode": "CAP202610000241",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!Y12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 23,
+          "standardCapacityId": 241,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC23",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000023",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 23,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1156,
+            "sequence": 19,
+            "operationId": 23
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 242,
+            "standardCapacityCode": "CAP202610000242",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!Z12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 24,
+          "standardCapacityId": 242,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC24",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000024",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 24,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1157,
+            "sequence": 20,
+            "operationId": 24
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 243,
+            "standardCapacityCode": "CAP202610000243",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!AA12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 25,
+          "standardCapacityId": 243,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC25",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000025",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 25,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1158,
+            "sequence": 21,
+            "operationId": 25
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 244,
+            "standardCapacityCode": "CAP202610000244",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!AB12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 26,
+          "standardCapacityId": 244,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC26",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000026",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 26,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1159,
+            "sequence": 22,
+            "operationId": 26
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 245,
+            "standardCapacityCode": "CAP202610000245",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!AC12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 27,
+          "standardCapacityId": 245,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC27",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000027",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 27,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1160,
+            "sequence": 23,
+            "operationId": 27
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 246,
+            "standardCapacityCode": "CAP202610000246",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!AD12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 28,
+          "standardCapacityId": 246,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC28",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000028",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 28,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1161,
+            "sequence": 24,
+            "operationId": 28
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 247,
+            "standardCapacityCode": "CAP202610000247",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!AE12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 29,
+          "standardCapacityId": 247,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT11.PROC29",
+      "ruleName": "完整工艺码QSFB/FM逐对象见光面积 / PROC202608000029",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 29,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "QSFB/FM",
+          "formalProductTypeId": 11,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1162,
+            "sequence": 25,
+            "operationId": 29
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 248,
+            "standardCapacityCode": "CAP202610000248",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!AF12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "417deea6401daafda6c5de41b9e9def86b2149355a7dc53bd73a66ac6b2a3f75"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 30,
+          "standardCapacityId": 248,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "QSFB/FM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC16",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000016",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 16,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 131,
+            "sequence": 14,
+            "operationId": 16
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 617,
+            "standardCapacityCode": "CAP202610000617",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!S29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 17,
+          "standardCapacityId": 617,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC17",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000017",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 17,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 132,
+            "sequence": 15,
+            "operationId": 17
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 618,
+            "standardCapacityCode": "CAP202610000618",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!T29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 18,
+          "standardCapacityId": 618,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC18",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000018",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 18,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 133,
+            "sequence": 16,
+            "operationId": 18
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 619,
+            "standardCapacityCode": "CAP202610000619",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!U29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 19,
+          "standardCapacityId": 619,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC19",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000019",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 19,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 134,
+            "sequence": 17,
+            "operationId": 19
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 620,
+            "standardCapacityCode": "CAP202610000620",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!V29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 20,
+          "standardCapacityId": 620,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC20",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000020",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 20,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 135,
+            "sequence": 18,
+            "operationId": 20
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 621,
+            "standardCapacityCode": "CAP202610000621",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!W29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 21,
+          "standardCapacityId": 621,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC21",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000021",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 21,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 136,
+            "sequence": 19,
+            "operationId": 21
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 622,
+            "standardCapacityCode": "CAP202610000622",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!X29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 22,
+          "standardCapacityId": 622,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC22",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000022",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 22,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 137,
+            "sequence": 20,
+            "operationId": 22
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 623,
+            "standardCapacityCode": "CAP202610000623",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!Y29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 23,
+          "standardCapacityId": 623,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC23",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000023",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 23,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 138,
+            "sequence": 21,
+            "operationId": 23
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 624,
+            "standardCapacityCode": "CAP202610000624",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!Z29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 24,
+          "standardCapacityId": 624,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC24",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000024",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 24,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 139,
+            "sequence": 22,
+            "operationId": 24
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 625,
+            "standardCapacityCode": "CAP202610000625",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!AA29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 25,
+          "standardCapacityId": 625,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC25",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000025",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 25,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 140,
+            "sequence": 23,
+            "operationId": 25
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 626,
+            "standardCapacityCode": "CAP202610000626",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!AB29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 26,
+          "standardCapacityId": 626,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC26",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000026",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 26,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 141,
+            "sequence": 24,
+            "operationId": 26
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 627,
+            "standardCapacityCode": "CAP202610000627",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!AC29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 27,
+          "standardCapacityId": 627,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC27",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000027",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 27,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 142,
+            "sequence": 25,
+            "operationId": 27
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 628,
+            "standardCapacityCode": "CAP202610000628",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!AD29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 28,
+          "standardCapacityId": 628,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC28",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000028",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 28,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 143,
+            "sequence": 26,
+            "operationId": 28
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 629,
+            "standardCapacityCode": "CAP202610000629",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!AE29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 29,
+          "standardCapacityId": 629,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT28.PROC29",
+      "ruleName": "完整工艺码BTKF/GT逐对象见光面积 / PROC202608000029",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 29,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/GT",
+          "formalProductTypeId": 28,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 5,
+            "routingCode": "BTKF/GT",
+            "routingVersionId": 5,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 144,
+            "sequence": 27,
+            "operationId": 29
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 630,
+            "standardCapacityCode": "CAP202610000630",
+            "productTypeId": 28,
+            "productTypeCode": "BTKF/GT",
+            "sourceCell": "标准产能!AF29",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2e2b51e08d057ce7c332a06154385abd61294e309f3d19974ba26edbfc0bd8b6"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 30,
+          "standardCapacityId": 630,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/GT",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC16",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000016",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 16,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 161,
+            "sequence": 14,
+            "operationId": 16
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 318,
+            "standardCapacityCode": "CAP202610000318",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!S16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 17,
+          "standardCapacityId": 318,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC17",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000017",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 17,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 162,
+            "sequence": 15,
+            "operationId": 17
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 319,
+            "standardCapacityCode": "CAP202610000319",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!T16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 18,
+          "standardCapacityId": 319,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC18",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000018",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 18,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 163,
+            "sequence": 16,
+            "operationId": 18
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 320,
+            "standardCapacityCode": "CAP202610000320",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!U16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 19,
+          "standardCapacityId": 320,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC19",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000019",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 19,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 164,
+            "sequence": 17,
+            "operationId": 19
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 321,
+            "standardCapacityCode": "CAP202610000321",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!V16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 20,
+          "standardCapacityId": 321,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC20",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000020",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 20,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 165,
+            "sequence": 18,
+            "operationId": 20
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 322,
+            "standardCapacityCode": "CAP202610000322",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!W16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 21,
+          "standardCapacityId": 322,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC21",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000021",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 21,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 166,
+            "sequence": 19,
+            "operationId": 21
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 323,
+            "standardCapacityCode": "CAP202610000323",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!X16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 22,
+          "standardCapacityId": 323,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC22",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000022",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 22,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 167,
+            "sequence": 20,
+            "operationId": 22
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 324,
+            "standardCapacityCode": "CAP202610000324",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!Y16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 23,
+          "standardCapacityId": 324,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC23",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000023",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 23,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 168,
+            "sequence": 21,
+            "operationId": 23
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 325,
+            "standardCapacityCode": "CAP202610000325",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!Z16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 24,
+          "standardCapacityId": 325,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC24",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000024",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 24,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 169,
+            "sequence": 22,
+            "operationId": 24
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 326,
+            "standardCapacityCode": "CAP202610000326",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!AA16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 25,
+          "standardCapacityId": 326,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC25",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000025",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 25,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 170,
+            "sequence": 23,
+            "operationId": 25
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 327,
+            "standardCapacityCode": "CAP202610000327",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!AB16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 26,
+          "standardCapacityId": 327,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC26",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000026",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 26,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 171,
+            "sequence": 24,
+            "operationId": 26
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 328,
+            "standardCapacityCode": "CAP202610000328",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!AC16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 27,
+          "standardCapacityId": 328,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC27",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000027",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 27,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 172,
+            "sequence": 25,
+            "operationId": 27
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 329,
+            "standardCapacityCode": "CAP202610000329",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!AD16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 28,
+          "standardCapacityId": 329,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC28",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000028",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 28,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 173,
+            "sequence": 26,
+            "operationId": 28
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 330,
+            "standardCapacityCode": "CAP202610000330",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!AE16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 29,
+          "standardCapacityId": 330,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "PAINT-FULL-CODE.PCT15.PROC29",
+      "ruleName": "完整工艺码BTKF/SM逐对象见光面积 / PROC202608000029",
+      "version": "V2",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA-EOR",
+          "version": "V2"
+        },
+        "expression": "area_quantity",
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "sourceCanonicalField": "PaintingProcessAreaQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "painting_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 29,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "PAINTING_PROCESS_VISIBLE_AREA"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "areaType": "VISIBLE_AREA",
+          "productPaintingProcessCode": "BTKF/SM",
+          "formalProductTypeId": 15,
+          "quantityBasisDecision": "逐对象正式PaintingProcessAreaQuantity直接作为需求，不乘销售订单行数量；SOURCE_SCOPE_TOTAL只保存来源基数",
+          "formalRouting": {
+            "routingId": 6,
+            "routingCode": "BTKF/SM",
+            "routingVersionId": 6,
+            "routingVersion": "SYSTEM_INITIAL_VERSION",
+            "status": "released",
+            "routingStepId": 174,
+            "sequence": 27,
+            "operationId": 29
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 331,
+            "standardCapacityCode": "CAP202610000331",
+            "productTypeId": 15,
+            "productTypeCode": "BTKF/SM",
+            "sourceCell": "标准产能!AF16",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67",
+            "sourceRulesHash": "2d1f2fdacf98db35315bf3b9792c89d2c9bf6dad8dd5b11fca58f5945a812f1d"
+          },
+          "operationScopeDecision": "正式已发布油漆路线步骤与正式产能来源合同适用工序的显式配置；不按名称选择工序，不生成非适用工序",
+          "unitDecision": "输入、制造模式、工序、EOR与StandardCapacity同为UOM18面积，产能时间基准为1 day；无单位换算，不使用标准工时",
+          "stopBoundary": "仅EOR，完成后停止，不进入APS、计划、采购、BOM或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 30,
+          "standardCapacityId": 331,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 2
+          },
+          "sourceSelector": {
+            "canonicalField": "PaintingProcessAreaQuantity",
+            "producerRuleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+            "producerRuleVersion": "V2",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+              "ProductPaintingProcessCode": "BTKF/SM",
+              "AreaType": "VISIBLE_AREA"
+            },
+            "objectTraceKeys": [
+              "baseEngineeringCalculationId",
+              "ProductPaintingProcessCode",
+              "AreaType",
+              "baselineId",
+              "baselineItemId",
+              "designItemId",
+              "sourceAttributeId",
+              "sourceFactId",
+              "InputHash",
+              "outputKey"
+            ],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    }
+  ]
+}

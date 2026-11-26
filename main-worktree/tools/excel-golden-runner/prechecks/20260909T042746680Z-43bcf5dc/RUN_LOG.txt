@@ -1,0 +1,12 @@
+2026-09-09T12:27:46.9513927+08:00 正在检查 Microsoft Excel……
+2026-09-09T12:27:47.0765752+08:00 正在验证原始工作簿……
+2026-09-09T12:27:47.0963685+08:00 正在创建只读验证副本……
+2026-09-09T12:28:04.6756713+08:00 EXCEL GOLDEN VALIDATION = BLOCKED. c:\Users\DAODA\appdata\Local\Temp\z1h00ius.0.cs(6) : 类、结构或接口成员声明中的标记“=”无效
+
+c:\Users\DAODA\appdata\Local\Temp\z1h00ius.0.cs(5) :     public bool HasFormula { get; private set; }
+
+c:\Users\DAODA\appdata\Local\Temp\z1h00ius.0.cs(6) : >>>     public string NumberFormat { get; set; } = "General";
+
+c:\Users\DAODA\appdata\Local\Temp\z1h00ius.0.cs(7) :     public int Writes { get; private set; }
+
+2026-09-09T12:28:04.7388078+08:00 完成。结果目录：D:\Dev-PCE\Source\tools\excel-golden-runner\prechecks\20260909T042746680Z-43bcf5dc

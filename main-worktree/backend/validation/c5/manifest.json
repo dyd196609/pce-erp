@@ -1,0 +1,61 @@
+{
+  "baselineId": "PCE-C5-REAL-SESSION-ACTOR-BASELINE-V1",
+  "purpose": "C5 Gate verification only",
+  "createdAt": "2026-09-28T06:01:59.3300670+08:00",
+  "canonicalPath": "backend/validation/c5/c5-validation-baseline.sqlite3",
+  "gateInputPath": "backend/db.sqlite3",
+  "generatorPath": "backend/scripts/build_c5_validation_baseline.py",
+  "generationMethod": "Create the declared Django model tables directly with schema_editor in a new SQLite file; do not read another database and do not run migrations; insert only the fixed COMP001 root company; set fixed SQLite pragmas and VACUUM.",
+  "sha256": "0840a70e7d2f3965fcfc038977841d9babc0354101b5c7cce14f89552fc39f67",
+  "bytes": 888832,
+  "tableCountIncludingInternal": 47,
+  "keyFactCounts": {
+    "system_company": 1,
+    "user_system": 0,
+    "employee": 0,
+    "system_department": 0,
+    "system_position": 0,
+    "system_responsibility": 0,
+    "system_role": 0,
+    "system_permission": 0,
+    "system_rolepermission": 0,
+    "system_user_role_scope_assignments": 0,
+    "sales_customer": 0,
+    "masterdata_external_identity": 0,
+    "masterdata_write_request": 0
+  },
+  "rootFacts": [
+    {
+      "table": "system_company",
+      "id": 1,
+      "code": "COMP001",
+      "name": "C5隔离验证企业",
+      "isActive": true
+    }
+  ],
+  "productionBusinessFacts": 0,
+  "migrationUsed": false,
+  "protectedProductionDatabaseAccessed": false,
+  "reproducibility": {
+    "independentBuildCount": 2,
+    "hashesEqual": true,
+    "expectedSha256": "0840a70e7d2f3965fcfc038977841d9babc0354101b5c7cce14f89552fc39f67"
+  },
+  "isolation": {
+    "allowedConsumers": [
+      "verify:pce-formal-import-real-session-actor",
+      "C5 build verification"
+    ],
+    "forbiddenUses": [
+      "business runtime",
+      "production runtime",
+      "formal business data storage",
+      "BOM generation",
+      "BOM Version generation",
+      "operation requirement generation",
+      "ProductionPlan generation",
+      "MRP",
+      "APS"
+    ]
+  }
+}

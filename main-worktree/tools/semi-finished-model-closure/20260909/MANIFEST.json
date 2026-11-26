@@ -1,0 +1,51 @@
+{
+  "status": "ISOLATED_TESTED_NOT_PRODUCTION_APPLIED",
+  "productionApplied": false,
+  "sourceHead": "6058ee03022ac1f4ef7a40905aef32f0dd2e294e",
+  "target": "canonical pde models and original db_table names",
+  "baselineProductionModelsSha256": "8920F7BBDB1FB2DD7785F1C9E8AD257A65F0725CDEFF7DD9BC1428F84FE3CADB",
+  "baselineDatabaseSha256": "9DADFB55D446DF052A4DCF6CF2EE552906939FD1B65D7D899C5FD8C1AC368F5C",
+  "files": [
+    {
+      "canonicalPath": "backend/pde/models.py",
+      "packagePath": "candidate\\backend\\pde\\models.py",
+      "sha256": "9964F83FD7BC95CF807E1DD137455A0600B2625992BF3957CF86AC730952B099"
+    },
+    {
+      "canonicalPath": "backend/pde/material_configuration_models.py",
+      "packagePath": "candidate\\backend\\pde\\material_configuration_models.py",
+      "sha256": "9019A62B893125A5E497B51F8A41D635C9B8E0D17B2ADDF6684C22057AE2A1E1"
+    },
+    {
+      "canonicalPath": "backend/pde/material_configuration_service.py",
+      "packagePath": "candidate\\backend\\pde\\material_configuration_service.py",
+      "sha256": "BCF53CB4C3C28EE4BBDB10FBC9DA1BA15C4FB6AC3D52BCC02167AEF47CE4C720"
+    },
+    {
+      "canonicalPath": "backend/pde/material_configuration_serializers.py",
+      "packagePath": "candidate\\backend\\pde\\material_configuration_serializers.py",
+      "sha256": "B3B356778D619B878DDD86F02D19FBB71874A08521775EC3AEC9A6E838481904"
+    },
+    {
+      "canonicalPath": "backend/pde/order_engineered_product_service.py",
+      "packagePath": "candidate\\backend\\pde\\order_engineered_product_service.py",
+      "sha256": "3AA8D8B250AF1E39638B9ADA4B585B21DFC1EDDEE06D9E605CB7B6B6FEF4730B"
+    },
+    {
+      "canonicalPath": "backend/pde/migrations/0024_restore_material_contract_state.py",
+      "packagePath": "candidate\\backend\\pde\\migrations\\0024_restore_material_contract_state.py",
+      "sha256": "870B040621604FD131DC5A926AD15B408F54831BB7F2D240C66FF163179C4FF4"
+    },
+    {
+      "canonicalPath": "backend/pde/migrations/0025_material_configuration_applicability_quantity.py",
+      "packagePath": "candidate\\backend\\pde\\migrations\\0025_material_configuration_applicability_quantity.py",
+      "sha256": "4FD6578D11BC482A53F6631606BF10BA73ED4E43D9827A6FB0F0593AE5ABA962"
+    }
+  ],
+  "rules": "No production apply runner. Separate authorization and schema preflight required.",
+  "patchCheck": {
+    "status": "PASS",
+    "readOnly": true,
+    "sha256": "16F87FE8FED463ECE9D167D0FE263A120096FB5FF11DC11ABF6B42A72D212BF3"
+  }
+}

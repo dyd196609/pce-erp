@@ -1,0 +1,2989 @@
+{
+  "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+  "companyId": 1,
+  "modes": [],
+  "rules": [
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT1",
+      "ruleName": "板材总净面积承接开料 / MQ/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 1,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 1,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT2",
+      "ruleName": "板材总净面积承接开料 / BTKF/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 2,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 11,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT3",
+      "ruleName": "板材总净面积承接开料 / QSKF/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 3,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 36,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT4",
+      "ruleName": "板材总净面积承接开料 / HTKF/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 4,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 58,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT5",
+      "ruleName": "板材总净面积承接开料 / HBKF/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 5,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 80,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT6",
+      "ruleName": "板材总净面积承接开料 / MCSKF/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 6,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 103,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT7",
+      "ruleName": "板材总净面积承接开料 / DCSKF/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 7,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 128,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT8",
+      "ruleName": "板材总净面积承接开料 / BCSKF/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 8,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 153,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT9",
+      "ruleName": "板材总净面积承接开料 / FGKF/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 9,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 178,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT10",
+      "ruleName": "板材总净面积承接开料 / ZJKF/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 10,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 203,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT11",
+      "ruleName": "板材总净面积承接开料 / QSFB/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 228,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT12",
+      "ruleName": "板材总净面积承接开料 / HYFB/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 12,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 252,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT13",
+      "ruleName": "板材总净面积承接开料 / MLY/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 13,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 275,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT14",
+      "ruleName": "板材总净面积承接开料 / MQ/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 14,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 300,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT15",
+      "ruleName": "板材总净面积承接开料 / BTKF/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 15,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 310,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT16",
+      "ruleName": "板材总净面积承接开料 / QSKF/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 16,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 335,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT17",
+      "ruleName": "板材总净面积承接开料 / HTKF/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 17,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 357,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT18",
+      "ruleName": "板材总净面积承接开料 / HBKF/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 18,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 379,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT19",
+      "ruleName": "板材总净面积承接开料 / MCSKF/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 19,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 402,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT20",
+      "ruleName": "板材总净面积承接开料 / DCSKF/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 20,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 427,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT21",
+      "ruleName": "板材总净面积承接开料 / BCSKF/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 21,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 452,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT22",
+      "ruleName": "板材总净面积承接开料 / FGKF/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 22,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 477,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT23",
+      "ruleName": "板材总净面积承接开料 / ZJKF/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 23,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 502,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT24",
+      "ruleName": "板材总净面积承接开料 / QSFB/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 24,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 527,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT25",
+      "ruleName": "板材总净面积承接开料 / HYFB/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 25,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 551,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT26",
+      "ruleName": "板材总净面积承接开料 / MLY/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 26,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 574,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT27",
+      "ruleName": "板材总净面积承接开料 / MQ/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 27,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 599,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT28",
+      "ruleName": "板材总净面积承接开料 / BTKF/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 28,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 609,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT29",
+      "ruleName": "板材总净面积承接开料 / QSKF/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 29,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 634,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT30",
+      "ruleName": "板材总净面积承接开料 / HTKF/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 30,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 656,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT31",
+      "ruleName": "板材总净面积承接开料 / HBKF/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 31,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 678,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT32",
+      "ruleName": "板材总净面积承接开料 / MCSKF/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 32,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 701,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT33",
+      "ruleName": "板材总净面积承接开料 / DCSKF/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 33,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 726,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT34",
+      "ruleName": "板材总净面积承接开料 / BCSKF/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 34,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 751,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT35",
+      "ruleName": "板材总净面积承接开料 / FGKF/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 35,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 776,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT36",
+      "ruleName": "板材总净面积承接开料 / ZJKF/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 36,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 801,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT37",
+      "ruleName": "板材总净面积承接开料 / QSFB/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 37,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 826,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT38",
+      "ruleName": "板材总净面积承接开料 / HYFB/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 38,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 850,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT39",
+      "ruleName": "板材总净面积承接开料 / MLY/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 39,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 873,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT40",
+      "ruleName": "板材总净面积承接开料 / ZJFB/FM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 40,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 898,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT41",
+      "ruleName": "板材总净面积承接开料 / ZJFB/SM",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 41,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 923,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-TOTAL-CUTTING.PCT42",
+      "ruleName": "板材总净面积承接开料 / ZJFB/GT",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-CUTTING",
+          "version": "V1"
+        },
+        "expression": "source_quantity",
+        "inputs": [
+          {
+            "canonicalName": "source_quantity",
+            "sourceCanonicalField": "BoardNetAreaSummary",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "operation_quantity",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "uomId": 18,
+            "operationId": 1,
+            "productTypeId": 42,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "fact_extension"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-AREA",
+          "modeVersion": "V1",
+          "workCenterId": 1,
+          "standardCapacityId": 948,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "BoardNetAreaSummary",
+            "producerRuleCode": "BOARD-NET-AREA-SUMMARY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {
+              "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+            }
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    }
+  ]
+}

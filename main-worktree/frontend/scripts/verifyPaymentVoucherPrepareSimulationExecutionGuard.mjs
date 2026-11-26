@@ -1,0 +1,58 @@
+﻿import {
+  runPaymentVoucherPrepareSimulationExecutionGuardTestMatrix,
+} from '../src/meta/finance/payment-voucher-prepare-simulation/paymentVoucherPrepareSimulationExecutionGuardTestMatrix.js'
+
+const report = runPaymentVoucherPrepareSimulationExecutionGuardTestMatrix()
+
+console.log('椤甸潰鐗堟湰鐩爣锛歏1.13.68.1')
+console.log(`鎵ц闃叉姢娴嬭瘯鐭╅樀鐗堟湰锛?{report.matrixVersion}`)
+console.log(`鎵ц闃叉姢娴嬭瘯鐭╅樀妯″紡锛?{report.matrixMode}`)
+console.log(`鏉冮檺绛栫暐鐗堟湰锛?{report.permissionVersion}`)
+console.log(`鏉冮檺涓婁笅鏂囧瓧娈垫暟锛?{report.permissionContextFieldCount}`)
+console.log(`鏉冮檺绛栫暐鎸囩汗锛?{report.permissionPolicyFingerprint}`)
+console.log(`鏉冮檺绛栫暐閿佸畾鎸囩汗锛?{report.permissionPolicyLockedFingerprint}`)
+console.log(`浜屾纭濂戠害鐗堟湰锛?{report.confirmationVersion}`)
+console.log(`浜屾纭瀛楁鏁帮細${report.confirmationFieldCount}`)
+console.log(`浜屾纭瑕佹眰鏁帮細${report.confirmationRequirementCount}`)
+console.log(`浜屾纭濂戠害鎸囩汗锛?{report.confirmationContractFingerprint}`)
+console.log(`浜屾纭閿佸畾鎸囩汗锛?{report.confirmationLockedFingerprint}`)
+console.log(`娌欑绛栫暐鐗堟湰锛?{report.sandboxVersion}`)
+console.log(`鏁堟灉娓呭崟鐗堟湰锛?{report.effectManifestVersion}`)
+console.log(`鏁堟灉瀛楁鏁帮細${report.effectFieldCount}`)
+console.log(`鏁堟灉缂栫爜鏁帮細${report.effectManifestCount}`)
+console.log(`鍏佽绾嚱鏁伴瑙堟晥鏋滄暟锛?{report.allowedPurePreviewEffectCount}`)
+console.log(`绛栫暐绂佹鏁堟灉鏁帮細${report.forbiddenByPolicyEffectCount}`)
+console.log(`褰撳墠璺敱鍏佽鏁堟灉鏁帮細${report.allowedCurrentRouteEffectCount}`)
+console.log(`褰撳墠璺敱绂佹鏁堟灉鏁帮細${report.currentRouteForbiddenEffectCount}`)
+console.log(`褰撳墠璺敱鎷熸墽琛屾晥鏋滄暟锛?{report.currentRouteProposedEffectCount}`)
+console.log(`娌欑绛栫暐鎸囩汗锛?{report.sandboxPolicyFingerprint}`)
+console.log(`娌欑绛栫暐閿佸畾鎸囩汗锛?{report.sandboxPolicyLockedFingerprint}`)
+console.log(`娴嬭瘯鐢ㄤ緥鏁帮細${report.testCaseCount}`)
+console.log(`閫氳繃鐢ㄤ緥鏁帮細${report.passedCaseCount}`)
+console.log(`澶辫触鐢ㄤ緥鏁帮細${report.failedCaseCount}`)
+console.log(`鏂█鏁帮細${report.assertionCount}`)
+console.log(`澶辫触鏂█鏁帮細${report.failedAssertionCount}`)
+console.log(`褰撳墠姝ｅ父 PEP 鏉冮檺鐘舵€侊細${report.currentPermission.permissionDecisionStatus}`)
+console.log(`UNKNOWN-PEP 鏉冮檺鐘舵€侊細${report.unknownPermission.permissionDecisionStatus}`)
+console.log(`褰撳墠姝ｅ父 PEP 浜屾纭鐘舵€侊細${report.currentConfirmation.confirmationDecisionStatus}`)
+console.log(`UNKNOWN-PEP 浜屾纭鐘舵€侊細${report.unknownConfirmation.confirmationDecisionStatus}`)
+console.log(`褰撳墠姝ｅ父 PEP 娌欑鍑嗗叆鐘舵€侊細${report.currentSandbox.sandboxAdmissionStatus}`)
+console.log(`UNKNOWN-PEP 娌欑鍑嗗叆鐘舵€侊細${report.unknownSandbox.sandboxAdmissionStatus}`)
+console.log(`鐪熷疄鎺堟潈鏁伴噺锛?{report.protection.realPermissionGrantedCount}`)
+console.log(`鐪熷疄浜屾纭瀹屾垚鏁伴噺锛?{report.protection.realSecondConfirmationCompletedCount}`)
+console.log(`鐪熷疄娌欑杩涘叆鏁伴噺锛?{report.protection.realSandboxEnteredCount}`)
+console.log(`鐪熷疄妯℃嫙璇锋眰鍒涘缓鏁伴噺锛?{report.protection.realSimulationRequestCreatedCount}`)
+console.log(`鐪熷疄妯℃嫙缁撴灉鍒涘缓鏁伴噺锛?{report.protection.realSimulationResultCreatedCount}`)
+console.log(`鐪熷疄瀹¤浜嬩欢鍒涘缓鏁伴噺锛?{report.protection.realAuditEventCreatedCount}`)
+console.log(`姝ｅ紡涓氬姟鍐欏叆璺緞鏁帮細${report.protection.formalBusinessWritePathCount}`)
+console.log(`姝ｅ紡涓氬姟鍐欏叆璁板綍鏁帮細${report.protection.businessDataWrittenCount}`)
+console.log(`姝ｅ紡涓氬姟鍥炴粴璁板綍鏁帮細${report.protection.businessRollbackCount}`)
+console.log(`姝ｅ紡涓氬姟琛ュ伩鎿嶄綔鏁帮細${report.protection.businessCompensationCount}`)
+console.log(`闇€瑕佹竻鐞嗙殑鐪熷疄涓氬姟瀵硅薄鏁帮細${report.protection.realBusinessObjectCleanupRequiredCount}`)
+console.log(`鏁翠綋缁撴灉锛?{report.overallStatus}`)
+
+if (report.overallStatus !== 'passed') {
+  console.log(JSON.stringify(report.failedAssertions, null, 2))
+  process.exitCode = 1
+}
+

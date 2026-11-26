@@ -1,0 +1,5300 @@
+{
+  "oracle": false,
+  "native_executed": false,
+  "results": [
+    {
+      "case_id": "UNIT_FF_b689b5b31e1f",
+      "cell": "拆单基础数据!K2",
+      "formula_family": "FF_b689b5b31e1f",
+      "semantic_name": "横线",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 110
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_e9d129d84a66",
+      "cell": "拆单基础数据!L2",
+      "formula_family": "FF_e9d129d84a66",
+      "semantic_name": "竖线",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 70
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_a1b554a798a5",
+      "cell": "房门单!F2",
+      "formula_family": "FF_a1b554a798a5",
+      "semantic_name": "语义待核对_F",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "1-4-正"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_d3fc62f3d1cb",
+      "cell": "房门单!R2",
+      "formula_family": "FF_d3fc62f3d1cb",
+      "semantic_name": "订单交期",
+      "contract": {
+        "source_number_format": "yy/mm/dd;@",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 45316
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_c44e95df4ffb",
+      "cell": "房门单!U2",
+      "formula_family": "FF_c44e95df4ffb",
+      "semantic_name": "周期",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "木12天  \n油8天"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_0c81aaeeb4aa",
+      "cell": "房门单!F3",
+      "formula_family": "FF_0c81aaeeb4aa",
+      "semantic_name": "语义待核对_F",
+      "contract": {
+        "source_number_format": "0.00_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "上海 大居苑"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_743d4f108af9",
+      "cell": "房门单!M3",
+      "formula_family": "FF_743d4f108af9",
+      "semantic_name": "油漆工艺",
+      "contract": {
+        "source_number_format": "0.00_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "清水封闭"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_916c19053114",
+      "cell": "房门单!P3",
+      "formula_family": "FF_916c19053114",
+      "semantic_name": "木皮",
+      "contract": {
+        "source_number_format": "0.00_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "柚木"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_d28514ba850e",
+      "cell": "房门单!S3",
+      "formula_family": "FF_d28514ba850e",
+      "semantic_name": "坯板",
+      "contract": {
+        "source_number_format": "0.00_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "实木多层板"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_82df6461f465",
+      "cell": "房门单!X3",
+      "formula_family": "FF_82df6461f465",
+      "semantic_name": "客户等级",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "A"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_6131298d871e",
+      "cell": "房门单!I6",
+      "formula_family": "FF_6131298d871e",
+      "semantic_name": "60_18",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_1fbc94502ca1",
+      "cell": "房门单!I8",
+      "formula_family": "FF_1fbc94502ca1",
+      "semantic_name": "50_18",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 57
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_99f21de6ab30",
+      "cell": "房门单!G9",
+      "formula_family": "FF_99f21de6ab30",
+      "semantic_name": "空套",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_ad9acf8a80f4",
+      "cell": "房门单!I9",
+      "formula_family": "FF_ad9acf8a80f4",
+      "semantic_name": "空套板",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 9
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_fa2dd4db99da",
+      "cell": "房门单!K9",
+      "formula_family": "FF_fa2dd4db99da",
+      "semantic_name": "门头板",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_78211945bc71",
+      "cell": "房门单!M9",
+      "formula_family": "FF_78211945bc71",
+      "semantic_name": "门扇",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 5
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_13345f9170f0",
+      "cell": "房门单!O9",
+      "formula_family": "FF_13345f9170f0",
+      "semantic_name": "门套",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_b69691813325",
+      "cell": "房门单!Q9",
+      "formula_family": "FF_b69691813325",
+      "semantic_name": "门套板",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 9
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_fd9445ff72f3",
+      "cell": "房门单!S9",
+      "formula_family": "FF_fd9445ff72f3",
+      "semantic_name": "visible_area_m2",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "房门单!W39 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_2f8e4b6fc8b6",
+      "cell": "房门单!U9",
+      "formula_family": "FF_2f8e4b6fc8b6",
+      "semantic_name": "frame_area_m2",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 8.17846
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_04a7ba17119b",
+      "cell": "房门单!W9",
+      "formula_family": "FF_04a7ba17119b",
+      "semantic_name": "门面板",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 10
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_7e6207dbd768",
+      "cell": "房门单!A11",
+      "formula_family": "FF_7e6207dbd768",
+      "semantic_name": "row_number",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_01649050f825",
+      "cell": "房门单!B11",
+      "formula_family": "FF_01649050f825",
+      "semantic_name": "material_code",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "QSFB4601001"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_7eda01a9afff",
+      "cell": "房门单!C11",
+      "formula_family": "FF_7eda01a9afff",
+      "semantic_name": "process_code",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "QSFB/FM"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_7365d3f62375",
+      "cell": "房门单!D11",
+      "formula_family": "FF_7365d3f62375",
+      "semantic_name": "订单类型_必填",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "正"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_7365d3f62375_0001",
+      "cell": "房门单!D11",
+      "formula_family": "FF_7365d3f62375",
+      "semantic_name": "订单类型_必填",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_fc6fb8c4ccd7",
+      "cell": "房门单!I11",
+      "formula_family": "FF_fc6fb8c4ccd7",
+      "semantic_name": "paint_process",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "清水封闭"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_e5d7975b2645",
+      "cell": "房门单!N11",
+      "formula_family": "FF_e5d7975b2645",
+      "semantic_name": "frame_height_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2035
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e5d7975b2645_0002",
+      "cell": "房门单!N11",
+      "formula_family": "FF_e5d7975b2645",
+      "semantic_name": "frame_height_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e5d7975b2645_0003",
+      "cell": "房门单!N11",
+      "formula_family": "FF_e5d7975b2645",
+      "semantic_name": "frame_height_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2045
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e5d7975b2645_0004",
+      "cell": "房门单!N11",
+      "formula_family": "FF_e5d7975b2645",
+      "semantic_name": "frame_height_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2045
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_cd8350bcc8e1",
+      "cell": "房门单!O11",
+      "formula_family": "FF_cd8350bcc8e1",
+      "semantic_name": "frame_width_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 918
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_cd8350bcc8e1_0005",
+      "cell": "房门单!O11",
+      "formula_family": "FF_cd8350bcc8e1",
+      "semantic_name": "frame_width_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_cd8350bcc8e1_0006",
+      "cell": "房门单!O11",
+      "formula_family": "FF_cd8350bcc8e1",
+      "semantic_name": "frame_width_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 938
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_cd8350bcc8e1_0007",
+      "cell": "房门单!O11",
+      "formula_family": "FF_cd8350bcc8e1",
+      "semantic_name": "frame_width_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 938
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_94d7bbd1bcc8",
+      "cell": "房门单!P11",
+      "formula_family": "FF_94d7bbd1bcc8",
+      "semantic_name": "frame_wall_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 265
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_94d7bbd1bcc8_0008",
+      "cell": "房门单!P11",
+      "formula_family": "FF_94d7bbd1bcc8",
+      "semantic_name": "frame_wall_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_94558f4e733f",
+      "cell": "房门单!Q11",
+      "formula_family": "FF_94558f4e733f",
+      "semantic_name": "frame_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_94558f4e733f_0009",
+      "cell": "房门单!Q11",
+      "formula_family": "FF_94558f4e733f",
+      "semantic_name": "frame_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_e55e6ecbe2f5",
+      "cell": "房门单!R11",
+      "formula_family": "FF_e55e6ecbe2f5",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2002
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e55e6ecbe2f5_0010",
+      "cell": "房门单!R11",
+      "formula_family": "FF_e55e6ecbe2f5",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2007
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e55e6ecbe2f5_0011",
+      "cell": "房门单!R11",
+      "formula_family": "FF_e55e6ecbe2f5",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2002
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e55e6ecbe2f5_0012",
+      "cell": "房门单!R11",
+      "formula_family": "FF_e55e6ecbe2f5",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2002
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e55e6ecbe2f5_0013",
+      "cell": "房门单!R11",
+      "formula_family": "FF_e55e6ecbe2f5",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2002
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e55e6ecbe2f5_0014",
+      "cell": "房门单!R11",
+      "formula_family": "FF_e55e6ecbe2f5",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e55e6ecbe2f5_0015",
+      "cell": "房门单!R11",
+      "formula_family": "FF_e55e6ecbe2f5",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_2ddbe2157997",
+      "cell": "房门单!S11",
+      "formula_family": "FF_2ddbe2157997",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 866
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2ddbe2157997_0016",
+      "cell": "房门单!S11",
+      "formula_family": "FF_2ddbe2157997",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 876
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2ddbe2157997_0017",
+      "cell": "房门单!S11",
+      "formula_family": "FF_2ddbe2157997",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 866
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2ddbe2157997_0018",
+      "cell": "房门单!S11",
+      "formula_family": "FF_2ddbe2157997",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 436.0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2ddbe2157997_0019",
+      "cell": "房门单!S11",
+      "formula_family": "FF_2ddbe2157997",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "872(529,350)"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2ddbe2157997_0020",
+      "cell": "房门单!S11",
+      "formula_family": "FF_2ddbe2157997",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2ddbe2157997_0021",
+      "cell": "房门单!S11",
+      "formula_family": "FF_2ddbe2157997",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_2b9e867ba950",
+      "cell": "房门单!T11",
+      "formula_family": "FF_2b9e867ba950",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 45
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2b9e867ba950_0022",
+      "cell": "房门单!T11",
+      "formula_family": "FF_2b9e867ba950",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2b9e867ba950_0023",
+      "cell": "房门单!T11",
+      "formula_family": "FF_2b9e867ba950",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2b9e867ba950_0024",
+      "cell": "房门单!T11",
+      "formula_family": "FF_2b9e867ba950",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2b9e867ba950_0025",
+      "cell": "房门单!T11",
+      "formula_family": "FF_2b9e867ba950",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2b9e867ba950_0026",
+      "cell": "房门单!T11",
+      "formula_family": "FF_2b9e867ba950",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 45
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2b9e867ba950_0027",
+      "cell": "房门单!T11",
+      "formula_family": "FF_2b9e867ba950",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 45
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_2b9e867ba950_0028",
+      "cell": "房门单!T11",
+      "formula_family": "FF_2b9e867ba950",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 45
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_16c1f81ef2f0",
+      "cell": "房门单!U11",
+      "formula_family": "FF_16c1f81ef2f0",
+      "semantic_name": "leaf_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_16c1f81ef2f0_0029",
+      "cell": "房门单!U11",
+      "formula_family": "FF_16c1f81ef2f0",
+      "semantic_name": "leaf_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_16c1f81ef2f0_0030",
+      "cell": "房门单!U11",
+      "formula_family": "FF_16c1f81ef2f0",
+      "semantic_name": "leaf_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_16c1f81ef2f0_0031",
+      "cell": "房门单!U11",
+      "formula_family": "FF_16c1f81ef2f0",
+      "semantic_name": "leaf_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_16c1f81ef2f0_0032",
+      "cell": "房门单!U11",
+      "formula_family": "FF_16c1f81ef2f0",
+      "semantic_name": "leaf_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_16c1f81ef2f0_0033",
+      "cell": "房门单!U11",
+      "formula_family": "FF_16c1f81ef2f0",
+      "semantic_name": "leaf_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_1aea682eff65",
+      "cell": "房门单!V11",
+      "formula_family": "FF_1aea682eff65",
+      "semantic_name": "uom",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "扇"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_bb1154f33707",
+      "cell": "房门单!W11",
+      "formula_family": "FF_bb1154f33707",
+      "semantic_name": "visible_area_m2",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 4.789283999999999
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_2754778664d5",
+      "cell": "房门单!X11",
+      "formula_family": "FF_2754778664d5",
+      "semantic_name": "frame_area_m2",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1.3218200000000002
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_085a2f26fd1f",
+      "cell": "房门单!Y11",
+      "formula_family": "FF_085a2f26fd1f",
+      "semantic_name": "door_face_panel_count",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_085a2f26fd1f_0034",
+      "cell": "房门单!Y11",
+      "formula_family": "FF_085a2f26fd1f",
+      "semantic_name": "door_face_panel_count",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_085a2f26fd1f_0035",
+      "cell": "房门单!Y11",
+      "formula_family": "FF_085a2f26fd1f",
+      "semantic_name": "door_face_panel_count",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_085a2f26fd1f_0036",
+      "cell": "房门单!Y11",
+      "formula_family": "FF_085a2f26fd1f",
+      "semantic_name": "door_face_panel_count",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 4
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_085a2f26fd1f_0037",
+      "cell": "房门单!Y11",
+      "formula_family": "FF_085a2f26fd1f",
+      "semantic_name": "door_face_panel_count",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_085a2f26fd1f_0038",
+      "cell": "房门单!Y11",
+      "formula_family": "FF_085a2f26fd1f",
+      "semantic_name": "door_face_panel_count",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_085a2f26fd1f_0039",
+      "cell": "房门单!Y11",
+      "formula_family": "FF_085a2f26fd1f",
+      "semantic_name": "door_face_panel_count",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_9f31702900d0",
+      "cell": "房门单!Z11",
+      "formula_family": "FF_9f31702900d0",
+      "semantic_name": "edge_veneer_25_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 9.976
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_9f31702900d0_0040",
+      "cell": "房门单!Z11",
+      "formula_family": "FF_9f31702900d0",
+      "semantic_name": "edge_veneer_25_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 9.976
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_9f31702900d0_0041",
+      "cell": "房门单!Z11",
+      "formula_family": "FF_9f31702900d0",
+      "semantic_name": "edge_veneer_25_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 9.976
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_9f31702900d0_0042",
+      "cell": "房门单!Z11",
+      "formula_family": "FF_9f31702900d0",
+      "semantic_name": "edge_veneer_25_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 10.056
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_9f31702900d0_0043",
+      "cell": "房门单!Z11",
+      "formula_family": "FF_9f31702900d0",
+      "semantic_name": "edge_veneer_25_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 10.056
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_9f31702900d0_0044",
+      "cell": "房门单!Z11",
+      "formula_family": "FF_9f31702900d0",
+      "semantic_name": "edge_veneer_25_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 9.976
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_72be7690c27f",
+      "cell": "房门单!AA11",
+      "formula_family": "FF_72be7690c27f",
+      "semantic_name": "edge_veneer_50_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 5.906000000000001
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_72be7690c27f_0045",
+      "cell": "房门单!AA11",
+      "formula_family": "FF_72be7690c27f",
+      "semantic_name": "edge_veneer_50_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 5.906000000000001
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_72be7690c27f_0046",
+      "cell": "房门单!AA11",
+      "formula_family": "FF_72be7690c27f",
+      "semantic_name": "edge_veneer_50_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 9.976
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_72be7690c27f_0047",
+      "cell": "房门单!AA11",
+      "formula_family": "FF_72be7690c27f",
+      "semantic_name": "edge_veneer_50_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 9.976
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_72be7690c27f_0048",
+      "cell": "房门单!AA11",
+      "formula_family": "FF_72be7690c27f",
+      "semantic_name": "edge_veneer_50_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_72be7690c27f_0049",
+      "cell": "房门单!AA11",
+      "formula_family": "FF_72be7690c27f",
+      "semantic_name": "edge_veneer_50_length_m",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "error",
+        "value": "#VALUE!"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_f4ef404f3311",
+      "cell": "房门单!AB11",
+      "formula_family": "FF_f4ef404f3311",
+      "semantic_name": "特殊色版",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_f4ef404f3311_0050",
+      "cell": "房门单!AB11",
+      "formula_family": "FF_f4ef404f3311",
+      "semantic_name": "特殊色版",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_75e037f1153b",
+      "cell": "房门单!AD11",
+      "formula_family": "FF_75e037f1153b",
+      "semantic_name": "finish_reference",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "柚木直纹，封闭/LC-M045"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_75e037f1153b_0051",
+      "cell": "房门单!AD11",
+      "formula_family": "FF_75e037f1153b",
+      "semantic_name": "finish_reference",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_4d62764356d5",
+      "cell": "房门单!AE11",
+      "formula_family": "FF_4d62764356d5",
+      "semantic_name": "计划系数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_730c9031d59f",
+      "cell": "房门单!AF11",
+      "formula_family": "FF_730c9031d59f",
+      "semantic_name": "计划量",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_730c9031d59f_0052",
+      "cell": "房门单!AF11",
+      "formula_family": "FF_730c9031d59f",
+      "semantic_name": "计划量",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_730c9031d59f_0053",
+      "cell": "房门单!AF11",
+      "formula_family": "FF_730c9031d59f",
+      "semantic_name": "计划量",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_7434f7b35fba",
+      "cell": "房门单!AJ11",
+      "formula_family": "FF_7434f7b35fba",
+      "semantic_name": "语义待核对_AJ",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_7434f7b35fba_0054",
+      "cell": "房门单!AJ11",
+      "formula_family": "FF_7434f7b35fba",
+      "semantic_name": "语义待核对_AJ",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2.366
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_1e1f4b3a2bf8",
+      "cell": "房门单!AK11",
+      "formula_family": "FF_1e1f4b3a2bf8",
+      "semantic_name": "套板板材平方",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_1e1f4b3a2bf8_0055",
+      "cell": "房门单!AK11",
+      "formula_family": "FF_1e1f4b3a2bf8",
+      "semantic_name": "套板板材平方",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.002101
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_1e1f4b3a2bf8_0056",
+      "cell": "房门单!AK11",
+      "formula_family": "FF_1e1f4b3a2bf8",
+      "semantic_name": "套板板材平方",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.002101
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_1e1f4b3a2bf8_0057",
+      "cell": "房门单!AK11",
+      "formula_family": "FF_1e1f4b3a2bf8",
+      "semantic_name": "套板板材平方",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.14707
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_1e1f4b3a2bf8_0058",
+      "cell": "房门单!AK11",
+      "formula_family": "FF_1e1f4b3a2bf8",
+      "semantic_name": "套板板材平方",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.14707
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_1e1f4b3a2bf8_0059",
+      "cell": "房门单!AK11",
+      "formula_family": "FF_1e1f4b3a2bf8",
+      "semantic_name": "套板板材平方",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.14707
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_1e1f4b3a2bf8_0060",
+      "cell": "房门单!AK11",
+      "formula_family": "FF_1e1f4b3a2bf8",
+      "semantic_name": "套板板材平方",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.14707
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_57dd115fa0d3",
+      "cell": "房门单!AL11",
+      "formula_family": "FF_57dd115fa0d3",
+      "semantic_name": "语义待核对_AL",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_57dd115fa0d3_0061",
+      "cell": "房门单!AL11",
+      "formula_family": "FF_57dd115fa0d3",
+      "semantic_name": "语义待核对_AL",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": -0.102949
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_57dd115fa0d3_0062",
+      "cell": "房门单!AL11",
+      "formula_family": "FF_57dd115fa0d3",
+      "semantic_name": "语义待核对_AL",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": -0.102949
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_57dd115fa0d3_0063",
+      "cell": "房门单!AL11",
+      "formula_family": "FF_57dd115fa0d3",
+      "semantic_name": "语义待核对_AL",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": -0.102949
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_57dd115fa0d3_0064",
+      "cell": "房门单!AL11",
+      "formula_family": "FF_57dd115fa0d3",
+      "semantic_name": "语义待核对_AL",
+      "contract": {
+        "source_number_format": "0.0_);[Red]\\(0.0\\)",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": -0.102949
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_2f2884e4ae34",
+      "cell": "房门单!AN11",
+      "formula_family": "FF_2f2884e4ae34",
+      "semantic_name": "是否为空套",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "×"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_a64e35ccfd3b",
+      "cell": "房门单!AO11",
+      "formula_family": "FF_a64e35ccfd3b",
+      "semantic_name": "横加",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 220.0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_aa14e1627fc7",
+      "cell": "房门单!AP11",
+      "formula_family": "FF_aa14e1627fc7",
+      "semantic_name": "竖加",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 160.0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_f6a8f0521d90",
+      "cell": "房门单!AQ11",
+      "formula_family": "FF_f6a8f0521d90",
+      "semantic_name": "线宽",
+      "contract": {
+        "source_number_format": "@",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "60"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_9791bfccc541",
+      "cell": "房门单!AR11",
+      "formula_family": "FF_9791bfccc541",
+      "semantic_name": "单边横线",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1158.0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_4412a3b79417",
+      "cell": "房门单!AT11",
+      "formula_family": "FF_4412a3b79417",
+      "semantic_name": "竖线净长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2205.0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_56638d1b30f9",
+      "cell": "房门单!AU11",
+      "formula_family": "FF_56638d1b30f9",
+      "semantic_name": "横线净长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2316.0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_fc5f706a0412",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0065",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0066",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0067",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0068",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0069",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0070",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2800
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0071",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2800
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0072",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2800
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0073",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3050
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0074",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3050
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0075",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3050
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0076",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0077",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0078",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fc5f706a0412_0079",
+      "cell": "房门单!AV11",
+      "formula_family": "FF_fc5f706a0412",
+      "semantic_name": "竖线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_6172b8a3a02a",
+      "cell": "房门单!AW11",
+      "formula_family": "FF_6172b8a3a02a",
+      "semantic_name": "竖线条数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 4
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_6172b8a3a02a_0080",
+      "cell": "房门单!AW11",
+      "formula_family": "FF_6172b8a3a02a",
+      "semantic_name": "竖线条数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 4
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_38be392bce2b",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0081",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0082",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0083",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0084",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0085",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0086",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0087",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0088",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0089",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0090",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0091",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0092",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0093",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0094",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0095",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2440
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0096",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0097",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0098",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2800
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0099",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2800
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0100",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2800
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0101",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3050
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0102",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3050
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0103",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3050
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0104",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0105",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0106",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 3600
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_38be392bce2b_0107",
+      "cell": "房门单!AX11",
+      "formula_family": "FF_38be392bce2b",
+      "semantic_name": "横线开料长",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_1e520fd1a320",
+      "cell": "房门单!AY11",
+      "formula_family": "FF_1e520fd1a320",
+      "semantic_name": "横线条数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_1e520fd1a320_0108",
+      "cell": "房门单!AY11",
+      "formula_family": "FF_1e520fd1a320",
+      "semantic_name": "横线条数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_1e520fd1a320_0109",
+      "cell": "房门单!AY11",
+      "formula_family": "FF_1e520fd1a320",
+      "semantic_name": "横线条数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_1e520fd1a320_0110",
+      "cell": "房门单!AY11",
+      "formula_family": "FF_1e520fd1a320",
+      "semantic_name": "横线条数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_1e520fd1a320_0111",
+      "cell": "房门单!AY11",
+      "formula_family": "FF_1e520fd1a320",
+      "semantic_name": "横线条数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 2
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_c7a6342dcce5",
+      "cell": "房门单!AZ11",
+      "formula_family": "FF_c7a6342dcce5",
+      "semantic_name": "线条单双",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "双"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_046f9be4c4c5",
+      "cell": "房门单!X19",
+      "formula_family": "FF_046f9be4c4c5",
+      "semantic_name": "frame_area_m2",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_046f9be4c4c5_0112",
+      "cell": "房门单!X19",
+      "formula_family": "FF_046f9be4c4c5",
+      "semantic_name": "frame_area_m2",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_046f9be4c4c5_0113",
+      "cell": "房门单!X19",
+      "formula_family": "FF_046f9be4c4c5",
+      "semantic_name": "frame_area_m2",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_046f9be4c4c5_0114",
+      "cell": "房门单!X19",
+      "formula_family": "FF_046f9be4c4c5",
+      "semantic_name": "frame_area_m2",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_046f9be4c4c5_0115",
+      "cell": "房门单!X19",
+      "formula_family": "FF_046f9be4c4c5",
+      "semantic_name": "frame_area_m2",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_046f9be4c4c5_0116",
+      "cell": "房门单!X19",
+      "formula_family": "FF_046f9be4c4c5",
+      "semantic_name": "frame_area_m2",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_046f9be4c4c5_0117",
+      "cell": "房门单!X19",
+      "formula_family": "FF_046f9be4c4c5",
+      "semantic_name": "frame_area_m2",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_8094bb56a5b1",
+      "cell": "房门单!I39",
+      "formula_family": "FF_8094bb56a5b1",
+      "semantic_name": "paint_process",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_237f9831456e",
+      "cell": "房门单!M39",
+      "formula_family": "FF_237f9831456e",
+      "semantic_name": "opening_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": -10
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_237f9831456e_0118",
+      "cell": "房门单!M39",
+      "formula_family": "FF_237f9831456e",
+      "semantic_name": "opening_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_237f9831456e_0119",
+      "cell": "房门单!M39",
+      "formula_family": "FF_237f9831456e",
+      "semantic_name": "opening_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_237f9831456e_0120",
+      "cell": "房门单!M39",
+      "formula_family": "FF_237f9831456e",
+      "semantic_name": "opening_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_533b4f331679",
+      "cell": "房门单!N39",
+      "formula_family": "FF_533b4f331679",
+      "semantic_name": "frame_height_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_533b4f331679_0121",
+      "cell": "房门单!N39",
+      "formula_family": "FF_533b4f331679",
+      "semantic_name": "frame_height_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_533b4f331679_0122",
+      "cell": "房门单!N39",
+      "formula_family": "FF_533b4f331679",
+      "semantic_name": "frame_height_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_533b4f331679_0123",
+      "cell": "房门单!N39",
+      "formula_family": "FF_533b4f331679",
+      "semantic_name": "frame_height_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_884dcddf3c1d",
+      "cell": "房门单!O39",
+      "formula_family": "FF_884dcddf3c1d",
+      "semantic_name": "frame_width_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_884dcddf3c1d_0124",
+      "cell": "房门单!O39",
+      "formula_family": "FF_884dcddf3c1d",
+      "semantic_name": "frame_width_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_f9342bb093c0",
+      "cell": "房门单!P39",
+      "formula_family": "FF_f9342bb093c0",
+      "semantic_name": "frame_wall_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_f9342bb093c0_0125",
+      "cell": "房门单!P39",
+      "formula_family": "FF_f9342bb093c0",
+      "semantic_name": "frame_wall_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_bfd6741e313a",
+      "cell": "房门单!Q39",
+      "formula_family": "FF_bfd6741e313a",
+      "semantic_name": "frame_quantity",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_bfd6741e313a_0126",
+      "cell": "房门单!Q39",
+      "formula_family": "FF_bfd6741e313a",
+      "semantic_name": "frame_quantity",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_bfd6741e313a_0127",
+      "cell": "房门单!Q39",
+      "formula_family": "FF_bfd6741e313a",
+      "semantic_name": "frame_quantity",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": -43
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_bfd6741e313a_0128",
+      "cell": "房门单!Q39",
+      "formula_family": "FF_bfd6741e313a",
+      "semantic_name": "frame_quantity",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": -43
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_bfd6741e313a_0129",
+      "cell": "房门单!Q39",
+      "formula_family": "FF_bfd6741e313a",
+      "semantic_name": "frame_quantity",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": -43
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_bfd6741e313a_0130",
+      "cell": "房门单!Q39",
+      "formula_family": "FF_bfd6741e313a",
+      "semantic_name": "frame_quantity",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_bfd6741e313a_0131",
+      "cell": "房门单!Q39",
+      "formula_family": "FF_bfd6741e313a",
+      "semantic_name": "frame_quantity",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_fd80c4aba47b",
+      "cell": "房门单!R39",
+      "formula_family": "FF_fd80c4aba47b",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fd80c4aba47b_0132",
+      "cell": "房门单!R39",
+      "formula_family": "FF_fd80c4aba47b",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fd80c4aba47b_0133",
+      "cell": "房门单!R39",
+      "formula_family": "FF_fd80c4aba47b",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fd80c4aba47b_0134",
+      "cell": "房门单!R39",
+      "formula_family": "FF_fd80c4aba47b",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fd80c4aba47b_0135",
+      "cell": "房门单!R39",
+      "formula_family": "FF_fd80c4aba47b",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fd80c4aba47b_0136",
+      "cell": "房门单!R39",
+      "formula_family": "FF_fd80c4aba47b",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fd80c4aba47b_0137",
+      "cell": "房门单!R39",
+      "formula_family": "FF_fd80c4aba47b",
+      "semantic_name": "leaf_height_mm",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_54d8b54acb61",
+      "cell": "房门单!S39",
+      "formula_family": "FF_54d8b54acb61",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_54d8b54acb61_0138",
+      "cell": "房门单!S39",
+      "formula_family": "FF_54d8b54acb61",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_54d8b54acb61_0139",
+      "cell": "房门单!S39",
+      "formula_family": "FF_54d8b54acb61",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_54d8b54acb61_0140",
+      "cell": "房门单!S39",
+      "formula_family": "FF_54d8b54acb61",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_54d8b54acb61_0141",
+      "cell": "房门单!S39",
+      "formula_family": "FF_54d8b54acb61",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_54d8b54acb61_0142",
+      "cell": "房门单!S39",
+      "formula_family": "FF_54d8b54acb61",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 45
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_54d8b54acb61_0143",
+      "cell": "房门单!S39",
+      "formula_family": "FF_54d8b54acb61",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 45
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_54d8b54acb61_0144",
+      "cell": "房门单!S39",
+      "formula_family": "FF_54d8b54acb61",
+      "semantic_name": "leaf_width_or_pair_description",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 45
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_834ec8fbd920",
+      "cell": "房门单!T39",
+      "formula_family": "FF_834ec8fbd920",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_834ec8fbd920_0145",
+      "cell": "房门单!T39",
+      "formula_family": "FF_834ec8fbd920",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_834ec8fbd920_0146",
+      "cell": "房门单!T39",
+      "formula_family": "FF_834ec8fbd920",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_834ec8fbd920_0147",
+      "cell": "房门单!T39",
+      "formula_family": "FF_834ec8fbd920",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_834ec8fbd920_0148",
+      "cell": "房门单!T39",
+      "formula_family": "FF_834ec8fbd920",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_834ec8fbd920_0149",
+      "cell": "房门单!T39",
+      "formula_family": "FF_834ec8fbd920",
+      "semantic_name": "leaf_thickness_mm",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "mm",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_8f74c6a9c5f2",
+      "cell": "房门单!U39",
+      "formula_family": "FF_8f74c6a9c5f2",
+      "semantic_name": "leaf_quantity",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": 0,
+        "rounding": "ROUND_HALF_UP",
+        "comparison": "TYPED_INTEGER_EXACT",
+        "precision_authority": "integer field label"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_adf3afce97d5",
+      "cell": "房门单!V39",
+      "formula_family": "FF_adf3afce97d5",
+      "semantic_name": "uom",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_72f3a88de20b",
+      "cell": "房门单!AD39",
+      "formula_family": "FF_72f3a88de20b",
+      "semantic_name": "finish_reference",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_e75f815a7f13",
+      "cell": "房门单!AE39",
+      "formula_family": "FF_e75f815a7f13",
+      "semantic_name": "计划系数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e75f815a7f13_0150",
+      "cell": "房门单!AE39",
+      "formula_family": "FF_e75f815a7f13",
+      "semantic_name": "计划系数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e75f815a7f13_0151",
+      "cell": "房门单!AE39",
+      "formula_family": "FF_e75f815a7f13",
+      "semantic_name": "计划系数",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_a43d769070cf",
+      "cell": "房门单!AF39",
+      "formula_family": "FF_a43d769070cf",
+      "semantic_name": "计划量",
+      "contract": {
+        "source_number_format": "#,##0.00_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_f4cfad53d5e1",
+      "cell": "三合一生产单!F2",
+      "formula_family": "FF_f4cfad53d5e1",
+      "semantic_name": "语义待核对_F",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "1-4-正"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_94068ddf9c8c",
+      "cell": "三合一生产单!O2",
+      "formula_family": "FF_94068ddf9c8c",
+      "semantic_name": "订单交期",
+      "contract": {
+        "source_number_format": "yy/mm/dd;@",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 45316
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_036fc772ded4",
+      "cell": "三合一生产单!R2",
+      "formula_family": "FF_036fc772ded4",
+      "semantic_name": "生产周期",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "木16天  \n油10天"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_f87f9bee09a9",
+      "cell": "三合一生产单!F3",
+      "formula_family": "FF_f87f9bee09a9",
+      "semantic_name": "语义待核对_F",
+      "contract": {
+        "source_number_format": "0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "上海 大居苑"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_0fa5f36896a8",
+      "cell": "三合一生产单!L3",
+      "formula_family": "FF_0fa5f36896a8",
+      "semantic_name": "油漆工艺_木皮_坯板",
+      "contract": {
+        "source_number_format": "0.00_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "半透工艺/45丝半透黑胡桃花纹实木拼/实木多层板"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_4c2a5d2cdaa3",
+      "cell": "三合一生产单!Q3",
+      "formula_family": "FF_4c2a5d2cdaa3",
+      "semantic_name": "客户等级",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "A"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_71c31112a64e",
+      "cell": "三合一生产单!T3",
+      "formula_family": "FF_71c31112a64e",
+      "semantic_name": "白色_绿呈",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "陈加伟"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_0a2947b61045",
+      "cell": "三合一生产单!U3",
+      "formula_family": "FF_0a2947b61045",
+      "semantic_name": "白色_绿呈",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "邓尚荣"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_1e42da43e489",
+      "cell": "三合一生产单!M5",
+      "formula_family": "FF_1e42da43e489",
+      "semantic_name": "语义待核对_M",
+      "contract": {
+        "source_number_format": "#",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 111.5
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_01ebedf7327c",
+      "cell": "三合一生产单!Q5",
+      "formula_family": "FF_01ebedf7327c",
+      "semantic_name": "语义待核对_Q",
+      "contract": {
+        "source_number_format": "0.00_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 59.936215999999995
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_ea40795bcbec",
+      "cell": "三合一生产单!R5",
+      "formula_family": "FF_ea40795bcbec",
+      "semantic_name": "语义待核对_R",
+      "contract": {
+        "source_number_format": "0.00_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 302.448
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_3862905331ef",
+      "cell": "三合一生产单!S5",
+      "formula_family": "FF_3862905331ef",
+      "semantic_name": "语义待核对_S",
+      "contract": {
+        "source_number_format": "0.00_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 37.38929700000001
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_2204175db59c",
+      "cell": "三合一生产单!A7",
+      "formula_family": "FF_2204175db59c",
+      "semantic_name": "row_number",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_41e386154efe",
+      "cell": "三合一生产单!B7",
+      "formula_family": "FF_41e386154efe",
+      "semantic_name": "material_code",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "BTKF2601001"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_10d885884644",
+      "cell": "三合一生产单!C7",
+      "formula_family": "FF_10d885884644",
+      "semantic_name": "process_code",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "BTKF/GT"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_5f1b2a1dc7cf",
+      "cell": "三合一生产单!D7",
+      "formula_family": "FF_5f1b2a1dc7cf",
+      "semantic_name": "订单类型_必填",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "正"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_5f1b2a1dc7cf_0152",
+      "cell": "三合一生产单!D7",
+      "formula_family": "FF_5f1b2a1dc7cf",
+      "semantic_name": "订单类型_必填",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_23ef55bd6d2e",
+      "cell": "三合一生产单!I7",
+      "formula_family": "FF_23ef55bd6d2e",
+      "semantic_name": "paint_process",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "半透工艺"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_29b3f9b532a4",
+      "cell": "三合一生产单!Q7",
+      "formula_family": "FF_29b3f9b532a4",
+      "semantic_name": "visible_area_m2",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.1098
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_29b3f9b532a4_0153",
+      "cell": "三合一生产单!Q7",
+      "formula_family": "FF_29b3f9b532a4",
+      "semantic_name": "visible_area_m2",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.1098
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_29b3f9b532a4_0154",
+      "cell": "三合一生产单!Q7",
+      "formula_family": "FF_29b3f9b532a4",
+      "semantic_name": "visible_area_m2",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.2196
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_29b3f9b532a4_0155",
+      "cell": "三合一生产单!Q7",
+      "formula_family": "FF_29b3f9b532a4",
+      "semantic_name": "visible_area_m2",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_100e47a2666a",
+      "cell": "三合一生产单!R7",
+      "formula_family": "FF_100e47a2666a",
+      "semantic_name": "edge_length_m",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1.764
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_100e47a2666a_0156",
+      "cell": "三合一生产单!R7",
+      "formula_family": "FF_100e47a2666a",
+      "semantic_name": "edge_length_m",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.732
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_100e47a2666a_0157",
+      "cell": "三合一生产单!R7",
+      "formula_family": "FF_100e47a2666a",
+      "semantic_name": "edge_length_m",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.15
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_100e47a2666a_0158",
+      "cell": "三合一生产单!R7",
+      "formula_family": "FF_100e47a2666a",
+      "semantic_name": "edge_length_m",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1.464
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_100e47a2666a_0159",
+      "cell": "三合一生产单!R7",
+      "formula_family": "FF_100e47a2666a",
+      "semantic_name": "edge_length_m",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.3
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_100e47a2666a_0160",
+      "cell": "三合一生产单!R7",
+      "formula_family": "FF_100e47a2666a",
+      "semantic_name": "edge_length_m",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.882
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_100e47a2666a_0161",
+      "cell": "三合一生产单!R7",
+      "formula_family": "FF_100e47a2666a",
+      "semantic_name": "edge_length_m",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1.032
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_100e47a2666a_0162",
+      "cell": "三合一生产单!R7",
+      "formula_family": "FF_100e47a2666a",
+      "semantic_name": "edge_length_m",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1.6139999999999999
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_100e47a2666a_0163",
+      "cell": "三合一生产单!R7",
+      "formula_family": "FF_100e47a2666a",
+      "semantic_name": "edge_length_m",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1.764
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_100e47a2666a_0164",
+      "cell": "三合一生产单!R7",
+      "formula_family": "FF_100e47a2666a",
+      "semantic_name": "edge_length_m",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.0
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_e1734e5f3263",
+      "cell": "三合一生产单!S7",
+      "formula_family": "FF_e1734e5f3263",
+      "semantic_name": "product_area_m2",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 0.1098
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e1734e5f3263_0165",
+      "cell": "三合一生产单!S7",
+      "formula_family": "FF_e1734e5f3263",
+      "semantic_name": "product_area_m2",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_e1734e5f3263_0166",
+      "cell": "三合一生产单!S7",
+      "formula_family": "FF_e1734e5f3263",
+      "semantic_name": "product_area_m2",
+      "contract": {
+        "source_number_format": "0.00_);[Red]\\(0.00\\)",
+        "uom": "m²",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_fd290b0904b0",
+      "cell": "三合一生产单!T7",
+      "formula_family": "FF_fd290b0904b0",
+      "semantic_name": "特殊色版",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_fd290b0904b0_0167",
+      "cell": "三合一生产单!T7",
+      "formula_family": "FF_fd290b0904b0",
+      "semantic_name": "特殊色版",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_7e8ba2374d7c",
+      "cell": "三合一生产单!V7",
+      "formula_family": "FF_7e8ba2374d7c",
+      "semantic_name": "finish_reference",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "展厅样品无把手门"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "BOUNDARY_FF_7e8ba2374d7c_0168",
+      "cell": "三合一生产单!V7",
+      "formula_family": "FF_7e8ba2374d7c",
+      "semantic_name": "finish_reference",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": ""
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_848428625aa3",
+      "cell": "三合一生产单!AG30",
+      "formula_family": "FF_848428625aa3",
+      "semantic_name": "材料领用量",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AG29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_2bd1811c67f8",
+      "cell": "三合一生产单!AH30",
+      "formula_family": "FF_2bd1811c67f8",
+      "semantic_name": "语义待核对_AH",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AH29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_bcd05cc6e880",
+      "cell": "三合一生产单!AI30",
+      "formula_family": "FF_bcd05cc6e880",
+      "semantic_name": "语义待核对_AI",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AI29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_4043c1179fd9",
+      "cell": "三合一生产单!AJ30",
+      "formula_family": "FF_4043c1179fd9",
+      "semantic_name": "语义待核对_AJ",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AJ29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_381619e849ca",
+      "cell": "三合一生产单!AK30",
+      "formula_family": "FF_381619e849ca",
+      "semantic_name": "语义待核对_AK",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AK29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_78f188dacf66",
+      "cell": "三合一生产单!AL30",
+      "formula_family": "FF_78f188dacf66",
+      "semantic_name": "语义待核对_AL",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AL29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_5c9579580a9f",
+      "cell": "三合一生产单!AM30",
+      "formula_family": "FF_5c9579580a9f",
+      "semantic_name": "2800_1220光板",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AM29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_2b7cdd184e7c",
+      "cell": "三合一生产单!AN30",
+      "formula_family": "FF_2b7cdd184e7c",
+      "semantic_name": "语义待核对_AN",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AN29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_5540d6168ca2",
+      "cell": "三合一生产单!AO30",
+      "formula_family": "FF_5540d6168ca2",
+      "semantic_name": "语义待核对_AO",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AO29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_5df1a11391ce",
+      "cell": "三合一生产单!AP30",
+      "formula_family": "FF_5df1a11391ce",
+      "semantic_name": "语义待核对_AP",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AP29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_4c6c4a7b24cb",
+      "cell": "三合一生产单!AQ30",
+      "formula_family": "FF_4c6c4a7b24cb",
+      "semantic_name": "语义待核对_AQ",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AQ29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_d5a8ff252745",
+      "cell": "三合一生产单!AR30",
+      "formula_family": "FF_d5a8ff252745",
+      "semantic_name": "语义待核对_AR",
+      "contract": {
+        "source_number_format": "0.0_ ",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": null,
+      "reference_status": "BROKEN_DEPENDENCY",
+      "reason": "三合一生产单!AR29 contains #REF!"
+    },
+    {
+      "case_id": "UNIT_FF_9db72672de43",
+      "cell": "客户!B2",
+      "formula_family": "FF_9db72672de43",
+      "semantic_name": "row_number",
+      "contract": {
+        "source_number_format": "00",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "number",
+        "value": 1
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_76ac97cac847",
+      "cell": "物料目录(设计)!A2",
+      "formula_family": "FF_76ac97cac847",
+      "semantic_name": "物料名称_必填",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "见色板待定"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_0e6b4cbb3da5",
+      "cell": "物料目录(设计)!B2",
+      "formula_family": "FF_0e6b4cbb3da5",
+      "semantic_name": "material_code",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "JSB4708001"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    },
+    {
+      "case_id": "UNIT_FF_3ecf442b0e55",
+      "cell": "物料目录(设计)!B6",
+      "formula_family": "FF_3ecf442b0e55",
+      "semantic_name": "material_code",
+      "contract": {
+        "source_number_format": "General",
+        "uom": "SOURCE_UOM_OR_UNRESOLVED",
+        "precision": null,
+        "rounding": null,
+        "comparison": "TYPED_RAW_EXACT_NO_TOLERANCE",
+        "precision_authority": "not defined; raw equality only, mismatch cannot be waived"
+      },
+      "code_result": {
+        "type": "text",
+        "value": "HYFB0101001"
+      },
+      "reference_status": "EVALUATED_NOT_NATIVE_VERIFIED"
+    }
+  ]
+}

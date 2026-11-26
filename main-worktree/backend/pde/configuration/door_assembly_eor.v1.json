@@ -1,0 +1,102 @@
+{
+  "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+  "companyId": 1,
+  "version": "V1",
+  "modes": [],
+  "rules": [
+    {
+      "ruleCode": "DOOR-ASSEMBLY-SET.PCT11",
+      "ruleName": "正式房门套数组装需求 / PCT11 / PROC202608000008",
+      "version": "V1",
+      "effectiveFrom": "2026-10-14",
+      "specification": {
+        "rulePackage": {
+          "code": "DOOR-ASSEMBLY-SET-EOR",
+          "version": "V1"
+        },
+        "expression": "assembly_quantity",
+        "inputs": [
+          {
+            "canonicalName": "assembly_quantity",
+            "sourceCanonicalField": "DoorAssemblyQuantity",
+            "sourceType": "ENGINEERING_DERIVED",
+            "valueType": "decimal",
+            "unit": "套",
+            "unitDimension": "count",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "door_assembly_operation_quantity",
+            "valueType": "decimal",
+            "resultDomain": "OPERATION_REQUIREMENT",
+            "unit": "套",
+            "unitDimension": "count",
+            "uomId": 13,
+            "operationId": 8,
+            "productTypeId": 11,
+            "quantityBasis": "SOURCE_SCOPE_TOTAL",
+            "basisQuantitySource": "SALES_ORDER_ITEM",
+            "basisUomSource": "SALES_ORDER_ITEM",
+            "sourceScope": "SALES_ORDER_ITEM"
+          }
+        ],
+        "dependencies": [],
+        "applicability": {
+          "scope": "order_engineering",
+          "sourceSemantic": "FORMAL_COMPLETE_DOOR_ASSEMBLY_QUANTITY"
+        },
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "sourceEvidence": {
+          "reference": "PCE-DOOR-ASSEMBLY-EOR-20261014及PCE-DOOR-QUANTITY-DECISION-20261014：仅承接已确认正式房门组装套数，门套数量独立保留",
+          "quantityBasisDecision": "需求直接等于逐对象DoorAssemblyQuantity，不乘销售订单行数量，不使用门面积或固定数量",
+          "formalRouting": {
+            "routingId": 31,
+            "routingCode": "QSFB/FM",
+            "routingVersionId": 43,
+            "routingVersion": "V2.0",
+            "status": "released",
+            "routingStepId": 1142,
+            "sequence": 5,
+            "operationId": 8
+          },
+          "formalCapacitySource": {
+            "standardCapacityId": 230,
+            "standardCapacityCode": "CAP202610000230",
+            "productTypeId": 11,
+            "productTypeCode": "QSFB/FM",
+            "sourceCell": "标准产能!K12",
+            "sourceRulesContract": "PCE-APS-CAPACITY-SOURCE-RULES-V1",
+            "sourceSha256": "153c5d9a66ad3cfa0016104b9ebfc05af3152e186dd930a8fe95be1aa739eb67"
+          },
+          "unitDecision": "正式输入、制造模式、工序、需求和日产能使用套；日产能来自既有StandardCapacity，不使用标准工时或Runtime固定产能",
+          "stopBoundary": "仅EOR，不进入APS、生产计划、排产、采购或制造执行"
+        },
+        "manufacturing": {
+          "contractVersion": "PCE-MANUFACTURING-EOR-RULE-V1",
+          "modeCode": "QUANTITY-SET",
+          "modeVersion": "V1",
+          "workCenterId": 9,
+          "standardCapacityId": 230,
+          "factoryScope": {
+            "companyId": 1,
+            "workshopId": 1
+          },
+          "sourceSelector": {
+            "canonicalField": "DoorAssemblyQuantity",
+            "producerRuleCode": "DOOR-ASSEMBLY-QUANTITY",
+            "producerRuleVersion": "V1",
+            "traceEquals": {"contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"},
+            "objectTraceKeys": ["baseEngineeringCalculationId", "outputKey"],
+            "candidatePolicy": "MATCH_CONFIGURED_TRACE"
+          },
+          "factDisposition": "GENERATE_EOR"
+        }
+      }
+    }
+  ]
+}

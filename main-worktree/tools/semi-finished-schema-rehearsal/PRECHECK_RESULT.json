@@ -1,0 +1,48 @@
+{
+    "contractVersion":  "PCE-USER-SESSION-SCHEMA-REHEARSAL-V1.0",
+    "precheckId":  "precheck-20260910-164340-8ca03166",
+    "startedAt":  "2026-09-10T16:43:40.6676076+08:00",
+    "status":  "PASS",
+    "checks":  {
+                   "manifestParse":  "PASS",
+                   "packageStatusContract":  "PASS",
+                   "systemNetHttpAssemblyLoad":  "PASS",
+                   "httpClientTypeResolution":  "PASS",
+                   "httpClientInstantiation":  "PASS",
+                   "pathResolution":  "PASS",
+                   "backendPortLogic":  "PASS",
+                   "frontendPortLogic":  "PASS",
+                   "databaseSourceSha":  "9dadfb55d446df052a4dcf6cf2ee552906939fd1b65d7d899c5fd8c1ac368f5c",
+                   "databaseCopy":  "PASS",
+                   "pythonImport":  "PASS",
+                   "djangoCheck":  "PASS",
+                   "migrationPlan":  "PASS",
+                   "isolatedMigrationExecution":  "PASS",
+                   "nodeDependencies":  "PASS",
+                   "httpHealthCheckCode":  "PASS",
+                   "pidLifecycleCode":  "PASS",
+                   "runManifestProcessIdentityContract":  "PASS",
+                   "scm7Gates":  "PASS",
+                   "financeGuardBlockerCount":  0,
+                   "fullFrontendBuild":  "PASS",
+                   "hashLock":  "PASS",
+                   "roundTripParse":  "PASS"
+               },
+    "errors":  [
+
+               ],
+    "httpDependency":  {
+                           "systemNetHttpAssemblyLoad":  "PASS",
+                           "httpClientTypeResolution":  "PASS",
+                           "httpClientInstantiation":  "PASS",
+                           "assemblyFullName":  "System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+                           "assemblyLocation":  "C:\\Windows\\Microsoft.Net\\assembly\\GAC_MSIL\\System.Net.Http\\v4.0_4.0.0.0__b03f5f7f11d50a3a\\System.Net.Http.dll",
+                           "typeFullName":  "System.Net.Http.HttpClient",
+                           "processId":  34100,
+                           "powerShellVersion":  "5.1.26100.9444",
+                           "powerShellEdition":  "Desktop",
+                           "clrVersion":  "4.0.30319.42000",
+                           "processArchitecture":  "x64"
+                       },
+    "completedAt":  "2026-09-10T16:44:20.9760086+08:00"
+}

@@ -1,0 +1,238 @@
+{
+  "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+  "companyId": 1,
+  "version": "V1",
+  "rules": [
+    {
+      "ruleCode": "DOOR-PANEL-NET-AREA",
+      "ruleName": "门板材净面积",
+      "version": "V1",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-FACT-EXTENSION",
+          "version": "V1"
+        },
+        "inputs": [
+          {
+            "canonicalName": "height",
+            "valueType": "decimal",
+            "unit": "m",
+            "unitDimension": "length",
+            "sourceType": "AGGREGATED",
+            "required": true,
+            "unitRequired": true
+          },
+          {
+            "canonicalName": "width",
+            "valueType": "decimal",
+            "unit": "m",
+            "unitDimension": "length",
+            "sourceType": "AGGREGATED",
+            "required": true,
+            "unitRequired": true
+          },
+          {
+            "canonicalName": "quantity",
+            "valueType": "decimal",
+            "unit": "扇",
+            "unitDimension": "dimensionless",
+            "sourceType": "AGGREGATED",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "DoorPanelNetArea",
+            "valueType": "decimal",
+            "resultDomain": "DERIVED_FACT",
+            "unit": "m2",
+            "unitDimension": "area"
+          }
+        ],
+        "expression": "height * width * quantity",
+        "dependencies": [],
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "applicability": {},
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令；正式成功工程事实"
+        },
+        "factExtension": {
+          "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+          "outputUomId": 18,
+          "strategy": "OBJECT_FORMULA",
+          "productCategoryIds": [
+            1
+          ],
+          "groupKeys": [
+            "baselineItemId",
+            "designItemId",
+            "sourceAttributeId"
+          ],
+          "anchorInput": "quantity",
+          "requirePositiveInputGroups": true,
+          "bindings": [
+            {
+              "inputName": "height",
+              "sourceScope": "ORIGIN",
+              "sourceUomId": 15,
+              "targetUomId": 17,
+              "productCategoryIds": [
+                1
+              ],
+              "selector": {
+                "canonicalField": "R",
+                "producerRuleId": 11,
+                "producerRuleVersion": "V1",
+                "traceEquals": {
+                  "resultScope": "original"
+                }
+              }
+            },
+            {
+              "inputName": "width",
+              "sourceScope": "ORIGIN",
+              "sourceUomId": 15,
+              "targetUomId": 17,
+              "productCategoryIds": [
+                1
+              ],
+              "selector": {
+                "canonicalField": "S",
+                "producerRuleId": 11,
+                "producerRuleVersion": "V1",
+                "traceEquals": {
+                  "resultScope": "original"
+                }
+              }
+            },
+            {
+              "inputName": "quantity",
+              "sourceScope": "ORIGIN",
+              "sourceUomId": 26,
+              "targetUomId": 26,
+              "productCategoryIds": [
+                1
+              ],
+              "selector": {
+                "canonicalField": "U",
+                "producerRuleId": 11,
+                "producerRuleVersion": "V1",
+                "traceEquals": {
+                  "resultScope": "original"
+                }
+              },
+              "selectByUom": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "ruleCode": "BOARD-NET-AREA-SUMMARY",
+      "ruleName": "板材面积汇总",
+      "version": "V1",
+      "specification": {
+        "rulePackage": {
+          "code": "BOARD-AREA-FACT-EXTENSION",
+          "version": "V1"
+        },
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "sourceType": "AGGREGATED",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "BoardNetAreaSummary",
+            "valueType": "decimal",
+            "resultDomain": "DERIVED_FACT",
+            "unit": "m2",
+            "unitDimension": "area"
+          }
+        ],
+        "expression": "area_quantity",
+        "dependencies": [],
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "applicability": {},
+        "sourceEvidence": {
+          "reference": "2026-10-14用户板材总面积事实模型补齐与开料EOR生成实施指令；正式成功工程事实"
+        },
+        "factExtension": {
+          "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+          "outputUomId": 18,
+          "strategy": "SCOPE_SUM",
+          "productCategoryIds": [
+            1,
+            2,
+            3
+          ],
+          "bindings": [
+            {
+              "inputName": "area_quantity",
+              "sourceScope": "ORIGIN",
+              "sourceUomId": 18,
+              "targetUomId": 18,
+              "productCategoryIds": [
+                2,
+                3
+              ],
+              "selector": {
+                "canonicalField": "S",
+                "producerRuleId": 11,
+                "producerRuleVersion": "V1",
+                "traceEquals": {
+                  "resultScope": "original"
+                }
+              }
+            },
+            {
+              "inputName": "area_quantity",
+              "sourceScope": "ORIGIN",
+              "sourceUomId": 18,
+              "targetUomId": 18,
+              "productCategoryIds": [
+                1
+              ],
+              "selector": {
+                "canonicalField": "X",
+                "producerRuleId": 11,
+                "producerRuleVersion": "V1",
+                "traceEquals": {
+                  "resultScope": "original"
+                }
+              }
+            },
+            {
+              "inputName": "area_quantity",
+              "sourceScope": "EXTENSION",
+              "sourceUomId": 18,
+              "targetUomId": 18,
+              "productCategoryIds": [
+                1
+              ],
+              "selector": {
+                "canonicalField": "DoorPanelNetArea",
+                "producerRuleCode": "DOOR-PANEL-NET-AREA",
+                "producerRuleVersion": "V1",
+                "traceEquals": {
+                  "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

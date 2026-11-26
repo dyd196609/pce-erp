@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "PCE-LAUNCHER-PACKAGE-STATUS-CONTRACT-V1",
+  "comparison": "ordinal-exact",
+  "lifecycle": {
+    "blockedPendingFullBuild": "BLOCKED_PENDING_FULL_BUILD",
+    "readyForUserAuthorizedRehearsal": "READY_FOR_USER_AUTHORIZED_REHEARSAL",
+    "readyForSeparateProductionAuthorization": "READY_FOR_SEPARATE_PRODUCTION_AUTHORIZATION"
+  },
+  "rehearsalEntry": {
+    "acceptedPackageStatus": "READY_FOR_USER_AUTHORIZED_REHEARSAL",
+    "requiresExplicitUserAuthorization": true,
+    "rejectedPackageStatuses": [
+      "BLOCKED_PENDING_FULL_BUILD",
+      "READY",
+      "READY_FOR_SEPARATE_PRODUCTION_AUTHORIZATION"
+    ]
+  }
+}
+

@@ -1,0 +1,61 @@
+{
+  "status": "ISOLATED_TESTED_NOT_PRODUCTION_APPLIED",
+  "productionApplied": false,
+  "instructionSha256": "894230DC5BB2D05BFB28E99C731CEC9FD877EFA985E275FEBED7B483052B32FA",
+  "productionModelSha256": "8920F7BBDB1FB2DD7785F1C9E8AD257A65F0725CDEFF7DD9BC1428F84FE3CADB",
+  "productionDatabaseSha256": "9DADFB55D446DF052A4DCF6CF2EE552906939FD1B65D7D899C5FD8C1AC368F5C",
+  "replaySha256": "22C97C1D68267A53304050A927673C486D7006179D5F7B9FBA6636E2E352AD80",
+  "files": [
+    {
+      "canonicalPath": "backend/pde/models.py",
+      "packagePath": "candidate\\backend\\pde\\models.py",
+      "testedSha256": "580C4906F2C895B3CF57396B0E306E243F1DDCCD2DD959DF7F62AB282A8273E3",
+      "deliveredSha256": "580C4906F2C895B3CF57396B0E306E243F1DDCCD2DD959DF7F62AB282A8273E3"
+    },
+    {
+      "canonicalPath": "backend/pde/material_configuration_models.py",
+      "packagePath": "candidate\\backend\\pde\\material_configuration_models.py",
+      "testedSha256": "5E01D87D26252E6C4DFA5876BD15BBFB0D48F116B739B1CC68A132F6F4D7BF6D",
+      "deliveredSha256": "5E01D87D26252E6C4DFA5876BD15BBFB0D48F116B739B1CC68A132F6F4D7BF6D"
+    },
+    {
+      "canonicalPath": "backend/pde/material_configuration_service.py",
+      "packagePath": "candidate\\backend\\pde\\material_configuration_service.py",
+      "testedSha256": "DB372CEF54C17BF28F1A3094DBE4AFB6ADABC9C9DBC62E79FB18BFB3390C3F88",
+      "deliveredSha256": "DB372CEF54C17BF28F1A3094DBE4AFB6ADABC9C9DBC62E79FB18BFB3390C3F88"
+    },
+    {
+      "canonicalPath": "backend/pde/material_configuration_serializers.py",
+      "packagePath": "candidate\\backend\\pde\\material_configuration_serializers.py",
+      "testedSha256": "B3B356778D619B878DDD86F02D19FBB71874A08521775EC3AEC9A6E838481904",
+      "deliveredSha256": "B3B356778D619B878DDD86F02D19FBB71874A08521775EC3AEC9A6E838481904"
+    },
+    {
+      "canonicalPath": "backend/pde/order_engineered_product_service.py",
+      "packagePath": "candidate\\backend\\pde\\order_engineered_product_service.py",
+      "testedSha256": "3AA8D8B250AF1E39638B9ADA4B585B21DFC1EDDEE06D9E605CB7B6B6FEF4730B",
+      "deliveredSha256": "3AA8D8B250AF1E39638B9ADA4B585B21DFC1EDDEE06D9E605CB7B6B6FEF4730B"
+    },
+    {
+      "canonicalPath": "backend/pde/migrations/0024_restore_material_contract_state.py",
+      "packagePath": "candidate\\backend\\pde\\migrations\\0024_restore_material_contract_state.py",
+      "testedSha256": "870B040621604FD131DC5A926AD15B408F54831BB7F2D240C66FF163179C4FF4",
+      "deliveredSha256": "870B040621604FD131DC5A926AD15B408F54831BB7F2D240C66FF163179C4FF4"
+    },
+    {
+      "canonicalPath": "backend/pde/migrations/0025_material_configuration_applicability_quantity.py",
+      "packagePath": "candidate\\backend\\pde\\migrations\\0025_material_configuration_applicability_quantity.py",
+      "testedSha256": "4FD6578D11BC482A53F6631606BF10BA73ED4E43D9827A6FB0F0593AE5ABA962",
+      "deliveredSha256": "4FD6578D11BC482A53F6631606BF10BA73ED4E43D9827A6FB0F0593AE5ABA962"
+    },
+    {
+      "canonicalPath": "backend/pde/migrations/0026_material_role_layer_correction.py",
+      "packagePath": "candidate\\backend\\pde\\migrations\\0026_material_role_layer_correction.py",
+      "testedSha256": "68B0BFA639D40A039F30722BCE064382DA9FA29F5724A1E1A52A234925BA6646",
+      "deliveredSha256": "68B0BFA639D40A039F30722BCE064382DA9FA29F5724A1E1A52A234925BA6646"
+    }
+  ],
+  "noProductionApplyRunner": true,
+  "previousPackagePreserved": true,
+  "readOnlyPatchCheck": "PASS"
+}

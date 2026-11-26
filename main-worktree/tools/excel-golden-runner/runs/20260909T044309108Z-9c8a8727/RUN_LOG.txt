@@ -1,0 +1,47 @@
+2026-09-09T12:43:09.3133044+08:00 正在检查 Microsoft Excel……
+2026-09-09T12:43:09.4272042+08:00 正在验证原始工作簿……
+2026-09-09T12:43:09.4393825+08:00 正在创建只读验证副本……
+2026-09-09T12:43:26.0532001+08:00 正在启动用户会话中的独立 Excel……
+2026-09-09T12:43:31.7060203+08:00 正在打开 Excel 只读验证副本……（尚未开始公式计算）
+2026-09-09T12:43:35.5542351+08:00 正在准备隔离技术探针与候选验证……（不修改来源工作表，不保存）
+2026-09-09T12:43:56.0312670+08:00 正在使用 Microsoft Excel 原生计算……
+2026-09-09T12:44:03.5647391+08:00 Excel 原生计算：10 / 191
+2026-09-09T12:44:10.5693650+08:00 Excel 原生计算：20 / 191
+2026-09-09T12:44:16.7703191+08:00 Excel 原生计算：30 / 191
+2026-09-09T12:44:23.2019448+08:00 Excel 原生计算：40 / 191
+2026-09-09T12:44:29.6484359+08:00 Excel 原生计算：50 / 191
+2026-09-09T12:44:36.2500942+08:00 Excel 原生计算：60 / 191
+2026-09-09T12:44:43.1016628+08:00 Excel 原生计算：70 / 191
+2026-09-09T12:44:50.3431422+08:00 Excel 原生计算：80 / 191
+2026-09-09T12:44:57.7538252+08:00 Excel 原生计算：90 / 191
+2026-09-09T12:45:05.5263462+08:00 Excel 原生计算：100 / 191
+2026-09-09T12:45:13.0617173+08:00 Excel 原生计算：110 / 191
+2026-09-09T12:45:20.8220975+08:00 Excel 原生计算：120 / 191
+2026-09-09T12:45:28.9761506+08:00 Excel 原生计算：130 / 191
+2026-09-09T12:45:37.0031983+08:00 Excel 原生计算：140 / 191
+2026-09-09T12:45:45.3029193+08:00 Excel 原生计算：150 / 191
+2026-09-09T12:45:54.0612610+08:00 Excel 原生计算：160 / 191
+2026-09-09T12:46:02.7995666+08:00 Excel 原生计算：170 / 191
+2026-09-09T12:46:11.9721028+08:00 Excel 原生计算：180 / 191
+2026-09-09T12:46:21.0056943+08:00 Excel 原生计算：190 / 191
+2026-09-09T12:46:21.9542922+08:00 Excel 原生计算：191 / 191
+2026-09-09T12:46:22.8388394+08:00 正在进行 Excel 与代码结果比对……
+2026-09-09T04:46:32.623508+00:00 PYTHON FAILURE
+Traceback (most recent call last):
+  File "D:\Dev-PCE\Source\tools\excel-golden-runner\package_support.py", line 508, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "D:\Dev-PCE\Source\tools\excel-golden-runner\package_support.py", line 503, in main
+    return globals()[args.action](run_dir) or 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Dev-PCE\Source\tools\excel-golden-runner\package_support.py", line 426, in compare
+    indexed = validate_native(run, golden, plan, digest(run_dir / "RUN_CASE_PLAN.json"))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Dev-PCE\Source\tools\excel-golden-runner\package_support.py", line 392, in validate_native
+    require(applied["actual"] == {"type": change["type"], "value": change["value"]}, "NATIVE INPUT != REFERENCE INPUT")
+  File "D:\Dev-PCE\Source\tools\excel-golden-runner\package_support.py", line 57, in require
+    raise ValueError(message)
+ValueError: NATIVE INPUT != REFERENCE INPUT
+
+2026-09-09T12:46:32.7203707+08:00 EXCEL GOLDEN VALIDATION = BLOCKED. COMPARISON EVIDENCE INVALID
+2026-09-09T12:46:32.7615761+08:00 完成。结果目录：D:\Dev-PCE\Source\tools\excel-golden-runner\runs\20260909T044309108Z-9c8a8727

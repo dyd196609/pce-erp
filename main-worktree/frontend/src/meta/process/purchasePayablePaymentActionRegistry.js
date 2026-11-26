@@ -1,0 +1,157 @@
+export const PURCHASE_PAYABLE_PAYMENT_ACTION_VERSION = 'V1.14.2.3'
+
+export const terminalPaymentApplicationNotice = '当前版本只完成付款申请创建。付款申请审批与付款指令准备将在后续版本接入。'
+
+export const purchasePayablePaymentActions = [
+  {
+    actionCode: 'CREATE_PAYABLE_PREPARE',
+    pageStepId: 'payable-prepare',
+    actionName: '生成采购应付预备',
+    buttonText: '生成采购应付预备',
+    sourceObjectType: 'inventoryTransaction',
+    sourceObjectName: '库存流水',
+    targetObjectType: 'payablePrepare',
+    targetObjectName: '采购应付预备',
+    sourceNoField: 'transactionNo',
+    targetNoField: 'payablePrepareNo',
+    nextStepId: 'payable-check',
+    nextStepName: '应付核对',
+    outputRoutePath: '/finance/payable-prepares',
+  },
+  {
+    actionCode: 'COMPLETE_PAYABLE_CHECK',
+    pageStepId: 'payable-check',
+    actionName: '完成应付核对',
+    buttonText: '完成应付核对',
+    sourceObjectType: 'payablePrepare',
+    sourceObjectName: '采购应付预备',
+    targetObjectType: 'payableCheck',
+    targetObjectName: '应付核对',
+    sourceNoField: 'payablePrepareNo',
+    targetNoField: 'payableCheckNo',
+    nextStepId: 'supplier-settlement',
+    nextStepName: '供应商结算',
+    outputRoutePath: '/finance/payable-checks',
+  },
+  {
+    actionCode: 'CREATE_SUPPLIER_SETTLEMENT',
+    pageStepId: 'supplier-settlement',
+    actionName: '生成供应商结算',
+    buttonText: '生成供应商结算',
+    sourceObjectType: 'payableCheck',
+    sourceObjectName: '应付核对',
+    targetObjectType: 'supplierSettlement',
+    targetObjectName: '供应商结算',
+    sourceNoField: 'payableCheckNo',
+    targetNoField: 'settlementNo',
+    nextStepId: 'invoice-prepare',
+    nextStepName: '采购发票准备',
+    outputRoutePath: '/scm/supplier-settlements',
+  },
+  {
+    actionCode: 'GENERATE_PURCHASE_INVOICE_PREPARE',
+    pageStepId: 'invoice-prepare',
+    actionName: '生成采购发票准备',
+    buttonText: '生成采购发票准备',
+    sourceObjectType: 'purchaseReconciliation',
+    sourceObjectName: '采购对账',
+    targetObjectType: 'purchaseInvoicePrepare',
+    targetObjectName: '采购发票准备',
+    sourceNoField: 'reconciliationNo',
+    targetNoField: 'invoicePrepareNo',
+    nextStepId: 'account-payable-draft',
+    nextStepName: '应付草稿',
+    outputRoutePath: '/finance/purchase-invoice-prepares',
+  },
+  {
+    actionCode: 'SAVE_PURCHASE_INVOICE_PREPARE_DATA',
+    pageStepId: 'invoice-prepare',
+    actionName: '保存采购发票资料',
+    buttonText: '保存采购发票资料',
+    sourceObjectType: 'purchaseInvoicePrepare',
+    sourceObjectName: '采购发票准备',
+    targetObjectType: 'purchaseInvoicePrepare',
+    targetObjectName: '采购发票准备',
+    sourceNoField: 'prepareNo',
+    targetNoField: 'prepareNo',
+    nextStepId: 'invoice-prepare',
+    nextStepName: '采购发票准备',
+    outputRoutePath: '/finance/purchase-invoice-prepares',
+  },
+  {
+    actionCode: 'VALIDATE_PURCHASE_INVOICE_PREPARE',
+    pageStepId: 'invoice-prepare',
+    actionName: '执行采购发票要素校验',
+    buttonText: '执行采购发票要素校验',
+    sourceObjectType: 'purchaseInvoicePrepare',
+    sourceObjectName: '采购发票准备',
+    targetObjectType: 'purchaseInvoicePrepare',
+    targetObjectName: '采购发票准备',
+    sourceNoField: 'prepareNo',
+    targetNoField: 'prepareNo',
+    nextStepId: 'account-payable-draft',
+    nextStepName: '采购应付账款草稿',
+    outputRoutePath: '/finance/purchase-invoice-prepares',
+  },
+  {
+    actionCode: 'GENERATE_PURCHASE_ACCOUNTS_PAYABLE_DRAFT',
+    pageStepId: 'account-payable-draft',
+    actionName: '生成采购应付账款草稿',
+    buttonText: '测试租户生成采购应付账款草稿',
+    sourceObjectType: 'purchaseInvoicePrepare',
+    sourceObjectName: '采购发票准备',
+    targetObjectType: 'purchaseAccountsPayableDraft',
+    targetObjectName: '采购应付账款草稿',
+    sourceNoField: 'prepareNo',
+    targetNoField: 'draftNo',
+    nextStepId: 'account-payable-confirm',
+    nextStepName: '应付确认准备',
+    outputRoutePath: '/finance/ap-drafts',
+  },
+  {
+    actionCode: 'CONFIRM_ACCOUNT_PAYABLE',
+    pageStepId: 'account-payable-confirm',
+    actionName: '确认应付',
+    buttonText: '确认应付',
+    sourceObjectType: 'purchaseAccountsPayableDraft',
+    sourceObjectName: '采购应付账款草稿',
+    targetObjectType: 'accountPayableConfirm',
+    targetObjectName: '应付确认',
+    sourceNoField: 'draftNo',
+    targetNoField: 'payableConfirmNo',
+    nextStepId: 'payment-application',
+    nextStepName: '付款申请',
+    outputRoutePath: '/finance/account-payable-confirms',
+  },
+  {
+    actionCode: 'CREATE_PAYMENT_APPLICATION',
+    pageStepId: 'payment-application',
+    actionName: '生成付款申请',
+    buttonText: '生成付款申请',
+    sourceObjectType: 'accountPayableConfirm',
+    sourceObjectName: '应付确认',
+    targetObjectType: 'paymentApplication',
+    targetObjectName: '付款申请',
+    sourceNoField: 'payableConfirmNo',
+    targetNoField: 'paymentApplicationNo',
+    nextStepId: 'payment-instruction-prepare',
+    nextStepName: '付款指令准备',
+    outputRoutePath: '/finance/payment-applications',
+    terminalNotice: terminalPaymentApplicationNotice,
+  },
+]
+
+const actionByCode = new Map(purchasePayablePaymentActions.map((item) => [item.actionCode, item]))
+const actionByStepId = new Map(purchasePayablePaymentActions.map((item) => [item.pageStepId, item]))
+
+export function listPurchasePayablePaymentActions() {
+  return purchasePayablePaymentActions.map((item) => ({ ...item }))
+}
+
+export function findPurchasePayablePaymentAction(actionCode) {
+  return actionByCode.get(actionCode) || null
+}
+
+export function findPurchasePayablePaymentActionByStepId(pageStepId) {
+  return actionByStepId.get(pageStepId) || null
+}

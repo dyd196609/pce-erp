@@ -1,0 +1,178 @@
+{
+  "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+  "companyId": 1,
+  "version": "V2",
+  "rules": [
+    {
+      "ruleCode": "PAINTING-PROCESS-VISIBLE-AREA",
+      "ruleName": "按完整冻结工艺码逐对象汇总正式见光面积",
+      "version": "V2",
+      "specification": {
+        "rulePackage": {
+          "code": "PAINTING-PROCESS-AREA",
+          "version": "V2"
+        },
+        "inputs": [
+          {
+            "canonicalName": "area_quantity",
+            "valueType": "decimal",
+            "unit": "m2",
+            "unitDimension": "area",
+            "sourceType": "AGGREGATED",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "PaintingProcessAreaQuantity",
+            "valueType": "decimal",
+            "resultDomain": "DERIVED_FACT",
+            "unit": "m2",
+            "unitDimension": "area"
+          }
+        ],
+        "expression": "area_quantity",
+        "dependencies": [],
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "applicability": {},
+        "sourceEvidence": {
+          "reference": "PCE-PAINTING-FULL-CODE-EOR-20261014：用户确认原完整来源工艺码直接作为ProductPaintingProcessCode，按正式见光面积逐对象承接；保留旧已覆盖对象，仅EOR，不进入APS",
+          "sourceAuthority": "原成功EngineeringDerivedFact、Detail、Calculation对象输入与confirmed冻结BaselineItem；routingProcessCode来自正式冻结来源文本并交叉证明来源C字段及Hash，不修改任何来源或设计修订",
+          "areaTypeDecision": "VISIBLE_AREA；输入仅正式原见光面积，不混入其他面积类型",
+          "coverageDecision": "objectInputConditions严格IS_NULL原冻结paintProcessTypeId；原已有独立工艺FK对象保留其原Fact、规则和EOR",
+          "objectDecision": "完整工艺码+面积类型+designItemId+baselineItemId逐对象GROUP_SUM，两个零面积对象保留正式零Fact"
+        },
+        "factExtension": {
+          "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+          "outputUomId": 18,
+          "strategy": "GROUP_SUM",
+          "productCategoryIds": [
+            1,
+            2,
+            3
+          ],
+          "groupKeys": [
+            "ProductPaintingProcessCode",
+            "AreaType",
+            "designItemId",
+            "baselineItemId"
+          ],
+          "metadataBindings": [
+            {
+              "name": "ProductPaintingProcessCode",
+              "sourceType": "FORMAL_FROZEN_VALUE",
+              "inputPath": [
+                "routingProcessCode"
+              ]
+            },
+            {
+              "name": "AreaType",
+              "sourceType": "CONFIGURATION_VALUE",
+              "value": "VISIBLE_AREA"
+            },
+            {
+              "name": "baselineId",
+              "sourceType": "FORMAL_SOURCE_IDENTITY",
+              "valueField": "baselineId"
+            },
+            {
+              "name": "baselineItemId",
+              "sourceType": "FORMAL_SOURCE_IDENTITY",
+              "valueField": "baselineItemId"
+            },
+            {
+              "name": "designItemId",
+              "sourceType": "FORMAL_SOURCE_IDENTITY",
+              "valueField": "designItemId"
+            },
+            {
+              "name": "sourceAttributeId",
+              "sourceType": "FORMAL_SOURCE_IDENTITY",
+              "valueField": "sourceAttributeId"
+            },
+            {
+              "name": "sourceFactId",
+              "sourceType": "FORMAL_SOURCE_IDENTITY",
+              "valueField": "sourceFactId"
+            }
+          ],
+          "quantityTraceKey": "AreaQuantity",
+          "uomTraceKey": "UOM",
+          "inputHashTraceKey": "InputHash",
+          "bindings": [
+            {
+              "inputName": "area_quantity",
+              "sourceScope": "ORIGIN",
+              "sourceUomId": 18,
+              "targetUomId": 18,
+              "productCategoryIds": [
+                1
+              ],
+              "selector": {
+                "canonicalField": "W",
+                "producerRuleVersion": "V1",
+                "traceEquals": {
+                  "resultScope": "original"
+                },
+                "producerRuleCode": "APPROVED_SOURCE_NET"
+              }
+            },
+            {
+              "inputName": "area_quantity",
+              "sourceScope": "ORIGIN",
+              "sourceUomId": 18,
+              "targetUomId": 18,
+              "productCategoryIds": [
+                2,
+                3
+              ],
+              "selector": {
+                "canonicalField": "Q",
+                "producerRuleVersion": "V1",
+                "traceEquals": {
+                  "resultScope": "original"
+                },
+                "producerRuleCode": "APPROVED_SOURCE_NET"
+              }
+            }
+          ],
+          "objectInputConditions": [
+            {
+              "inputPath": [
+                "paintProcessTypeId"
+              ],
+              "operator": "IS_NULL"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "consolidatedReadback": {
+    "groupKeys": [
+      "ProductPaintingProcessCode",
+      "AreaType",
+      "designItemId",
+      "baselineItemId"
+    ],
+    "identityFields": [
+      "baselineId",
+      "baselineItemId",
+      "designItemId",
+      "sourceAttributeId",
+      "sourceFactId"
+    ],
+    "coverageCondition": [
+      {
+        "inputPath": [
+          "paintProcessTypeId"
+        ],
+        "operator": "IS_NULL"
+      }
+    ]
+  },
+  "businessDecision": "完整冻结来源routingProcessCode原样作为ProductPaintingProcessCode，不截取、不拆分、不根据名称推断；IS_NULL独立油漆工艺FK对象增量承接，已有正式油漆关联对象保留"
+}

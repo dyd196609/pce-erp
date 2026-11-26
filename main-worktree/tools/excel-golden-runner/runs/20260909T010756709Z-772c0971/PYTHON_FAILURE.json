@@ -1,0 +1,6 @@
+{
+  "time": "2026-09-09T01:15:29.430936+00:00",
+  "action": "compare",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\package_support.py\", line 446, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\package_support.py\", line 441, in main\n    return globals()[args.action](run_dir) or 0\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\package_support.py\", line 364, in compare\n    indexed = validate_native(run, golden, plan, digest(run_dir / \"RUN_CASE_PLAN.json\"))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\package_support.py\", line 334, in validate_native\n    require(output[\"formula\"].replace(\"_xlfn.\", \"\") == definition[\"formula\"].replace(\"_xlfn.\", \"\"), \"NATIVE FORMULA DRIFT\")\n  File \"D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\package_support.py\", line 57, in require\n    raise ValueError(message)\nValueError: NATIVE FORMULA DRIFT\n",
+  "native_result_not_invented": true
+}

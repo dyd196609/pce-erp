@@ -1,0 +1,69 @@
+{
+    "run_id":  "20260909T010756709Z-772c0971",
+    "windows_user":  "PCE-FZG\\DAODA",
+    "runner_pid":  29000,
+    "runner_session":  4,
+    "explorer_processes":  [
+                               {
+                                   "Id":  26192,
+                                   "SessionId":  4
+                               }
+                           ],
+    "excel_registration":  [
+                               {
+                                   "key":  "Registry::HKEY_CLASSES_ROOT\\Excel.Application\\CLSID",
+                                   "value":  "{00024500-0000-0000-C000-000000000046}"
+                               },
+                               {
+                                   "key":  "Registry::HKEY_CLASSES_ROOT\\CLSID\\{00024500-0000-0000-C000-000000000046}\\LocalServer32",
+                                   "value":  "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE /automation"
+                               },
+                               {
+                                   "key":  "Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\excel.exe",
+                                   "value":  "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE"
+                               },
+                               {
+                                   "key":  "Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\excel.exe",
+                                   "value":  "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE"
+                               }
+                           ],
+    "excel_paths":  [
+                        "C:\\Program Files\\Microsoft Office\\Root\\Office16\\EXCEL.EXE"
+                    ],
+    "errors":  [
+                   {
+                       "time":  "2026-09-09T09:15:29.5381365+08:00",
+                       "chain":  [
+                                     {
+                                         "type":  "System.Management.Automation.RuntimeException",
+                                         "message":  "COMPARISON EVIDENCE INVALID",
+                                         "hresult":  "0x80131501"
+                                     }
+                                 ],
+                       "position":  "At D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\run_excel_golden_validation.ps1:90 char:44\r\n+ ... ($LASTEXITCODE -notin @(0,3)) { throw \u0027COMPARISON EVIDENCE INVALID\u0027 }\r\n+                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+                   }
+               ],
+    "elevated":  false,
+    "excel_process":  {
+                          "pid":  26280,
+                          "session":  4,
+                          "started":  "2026-09-09T09:08:06.7735787+08:00"
+                      },
+    "native_stage":  "NATIVE_CAPTURE_COMPLETE",
+    "workbook_open":  {
+                          "status":  "OPENED",
+                          "method":  "Workbooks.Open(FileName, UpdateLinks=0, ReadOnly=true)",
+                          "file":  "D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\runs\\20260909T010756709Z-772c0971\\source-readonly-copy.xlsx",
+                          "bytes":  2039767,
+                          "omitted_optional_arguments":  "EXCEL_DEFAULTS; NORMAL_OPEN_NO_REPAIR",
+                          "macros_disabled":  true,
+                          "display_alerts":  false,
+                          "events_enabled":  false,
+                          "ask_to_update_links":  false,
+                          "culture":  "zh-CN",
+                          "ui_culture":  "en-US",
+                          "excel_build":  "20326",
+                          "protected_view_count":  null,
+                          "error":  null
+                      }
+}

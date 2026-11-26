@@ -1,0 +1,48 @@
+{
+  "status": "PASS",
+  "started_at": "2026-09-08T12:56:49.825395+00:00",
+  "checks": {
+    "manifest_and_frozen_hashes": "PASS",
+    "source_path_sha_readability": "PASS",
+    "isolated_copy_and_run_directory": "PASS",
+    "case_definitions_families_imports_source_mapping": "PASS",
+    "python_and_modules_compile": "PASS",
+    "all_112_intact_formulas_parse": "PASS",
+    "comparator_and_contract_tests": "PASS",
+    "all_selected_cases_reference_exercised": "PASS",
+    "output_schema": "PASS",
+    "excel_installation_discovery": "PASS",
+    "powershell_syntax": "PASS",
+    "tested_code_equals_packaged_code": "PASS"
+  },
+  "native_excel_executed": false,
+  "workbook_safety": {
+    "zip_readable": true,
+    "automatic_refresh_on_load": false,
+    "connection_metadata_checked": [
+      "xl/connections.xml",
+      "xl/queryTables/queryTable1.xml"
+    ]
+  },
+  "selected_cases": 280,
+  "selected_families": 112,
+  "unit_test_count": 23,
+  "reference_precheck_counts": {
+    "EVALUATED_NOT_NATIVE_VERIFIED": 267,
+    "BROKEN_DEPENDENCY": 13
+  },
+  "powershell_version": "5.1.26100.9168",
+  "tested_files": {
+    "RUN_EXCEL_GOLDEN_VALIDATION.cmd": "A7E4AC1E190A1176C3D7E12F6DC621CC035500920ADF9F8540C07D568925188A",
+    "run_excel_golden_validation.ps1": "95EE1056986331B0D93E51923FCC8BE0F97D73A03BFDDA55BA985873D4DBD4B8",
+    "runner_common.ps1": "CC3BA233A8510D4743E3C67A0CE5F4CB7B9225BA9C9DD9CCA961EB52EB32BD1F",
+    "native_excel_runner.ps1": "636582316BF89F93E0893806887BFFFCDC56D279123DE3189876CCE9288E4C1F",
+    "package_support.py": "C0536F473592A9C73E0EFEC61439DFE796B20435C0996462F85BB10361A12208",
+    "test_package.py": "131FBEEBA0EB4AA15BF53DC56A044A1CFF6FB70C134515107C7843A661C5BF66",
+    "README_FOR_USER.txt": "F72339C2CB6F4B524148BA847B2192A86B7803B2ACC75CF9BBC3D55CEC943AA1",
+    "OUTPUT_SCHEMA.json": "51DF10C9F33C0266E105289A008C619ADDE5A59B37BF4BE406B8759AA1B2BE76"
+  },
+  "package_manifest_sha": "A7E72FF599F82252C8999BFCB6CA520AB0E7F9F7FBF5794DEFFC347F73822998",
+  "native_excel_status": "NOT_EXECUTED",
+  "finished_at": "2026-09-08T12:57:10.452104+00:00"
+}

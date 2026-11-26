@@ -1,0 +1,39 @@
+{
+  "baselineId": "PCE_FORMAL_CONTINUATION_CURRENT_PROTECTION_V1_20261102",
+  "appliesTo": "Prospective canonical source only; not fixed N implementation/execution approval",
+  "historicalAuthorization": "UNKNOWN_RETAINED",
+  "legacyExpected": {
+    "create_instance": "07f9d304cfbf1f11ccc58ccff6e46402cee6704b6c83cfee758ee69b14e65bc5",
+    "confirm_instance_source": "7456c0e2ffb1746aa0fc885b1eefd7c87f169292443406613caa5a3f5e4b80e9",
+    "validate": "ee92d6d6580ae43cf827918ae184f609cd0e5aa44bd9753ffaca548e023d8b75",
+    "execute": "2afafc3779388e1d80adce93a3c96398e1eda1bd6aa3ee89ec0dee5b6c0b2f69",
+    "_execute_atomic": "26ac07d593d10e5ec2522d9795ae5372e2e3e9b117302dc9a22e0d3a5e2c30a1"
+  },
+  "currentMethods": {
+    "create_instance": "bad48dc1eaa10117b28c7eb3d204da1b009eadfe8771fd6bc528bb3bae7ca8df",
+    "confirm_instance_source": "7456c0e2ffb1746aa0fc885b1eefd7c87f169292443406613caa5a3f5e4b80e9",
+    "validate": "75432fe3f7838e9a9e5350710af2bc827776e5d8e228b92dc61e6d6e34bd8abc",
+    "execute": "2afafc3779388e1d80adce93a3c96398e1eda1bd6aa3ee89ec0dee5b6c0b2f69",
+    "_execute_atomic": "45dab55f9708ac5f29e9d4cd07d3e3a36f8ab01cddc00572ab405648164c1b4d"
+  },
+  "helpers": {
+    "formal_engineering_continuation_service.py": {
+      "_baseline_reference": "49873d4b67ef0f4a999f0875da90ef952e1f85dc68b69c2b84f1fba87f12575c",
+      "_snapshot_design_input": "a8f34bf222a2f1fe53adf38e1e8c7290cd33324394243e8bcfd504fa9dd0f486",
+      "_guard_consumed_legacy_revision": "5102c188aa9ea2f0ae010d165d4d3f4dc3f64e36adcb8b58ab55e3a337eda92f",
+      "_resolve_context": "9abfa3a5d4b4e23b07e5e3d5de000fc3ad3ef558210bd1d06984fc0f5bc25ead",
+      "_selected_workbook": "a525d5c83302c631e64bf26adeabe24a9833d7a915f7bd9a3bc577fdf4b297b4",
+      "_preview_baseline_inputs": "775b700fb4bc2c09ba61b98dac4dc12a4870bd6ce08c0c72cbce836794cdb834"
+    },
+    "baseline_source_identity.py": {
+      "_hash": "a621190852ffe0a50916d6b44a79b67dfd30ee1ff7abd4f7a8ff35c7d362add8",
+      "resolve_baseline_source_identity": "bd3fe6343cfe13c1d9a7c1b7d0dbda6092825c09896aa6c897ce3444a778d8ca"
+    }
+  },
+  "reviewEvidence": {
+    "path": "docs/governance/evidence/PCE_FORMAL_CONTINUATION_CURRENT_BOUNDARY_REVIEW_20261102.json",
+    "sha256": "1617b3daca39bc3e81fd45ffa2089cb6e153e55d1975b67592092fd1757ce352"
+  },
+  "requiredBehaviorTests": "pde.test_baseline_source_identity; pde.test_existing_instance_fact_handoff; readonly integration evidence",
+  "legacyFailureEvidence": "work/oei7-controlled-baseline-20261102/TARGETED_TEST_RESULT.json; work/oei7-native-source-identity-20261102/TESTS_BEFORE_BASELINE.json"
+}

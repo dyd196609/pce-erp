@@ -1,0 +1,47 @@
+{
+  "templateCode": "PCE-ENTERPRISE-PAGE-ACCEPTANCE-MASTER-V1",
+  "version": "V1.14.2.8.4.20.7",
+  "name": "PCE-ERP统一页面验收母模板",
+  "statusVocabulary": ["PASS", "FAIL", "N/A", "UNKNOWN"],
+  "pageIdentity": {
+    "pageCode": "",
+    "pageName": "",
+    "pageUrl": "",
+    "moduleCode": "",
+    "businessObject": "",
+    "pageVersion": "",
+    "templateVersion": "PCE Enterprise Page V2"
+  },
+  "execution": {
+    "acceptanceRunId": "",
+    "executedAt": "",
+    "executor": "",
+    "automaticAcceptance": "UNKNOWN",
+    "manualAcceptance": "UNKNOWN",
+    "archiveStatus": "UNKNOWN"
+  },
+  "checks": [],
+  "summary": {
+    "total": 0,
+    "PASS": 0,
+    "FAIL": 0,
+    "N/A": 0,
+    "UNKNOWN": 0
+  },
+  "releaseGate": {
+    "nextPageAllowed": false,
+    "blockingReasons": []
+  },
+  "dataProtection": {
+    "productionUserDataWritten": false,
+    "businessWriteCount": 0,
+    "databaseHashBefore": "",
+    "databaseHashAfter": "",
+    "databaseHashUnchanged": null
+  },
+  "archive": {
+    "archivePath": "",
+    "manifestHash": "",
+    "immutable": false
+  }
+}

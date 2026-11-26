@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "started_at": "2026-09-08T14:42:04.551130+00:00",
+  "checks": {
+    "manifest_and_frozen_hashes": "PASS",
+    "source_path_sha_readability": "PASS",
+    "isolated_copy_and_run_directory": "PASS",
+    "case_definitions_families_imports_source_mapping": "PASS",
+    "python_and_modules_compile": "PASS",
+    "all_112_intact_formulas_parse": "PASS",
+    "comparator_and_contract_tests": "PASS",
+    "all_selected_cases_reference_exercised": "PASS",
+    "output_schema": "PASS",
+    "excel_installation_discovery": "PASS",
+    "powershell_syntax": "PASS",
+    "powershell_serialization_control_pid_interop": "PASS",
+    "tested_code_equals_packaged_code": "PASS"
+  },
+  "native_excel_executed": false,
+  "workbook_safety": {
+    "zip_readable": true,
+    "automatic_refresh_on_load": false,
+    "connection_metadata_checked": [
+      "xl/connections.xml",
+      "xl/queryTables/queryTable1.xml"
+    ]
+  },
+  "selected_cases": 280,
+  "selected_families": 112,
+  "unit_test_count": 23,
+  "reference_precheck_counts": {
+    "EVALUATED_NOT_NATIVE_VERIFIED": 267,
+    "BROKEN_DEPENDENCY": 13
+  },
+  "powershell_version": "5.1.26100.9168",
+  "powershell_contract_test_count": 30,
+  "tested_files": {
+    "RUN_EXCEL_GOLDEN_VALIDATION.cmd": "A7E4AC1E190A1176C3D7E12F6DC621CC035500920ADF9F8540C07D568925188A",
+    "run_excel_golden_validation.ps1": "B7734358325D20D862EA4DA66A7B3C4EE87647A3E5A0DF9F88A337EC6CF74F34",
+    "runner_common.ps1": "CC3BA233A8510D4743E3C67A0CE5F4CB7B9225BA9C9DD9CCA961EB52EB32BD1F",
+    "native_excel_runner.ps1": "6EA8992175F0A7AE98EB8829FC901C6AF7002ADC31AF7736654FC88719970243",
+    "package_support.py": "21E8CDAF632390E3307DBC556227ABD7C35606F6998B672DCE7688DCD3502B1C",
+    "test_package.py": "131FBEEBA0EB4AA15BF53DC56A044A1CFF6FB70C134515107C7843A661C5BF66",
+    "test_native_contract.ps1": "E8319C97AB59C19E5FAFBFACBDBE07B55ACDE3727F63476FD28F46F27DE53BA4",
+    "README_FOR_USER.txt": "9D20E6492FC2921E320CCA9B47FE5E4EF07D4ACDAC57BF190398E9A5F64701BC",
+    "OUTPUT_SCHEMA.json": "51DF10C9F33C0266E105289A008C619ADDE5A59B37BF4BE406B8759AA1B2BE76"
+  },
+  "package_manifest_sha": "588E9F28769A5A3BEE1D9736E593CA0FD39C99497074F63365CD8B0EEE2B5AF5",
+  "native_excel_status": "NOT_EXECUTED",
+  "finished_at": "2026-09-08T14:42:31.886501+00:00"
+}

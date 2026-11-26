@@ -1,0 +1,149 @@
+{
+  "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+  "companyId": 1,
+  "version": "V1",
+  "businessDecision": "用户明确确认5扇对应5套房门组装需求，3套门套独立保留；原事实不改，不建立全局扇转套单位换算",
+  "rules": [
+    {
+      "ruleCode": "DOOR-SET-QUANTITY",
+      "ruleName": "正式房门套数语义承接",
+      "version": "V1",
+      "specification": {
+        "rulePackage": {
+          "code": "DOOR-ASSEMBLY-FACT-EXTENSION",
+          "version": "V1"
+        },
+        "inputs": [
+          {
+            "canonicalName": "source_door_quantity",
+            "valueType": "decimal",
+            "unit": "扇",
+            "unitDimension": "count",
+            "sourceType": "AGGREGATED",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "DoorSetQuantity",
+            "valueType": "decimal",
+            "resultDomain": "DERIVED_FACT",
+            "unit": "套",
+            "unitDimension": "count"
+          }
+        ],
+        "expression": "source_door_quantity",
+        "dependencies": [],
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "applicability": {
+          "sourceSemantic": "USER_CONFIRMED_DOOR_QUANTITY_AS_COMPLETE_ASSEMBLY_SET"
+        },
+        "sourceEvidence": {
+          "reference": "PCE-DOOR-QUANTITY-DECISION-20261014：用户明确确认5扇对应5套房门组装需求，3套门套独立保留",
+          "sourceAuthority": "同公司已完成原正式工程核算的EngineeringDerivedFact、成功Detail和冻结对象输入",
+          "quantitySemanticDecision": "已确认门数量按对象恒等承接完整房门组装套数；未确认的其他门型不得由该样本推断",
+          "producerQuantityContract": "APPROVED_SOURCE_NET@V1 / productCategoryId=1 / original / U / UOM26",
+          "unitDecision": "输入规范化26扇到26扇，输出为已确认业务套数13；两者为count维度，未建立扇到套的全局UOM换算",
+          "excludedQuantity": "UOM13单面门套来源独立保留，不参与房门套数承接"
+        },
+        "factExtension": {
+          "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+          "outputUomId": 13,
+          "strategy": "OBJECT_FORMULA",
+          "productCategoryIds": [1],
+          "groupKeys": ["baselineItemId", "designItemId", "sourceAttributeId"],
+          "anchorInput": "source_door_quantity",
+          "inheritGroupIdentity": true,
+          "bindings": [
+            {
+              "inputName": "source_door_quantity",
+              "sourceScope": "ORIGIN",
+              "sourceUomId": 26,
+              "targetUomId": 26,
+              "productCategoryIds": [1],
+              "selectByUom": true,
+              "selector": {
+                "canonicalField": "U",
+                "producerRuleId": 11,
+                "producerRuleVersion": "V1",
+                "traceEquals": {"resultScope": "original"}
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "ruleCode": "DOOR-ASSEMBLY-QUANTITY",
+      "ruleName": "正式房门组装数量恒等承接",
+      "version": "V1",
+      "specification": {
+        "rulePackage": {
+          "code": "DOOR-ASSEMBLY-FACT-EXTENSION",
+          "version": "V1"
+        },
+        "inputs": [
+          {
+            "canonicalName": "source_set_quantity",
+            "valueType": "decimal",
+            "unit": "套",
+            "unitDimension": "count",
+            "sourceType": "AGGREGATED",
+            "required": true,
+            "unitRequired": true
+          }
+        ],
+        "outputs": [
+          {
+            "canonicalName": "DoorAssemblyQuantity",
+            "valueType": "decimal",
+            "resultDomain": "DERIVED_FACT",
+            "unit": "套",
+            "unitDimension": "count"
+          }
+        ],
+        "expression": "source_set_quantity",
+        "dependencies": ["DOOR-SET-QUANTITY"],
+        "decimalPrecision": 28,
+        "outputScale": 6,
+        "roundingMode": "ROUND_HALF_UP",
+        "applicability": {
+          "sourceSemantic": "FORMAL_COMPLETE_DOOR_SET_QUANTITY"
+        },
+        "sourceEvidence": {
+          "reference": "PCE-DOOR-ASSEMBLY-EOR-20261014：房门组装数量等于正式房门套数，逐对象保留来源",
+          "sourceAuthority": "同一版本化事实增量中DOOR-SET-QUANTITY@V1的正式输出",
+          "unitDecision": "套数13到13恒等承接，不乘产品数量，不计算面积或固定比例"
+        },
+        "factExtension": {
+          "contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1",
+          "outputUomId": 13,
+          "strategy": "OBJECT_FORMULA",
+          "productCategoryIds": [1],
+          "groupKeys": ["baselineItemId", "designItemId", "sourceAttributeId"],
+          "anchorInput": "source_set_quantity",
+          "inheritGroupIdentity": true,
+          "bindings": [
+            {
+              "inputName": "source_set_quantity",
+              "sourceScope": "EXTENSION",
+              "sourceUomId": 13,
+              "targetUomId": 13,
+              "productCategoryIds": [1],
+              "selectByUom": true,
+              "selector": {
+                "canonicalField": "DoorSetQuantity",
+                "producerRuleCode": "DOOR-SET-QUANTITY",
+                "producerRuleVersion": "V1",
+                "traceEquals": {"contractVersion": "PCE-ENGINEERING-FACT-EXTENSION-V1"}
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

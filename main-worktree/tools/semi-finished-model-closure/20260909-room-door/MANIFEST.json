@@ -1,0 +1,69 @@
+{
+  "status": "ISOLATED_TESTED_NOT_PRODUCTION_APPLIED",
+  "files": [
+    {
+      "path": "backend/pde/models.py",
+      "packagePath": "candidate\\backend\\pde\\models.py",
+      "testedSha": "12B635A103E3CC1CF5EFF3FD17730C90C222CE694BA65A2C85CCCFF110ABC0FF",
+      "deliveredSha": "12B635A103E3CC1CF5EFF3FD17730C90C222CE694BA65A2C85CCCFF110ABC0FF"
+    },
+    {
+      "path": "backend/pde/material_configuration_models.py",
+      "packagePath": "candidate\\backend\\pde\\material_configuration_models.py",
+      "testedSha": "5E01D87D26252E6C4DFA5876BD15BBFB0D48F116B739B1CC68A132F6F4D7BF6D",
+      "deliveredSha": "5E01D87D26252E6C4DFA5876BD15BBFB0D48F116B739B1CC68A132F6F4D7BF6D"
+    },
+    {
+      "path": "backend/pde/material_configuration_service.py",
+      "packagePath": "candidate\\backend\\pde\\material_configuration_service.py",
+      "testedSha": "015DC91E17303A651E6E0345C516578255E607F23FC4CD1F3D6410785EE5FC9B",
+      "deliveredSha": "015DC91E17303A651E6E0345C516578255E607F23FC4CD1F3D6410785EE5FC9B"
+    },
+    {
+      "path": "backend/pde/material_configuration_serializers.py",
+      "packagePath": "candidate\\backend\\pde\\material_configuration_serializers.py",
+      "testedSha": "B3B356778D619B878DDD86F02D19FBB71874A08521775EC3AEC9A6E838481904",
+      "deliveredSha": "B3B356778D619B878DDD86F02D19FBB71874A08521775EC3AEC9A6E838481904"
+    },
+    {
+      "path": "backend/pde/order_engineered_product_service.py",
+      "packagePath": "candidate\\backend\\pde\\order_engineered_product_service.py",
+      "testedSha": "3AA8D8B250AF1E39638B9ADA4B585B21DFC1EDDEE06D9E605CB7B6B6FEF4730B",
+      "deliveredSha": "3AA8D8B250AF1E39638B9ADA4B585B21DFC1EDDEE06D9E605CB7B6B6FEF4730B"
+    },
+    {
+      "path": "backend/pde/material_loss_policy_service.py",
+      "packagePath": "candidate\\backend\\pde\\material_loss_policy_service.py",
+      "testedSha": "AF6F2844F4D1C290CD9E341AE204F02A502A7E488D522F29E00578E72743B0B5",
+      "deliveredSha": "AF6F2844F4D1C290CD9E341AE204F02A502A7E488D522F29E00578E72743B0B5"
+    },
+    {
+      "path": "backend/pde/migrations/0024_restore_material_contract_state.py",
+      "packagePath": "candidate\\backend\\pde\\migrations\\0024_restore_material_contract_state.py",
+      "testedSha": "870B040621604FD131DC5A926AD15B408F54831BB7F2D240C66FF163179C4FF4",
+      "deliveredSha": "870B040621604FD131DC5A926AD15B408F54831BB7F2D240C66FF163179C4FF4"
+    },
+    {
+      "path": "backend/pde/migrations/0025_material_configuration_applicability_quantity.py",
+      "packagePath": "candidate\\backend\\pde\\migrations\\0025_material_configuration_applicability_quantity.py",
+      "testedSha": "4FD6578D11BC482A53F6631606BF10BA73ED4E43D9827A6FB0F0593AE5ABA962",
+      "deliveredSha": "4FD6578D11BC482A53F6631606BF10BA73ED4E43D9827A6FB0F0593AE5ABA962"
+    },
+    {
+      "path": "backend/pde/migrations/0026_material_role_layer_correction.py",
+      "packagePath": "candidate\\backend\\pde\\migrations\\0026_material_role_layer_correction.py",
+      "testedSha": "68B0BFA639D40A039F30722BCE064382DA9FA29F5724A1E1A52A234925BA6646",
+      "deliveredSha": "68B0BFA639D40A039F30722BCE064382DA9FA29F5724A1E1A52A234925BA6646"
+    },
+    {
+      "path": "backend/pde/migrations/0027_component_net_and_loss_policy.py",
+      "packagePath": "candidate\\backend\\pde\\migrations\\0027_component_net_and_loss_policy.py",
+      "testedSha": "80B4EEF01E50B98C13DF7ABFA328D70ADE02DFB95866F4283A08A464B90834E3",
+      "deliveredSha": "80B4EEF01E50B98C13DF7ABFA328D70ADE02DFB95866F4283A08A464B90834E3"
+    }
+  ],
+  "productionApplyRunner": false,
+  "previousPackagePreserved": true,
+  "replaySha": "4AFF0A95B6C810218FFF09415F592EE2170F6EE40AADF155ECC058B73F907967",
+  "readOnlyPatchCheck": "PASS"
+}

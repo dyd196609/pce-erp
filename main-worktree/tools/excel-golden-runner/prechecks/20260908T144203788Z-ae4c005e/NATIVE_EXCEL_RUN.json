@@ -1,0 +1,32 @@
+{
+    "run_id":  "20260908T144203788Z-ae4c005e",
+    "mode":  "PACKAGE_PRECHECK",
+    "execution_status":  "NOT_EXECUTED",
+    "validation_status":  "NOT_EXECUTED",
+    "source_sha":  "7ED132C13F6F7B13F5805F3872EC06528D9342A8E821A4D6F3D8B571243FB122",
+    "source_sha_after":  "7ED132C13F6F7B13F5805F3872EC06528D9342A8E821A4D6F3D8B571243FB122",
+    "run_copy_sha":  "7ED132C13F6F7B13F5805F3872EC06528D9342A8E821A4D6F3D8B571243FB122",
+    "run_copy_sha_after":  "7ED132C13F6F7B13F5805F3872EC06528D9342A8E821A4D6F3D8B571243FB122",
+    "original_unchanged":  true,
+    "windows_user":  "PCE-FZG\\CodexSandboxOffline",
+    "session_id":  3,
+    "excel_pid":  null,
+    "excel_version":  null,
+    "calculation_start":  null,
+    "calculation_end":  null,
+    "result_count":  0,
+    "exit_code":  0,
+    "started_at":  "2026-09-08T22:42:03.8582075+08:00",
+    "finished_at":  "2026-09-08T22:42:31.9699289+08:00",
+    "workbook_copy":  "D:\\Dev-PCE\\Source\\tools\\excel-golden-runner\\prechecks\\20260908T144203788Z-ae4c005e\\source-readonly-copy.xlsx",
+    "update_links":  0,
+    "macros_disabled":  true,
+    "original_saved":  false,
+    "package_manifest_sha":  "588E9F28769A5A3BEE1D9736E593CA0FD39C99497074F63365CD8B0EEE2B5AF5",
+    "plan_sha":  "6D7D4C2DFF3BB8B758285964801BAA90DC06549AF89B620608381CB077021B2F",
+    "error":  null,
+    "cleanup_errors":  [
+
+                       ],
+    "native_stage":  "NOT_STARTED"
+}

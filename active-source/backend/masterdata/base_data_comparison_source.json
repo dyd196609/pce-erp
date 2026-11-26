@@ -1,0 +1,1008 @@
+{
+  "version": "BASE-DATA-COMPARISON-SOURCE-V1.0",
+  "sources": {
+    "customers": {
+      "fileName": "07经销商.xlsx",
+      "sha256": "A56852DF8969DA184FB519859592B30E9F2EBB86AE06CDC79D134A2F006BCCF6",
+      "sheet": "客户管理",
+      "rows": [
+        {
+          "sourceRow": 2,
+          "sequence": "1",
+          "sourceName": "上海李保华",
+          "phone": ""
+        },
+        {
+          "sourceRow": 3,
+          "sequence": "2",
+          "sourceName": "上海王燕",
+          "phone": ""
+        },
+        {
+          "sourceRow": 4,
+          "sequence": "3",
+          "sourceName": "终端(唐乐安)",
+          "phone": ""
+        },
+        {
+          "sourceRow": 5,
+          "sequence": "4",
+          "sourceName": "上海刘保永",
+          "phone": ""
+        },
+        {
+          "sourceRow": 6,
+          "sequence": "5",
+          "sourceName": "上海张素霞",
+          "phone": ""
+        },
+        {
+          "sourceRow": 7,
+          "sequence": "6",
+          "sourceName": "温岭江公馆",
+          "phone": ""
+        },
+        {
+          "sourceRow": 8,
+          "sequence": "7",
+          "sourceName": "杭州蔡总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 9,
+          "sequence": "8",
+          "sourceName": "终端(张华民)",
+          "phone": ""
+        },
+        {
+          "sourceRow": 10,
+          "sequence": "9",
+          "sourceName": "上海李尧",
+          "phone": ""
+        },
+        {
+          "sourceRow": 11,
+          "sequence": "10",
+          "sourceName": "终端（戴铭晔）",
+          "phone": ""
+        },
+        {
+          "sourceRow": 12,
+          "sequence": "11",
+          "sourceName": "李雪钻",
+          "phone": ""
+        },
+        {
+          "sourceRow": 13,
+          "sequence": "12",
+          "sourceName": "终端（戴桂丹）",
+          "phone": ""
+        },
+        {
+          "sourceRow": 14,
+          "sequence": "13",
+          "sourceName": "临平叶总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 15,
+          "sequence": "14",
+          "sourceName": "杭州青柠荟（优思）",
+          "phone": ""
+        },
+        {
+          "sourceRow": 16,
+          "sequence": "15",
+          "sourceName": "临安佰丽爱家",
+          "phone": ""
+        },
+        {
+          "sourceRow": 17,
+          "sequence": "16",
+          "sourceName": "湖州王斌",
+          "phone": ""
+        },
+        {
+          "sourceRow": 18,
+          "sequence": "17",
+          "sourceName": "柏集蒋总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 19,
+          "sequence": "18",
+          "sourceName": "宁波孙总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 20,
+          "sequence": "19",
+          "sourceName": "上海高总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 21,
+          "sequence": "20",
+          "sourceName": "吴江曹建良",
+          "phone": ""
+        },
+        {
+          "sourceRow": 22,
+          "sequence": "21",
+          "sourceName": "宜兴孙总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 23,
+          "sequence": "22",
+          "sourceName": "建德陈垂南",
+          "phone": ""
+        },
+        {
+          "sourceRow": 24,
+          "sequence": "23",
+          "sourceName": "南通蔡总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 25,
+          "sequence": "24",
+          "sourceName": "金玉山",
+          "phone": ""
+        },
+        {
+          "sourceRow": 26,
+          "sequence": "25",
+          "sourceName": "李晨光",
+          "phone": ""
+        },
+        {
+          "sourceRow": 27,
+          "sequence": "26",
+          "sourceName": "萧山周义生",
+          "phone": ""
+        },
+        {
+          "sourceRow": 28,
+          "sequence": "27",
+          "sourceName": "方为",
+          "phone": ""
+        },
+        {
+          "sourceRow": 29,
+          "sequence": "28",
+          "sourceName": "海宁梅安民",
+          "phone": ""
+        },
+        {
+          "sourceRow": 30,
+          "sequence": "29",
+          "sourceName": "上海樊总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 31,
+          "sequence": "30",
+          "sourceName": "海宁邱兰",
+          "phone": ""
+        },
+        {
+          "sourceRow": 32,
+          "sequence": "31",
+          "sourceName": "海宁叶总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 33,
+          "sequence": "32",
+          "sourceName": "米兰俞总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 34,
+          "sequence": "33",
+          "sourceName": "长兴周江敏",
+          "phone": ""
+        },
+        {
+          "sourceRow": 35,
+          "sequence": "34",
+          "sourceName": "上海王会来",
+          "phone": ""
+        },
+        {
+          "sourceRow": 36,
+          "sequence": "35",
+          "sourceName": "湖州冯总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 37,
+          "sequence": "36",
+          "sourceName": "暖汐装饰",
+          "phone": ""
+        },
+        {
+          "sourceRow": 38,
+          "sequence": "37",
+          "sourceName": "罗剑光",
+          "phone": ""
+        },
+        {
+          "sourceRow": 39,
+          "sequence": "38",
+          "sourceName": "温岭斑马家居",
+          "phone": ""
+        },
+        {
+          "sourceRow": 40,
+          "sequence": "39",
+          "sourceName": "杭州弘木",
+          "phone": ""
+        },
+        {
+          "sourceRow": 41,
+          "sequence": "40",
+          "sourceName": "宁海陈总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 42,
+          "sequence": "41",
+          "sourceName": "上海钱总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 43,
+          "sequence": "42",
+          "sourceName": "上海颉仕实业",
+          "phone": ""
+        },
+        {
+          "sourceRow": 44,
+          "sequence": "43",
+          "sourceName": "德意宁海尚佰",
+          "phone": ""
+        },
+        {
+          "sourceRow": 45,
+          "sequence": "44",
+          "sourceName": "台州林振峰",
+          "phone": ""
+        },
+        {
+          "sourceRow": 46,
+          "sequence": "45",
+          "sourceName": "温岭拉谜",
+          "phone": ""
+        },
+        {
+          "sourceRow": 47,
+          "sequence": "46",
+          "sourceName": "临安王总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 48,
+          "sequence": "47",
+          "sourceName": "桐乡何小艳",
+          "phone": ""
+        },
+        {
+          "sourceRow": 49,
+          "sequence": "48",
+          "sourceName": "杭州老濮",
+          "phone": ""
+        },
+        {
+          "sourceRow": 50,
+          "sequence": "49",
+          "sourceName": "董总(董力）",
+          "phone": ""
+        },
+        {
+          "sourceRow": 51,
+          "sequence": "50",
+          "sourceName": "南浔张林",
+          "phone": ""
+        },
+        {
+          "sourceRow": 52,
+          "sequence": "51",
+          "sourceName": "嘉兴高总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 53,
+          "sequence": "52",
+          "sourceName": "柯桥尚佰",
+          "phone": ""
+        },
+        {
+          "sourceRow": 54,
+          "sequence": "53",
+          "sourceName": "上海王清义",
+          "phone": ""
+        },
+        {
+          "sourceRow": 55,
+          "sequence": "54",
+          "sourceName": "儒德木业",
+          "phone": ""
+        },
+        {
+          "sourceRow": 56,
+          "sequence": "55",
+          "sourceName": "上海王峰",
+          "phone": ""
+        },
+        {
+          "sourceRow": 57,
+          "sequence": "56",
+          "sourceName": "青云红方装饰",
+          "phone": ""
+        },
+        {
+          "sourceRow": 58,
+          "sequence": "57",
+          "sourceName": "杭州王斌",
+          "phone": ""
+        },
+        {
+          "sourceRow": 59,
+          "sequence": "58",
+          "sourceName": "好艺家（沈总）",
+          "phone": ""
+        },
+        {
+          "sourceRow": 60,
+          "sequence": "59",
+          "sourceName": "柯桥吴总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 61,
+          "sequence": "60",
+          "sourceName": "上海王掌权",
+          "phone": ""
+        },
+        {
+          "sourceRow": 62,
+          "sequence": "61",
+          "sourceName": "上海董总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 63,
+          "sequence": "62",
+          "sourceName": "富阳朱玉波",
+          "phone": ""
+        },
+        {
+          "sourceRow": 64,
+          "sequence": "63",
+          "sourceName": "宁波张利芳",
+          "phone": ""
+        },
+        {
+          "sourceRow": 65,
+          "sequence": "64",
+          "sourceName": "蒋允健",
+          "phone": ""
+        },
+        {
+          "sourceRow": 66,
+          "sequence": "65",
+          "sourceName": "48快装上海店",
+          "phone": ""
+        },
+        {
+          "sourceRow": 67,
+          "sequence": "66",
+          "sourceName": "耿总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 68,
+          "sequence": "67",
+          "sourceName": "桐乡骆总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 69,
+          "sequence": "68",
+          "sourceName": "均瑶倪总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 70,
+          "sequence": "69",
+          "sourceName": "绍兴吴总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 71,
+          "sequence": "70",
+          "sourceName": "桐乡装修公司",
+          "phone": ""
+        },
+        {
+          "sourceRow": 72,
+          "sequence": "71",
+          "sourceName": "赛特莱德",
+          "phone": ""
+        },
+        {
+          "sourceRow": 73,
+          "sequence": "72",
+          "sourceName": "上海羊总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 74,
+          "sequence": "73",
+          "sourceName": "普朗克电梯",
+          "phone": ""
+        },
+        {
+          "sourceRow": 75,
+          "sequence": "74",
+          "sourceName": "嘉兴阮总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 76,
+          "sequence": "75",
+          "sourceName": "上海张英",
+          "phone": ""
+        },
+        {
+          "sourceRow": 77,
+          "sequence": "76",
+          "sourceName": "宁海中意",
+          "phone": ""
+        },
+        {
+          "sourceRow": 78,
+          "sequence": "77",
+          "sourceName": "上海亿联张总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 79,
+          "sequence": "78",
+          "sourceName": "南通繆总",
+          "phone": ""
+        },
+        {
+          "sourceRow": 80,
+          "sequence": "79",
+          "sourceName": "华建明",
+          "phone": ""
+        },
+        {
+          "sourceRow": 81,
+          "sequence": "80",
+          "sourceName": "姚文青",
+          "phone": ""
+        },
+        {
+          "sourceRow": 82,
+          "sequence": "81",
+          "sourceName": "朱安琪",
+          "phone": ""
+        },
+        {
+          "sourceRow": 83,
+          "sequence": "82",
+          "sourceName": "天工装饰",
+          "phone": ""
+        },
+        {
+          "sourceRow": 84,
+          "sequence": "83",
+          "sourceName": "吴墉春",
+          "phone": ""
+        },
+        {
+          "sourceRow": 85,
+          "sequence": "84",
+          "sourceName": "终端客户",
+          "phone": ""
+        },
+        {
+          "sourceRow": 86,
+          "sequence": "85",
+          "sourceName": "杭州青柠荟",
+          "phone": ""
+        },
+        {
+          "sourceRow": 87,
+          "sequence": "86",
+          "sourceName": "上海张永生",
+          "phone": ""
+        },
+        {
+          "sourceRow": 88,
+          "sequence": "87",
+          "sourceName": "绿呈",
+          "phone": ""
+        },
+        {
+          "sourceRow": 89,
+          "sequence": "88",
+          "sourceName": "上海松肃装饰董总",
+          "phone": ""
+        }
+      ]
+    },
+    "suppliers": {
+      "fileName": "09供应商.xlsx",
+      "sha256": "402D3B2AFE7DFA88A341991FBEF559E5F862970F47B550DB2543E432BF845965",
+      "sheet": "供应商目录",
+      "rows": [
+        {
+          "sourceRow": 2,
+          "sequence": "1",
+          "sourceName": "阿哩阿哆",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 3,
+          "sequence": "2",
+          "sourceName": "兔宝宝家具板（艺木艺凡）",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 4,
+          "sequence": "3",
+          "sourceName": "鹏升建材（摩纳森）",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 5,
+          "sequence": "4",
+          "sourceName": "莫干山阿五建材",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 6,
+          "sequence": "5",
+          "sourceName": "浙江柏集家具",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 7,
+          "sequence": "6",
+          "sourceName": "风顺木皮",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 8,
+          "sequence": "7",
+          "sourceName": "兄弟木皮",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 9,
+          "sequence": "8",
+          "sourceName": "雪宝板材",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 10,
+          "sequence": "9",
+          "sourceName": "惠翔涂料",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 11,
+          "sequence": "10",
+          "sourceName": "震溶化工",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 12,
+          "sequence": "11",
+          "sourceName": "永丰线条",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 13,
+          "sequence": "12",
+          "sourceName": "金塘玻璃",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 14,
+          "sequence": "13",
+          "sourceName": "杨小龙胶水",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 15,
+          "sequence": "14",
+          "sourceName": "长河包装/高永泉（气泡膜）",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 16,
+          "sequence": "15",
+          "sourceName": "练市正南木业",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 17,
+          "sequence": "16",
+          "sourceName": "佳音包装（纸板）",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 18,
+          "sequence": "17",
+          "sourceName": "中山市远科新材料（封边胶）",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 19,
+          "sequence": "18",
+          "sourceName": "方圆不锈钢",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 20,
+          "sequence": "19",
+          "sourceName": "",
+          "phone": "",
+          "address": ""
+        },
+        {
+          "sourceRow": 21,
+          "sequence": "20",
+          "sourceName": "",
+          "phone": "",
+          "address": ""
+        }
+      ]
+    },
+    "uoms": {
+      "sourceFiles": [
+        {
+          "fileName": "01工序.xlsx",
+          "sha256": "310706432239D1017F48677B1A7BF6C4D6F9BA247C92946B239C5C9191EF6C38",
+          "sheet": "工序管理"
+        },
+        {
+          "fileName": "05半成品板材.xlsx",
+          "sha256": "2D2FC7BC7558CB0CDE9D8FE3521FCB83B0C9858C6827E24B85C192D4504124DF",
+          "sheet": "半成品板材"
+        },
+        {
+          "fileName": "10采购物料.xlsx",
+          "sha256": "0A5BFD0810C77B8A0DE92D08C68C58FD63EE2C9E32F506A3E607B2F8658CEA3D",
+          "sheet": "采购物料"
+        }
+      ],
+      "rows": [
+        {
+          "sourceValue": "KG",
+          "occurrences": 15,
+          "sourceFiles": [
+            "10采购物料.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 93,
+              "materialName": "LCH-002",
+              "materialCategory": "油漆",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 94,
+              "materialName": "LCH-006",
+              "materialCategory": "油漆",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 95,
+              "materialName": "水性漆",
+              "materialCategory": "油漆",
+              "specification": ""
+            }
+          ]
+        },
+        {
+          "sourceValue": "个",
+          "occurrences": 1,
+          "sourceFiles": [
+            "10采购物料.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 129,
+              "materialName": "对角",
+              "materialCategory": "辅料",
+              "specification": ""
+            }
+          ]
+        },
+        {
+          "sourceValue": "块",
+          "occurrences": 1,
+          "sourceFiles": [
+            "10采购物料.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 115,
+              "materialName": "银镜",
+              "materialCategory": "辅料",
+              "specification": ""
+            }
+          ]
+        },
+        {
+          "sourceValue": "套",
+          "occurrences": 1,
+          "sourceFiles": [
+            "01工序.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "01工序.xlsx",
+              "sourceRow": 9,
+              "operationName": "房门组装",
+              "quantityBasis": "房门数量"
+            }
+          ]
+        },
+        {
+          "sourceValue": "平方",
+          "occurrences": 24,
+          "sourceFiles": [
+            "10采购物料.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 70,
+              "materialName": "黑胡桃8518",
+              "materialCategory": "木皮",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 71,
+              "materialName": "银檀1826",
+              "materialCategory": "木皮",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 72,
+              "materialName": "白橡花纹",
+              "materialCategory": "木皮",
+              "specification": ""
+            }
+          ]
+        },
+        {
+          "sourceValue": "张",
+          "occurrences": 72,
+          "sourceFiles": [
+            "10采购物料.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 2,
+              "materialName": "全桉全连芯超平20",
+              "materialCategory": "板材",
+              "specification": "2440*1220*20"
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 3,
+              "materialName": "超平9（3200）",
+              "materialCategory": "板材",
+              "specification": "3200*1220*9"
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 4,
+              "materialName": "超平15（2440）",
+              "materialCategory": "板材",
+              "specification": "2440*1220*15"
+            }
+          ]
+        },
+        {
+          "sourceValue": "支",
+          "occurrences": 6,
+          "sourceFiles": [
+            "10采购物料.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 108,
+              "materialName": "门套线6*1.5",
+              "materialCategory": "辅料",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 109,
+              "materialName": "踢脚线6*1.5",
+              "materialCategory": "辅料",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 110,
+              "materialName": "门套线6*1.8",
+              "materialCategory": "辅料",
+              "specification": ""
+            }
+          ]
+        },
+        {
+          "sourceValue": "根",
+          "occurrences": 4,
+          "sourceFiles": [
+            "10采购物料.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 130,
+              "materialName": "T6青古铜",
+              "materialCategory": "辅料",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 131,
+              "materialName": "T8黑钛金",
+              "materialCategory": "辅料",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 132,
+              "materialName": "黄拉丝",
+              "materialCategory": "辅料",
+              "specification": ""
+            }
+          ]
+        },
+        {
+          "sourceValue": "桶",
+          "occurrences": 5,
+          "sourceFiles": [
+            "10采购物料.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 106,
+              "materialName": "170KG稀释剂（面）",
+              "materialCategory": "油漆",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 107,
+              "materialName": "170KG稀释剂（底）",
+              "materialCategory": "油漆",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 118,
+              "materialName": "25KG贴皮胶",
+              "materialCategory": "胶水",
+              "specification": ""
+            }
+          ]
+        },
+        {
+          "sourceValue": "米",
+          "occurrences": 2,
+          "sourceFiles": [
+            "10采购物料.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 40,
+              "materialName": "D31爱马仕灰2.2",
+              "materialCategory": "板材",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 46,
+              "materialName": "D31爱马仕灰5.0封边条",
+              "materialCategory": "板材",
+              "specification": ""
+            }
+          ]
+        },
+        {
+          "sourceValue": "袋",
+          "occurrences": 2,
+          "sourceFiles": [
+            "10采购物料.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 126,
+              "materialName": "高温封边胶",
+              "materialCategory": "辅料",
+              "specification": ""
+            },
+            {
+              "sourceFile": "10采购物料.xlsx",
+              "sourceRow": 127,
+              "materialName": "纯白封边胶",
+              "materialCategory": "辅料",
+              "specification": ""
+            }
+          ]
+        },
+        {
+          "sourceValue": "面积",
+          "occurrences": 31,
+          "sourceFiles": [
+            "01工序.xlsx"
+          ],
+          "examples": [
+            {
+              "sourceFile": "01工序.xlsx",
+              "sourceRow": 2,
+              "operationName": "开料",
+              "quantityBasis": "木工数量"
+            },
+            {
+              "sourceFile": "01工序.xlsx",
+              "sourceRow": 3,
+              "operationName": "贴皮",
+              "quantityBasis": "木工数量"
+            },
+            {
+              "sourceFile": "01工序.xlsx",
+              "sourceRow": 4,
+              "operationName": "拉丝/打磨",
+              "quantityBasis": "无法核算"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

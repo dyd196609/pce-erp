@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "required_files": {
+    "NATIVE_EXCEL_RUN.json": {"run_id":"string","mode":"string","execution_status":"string","validation_status":"string","source_sha":"nullable_string","run_copy_sha":"nullable_string","source_sha_after":"nullable_string","original_unchanged":"boolean","windows_user":"string","session_id":"integer","excel_pid":"nullable_integer","excel_version":"nullable_string","calculation_start":"nullable_string","calculation_end":"nullable_string","result_count":"integer","exit_code":"integer"},
+    "EXCEL_NATIVE_GOLDEN.json": {"run_id":"string","engine":"nullable_string","status":"string","source_sha":"nullable_string","plan_sha":"nullable_string","results":"array"},
+    "DIFFERENTIAL_RESULTS.json": {"run_id":"string","status":"string","results":"array","families":"array"},
+    "SESSION_DIAGNOSTIC.json": {"run_id":"string","windows_user":"string","runner_pid":"integer","runner_session":"integer","explorer_processes":"array","excel_registration":"array","excel_paths":"array","errors":"array"},
+    "RUN_MANIFEST.json": {"run_id":"string","mode":"string","package_manifest_sha":"nullable_string","source_sha":"nullable_string","run_copy_sha":"nullable_string","files":"object"}
+  },
+  "result_classes": ["PARITY_PASS","TECHNICAL_TRANSLATOR_DEFECT","SOURCE_BUSINESS_ISSUE","BROKEN_DEPENDENCY","USER_DECISION_REQUIRED","UNCLASSIFIED_DIFFERENCE"],
+  "classification_policy": "Mismatches stay UNCLASSIFIED_DIFFERENCE until technical investigation. Business/user classifications require separately evidenced adjudication; never assigned by this runner."
+}

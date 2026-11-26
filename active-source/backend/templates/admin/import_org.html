@@ -1,0 +1,28 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div id="content-main">
+    <h1>导入组织架构数据</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+            <label for="excel_file">选择 Excel 文件（.xlsx 或 .xls）：</label>
+            <input type="file" name="excel_file" accept=".xlsx, .xls" required>
+        </div>
+        <div style="margin-top: 20px;">
+            <p>Excel 文件应包含以下 sheet（表）：</p>
+            <ul>
+                <li><strong>公司</strong>：列名 <code>公司名称, 公司编码, 地址, 联系人, 电话</code></li>
+                <li><strong>部门</strong>：列名 <code>部门名称, 部门编码, 父级编码, 公司编码, 负责人</code></li>
+                <li><strong>岗位</strong>：列名 <code>岗位名称, 岗位编码, 部门编码, 公司编码, 权限代码列表</code></li>
+            </ul>
+            <p>权限代码列表示例：<code>procurement.can_submit_purchaseorder,procurement.can_cancel_purchaseorder</code></p>
+        </div>
+        <div style="margin-top: 20px;">
+            <input type="submit" value="导入" class="default">
+            <a href="{% url 'admin:index' %}" class="button">返回首页</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

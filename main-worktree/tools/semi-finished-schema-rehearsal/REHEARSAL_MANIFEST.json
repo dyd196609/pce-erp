@@ -1,0 +1,31 @@
+{
+  "contractVersion": "PCE-USER-SESSION-SCHEMA-REHEARSAL-V1.0",
+  "packageStatus": "READY_FOR_USER_AUTHORIZED_REHEARSAL",
+  "testedGitHead": "6058ee03022ac1f4ef7a40905aef32f0dd2e294e",
+  "webStaticAssertionCount": 1233,
+  "buildArtifact": "D:\\Dev-PCE\\Source\\frontend\\dist",
+  "buildArtifactFileCount": 281,
+  "buildArtifactTreeSha256": "3D780C05027FE689D86500D3919D25543560C7E142BB84F05207674D2F4D107D",
+  "buildArtifactTreeAlgorithm": "sorted-relative-path-null-raw-bytes-null-v1",
+  "sourceRoot": "D:\\Dev-PCE\\Source",
+  "backendSource": "D:\\Dev-PCE\\Source\\backend",
+  "frontendSource": "D:\\Dev-PCE\\Source\\frontend",
+  "productionDatabaseSource": "D:\\Dev-PCE\\Source\\backend\\db.sqlite3",
+  "candidateOverlay": "D:\\Dev-PCE\\Source\\tools\\semi-finished-model-closure\\20260909-room-door\\candidate\\backend",
+  "pythonExecutable": "C:\\Users\\DAODA\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+  "pythonModulePath": "D:\\Dev-PCE\\Source\\backend\\venv\\Lib\\site-packages",
+  "nodeExecutable": "D:\\nodejs\\node.exe",
+  "backendPort": 8001,
+  "frontendPort": 5183,
+  "targetMigrations": [
+    "0024_restore_material_contract_state",
+    "0025_material_configuration_applicability_quantity",
+    "0026_material_role_layer_correction",
+    "0027_component_net_and_loss_policy"
+  ],
+  "runtimeRoot": "D:\\Dev-PCE\\Source\\.runtime\\semi-finished-schema-user-session-rehearsal",
+  "hashLockFile": "HASH_LOCK.json",
+  "latestRunFile": "LATEST_RUN.json",
+  "productionMigrationRetryAuthorized": false,
+  "productionBusinessFactCreate": 0
+}
