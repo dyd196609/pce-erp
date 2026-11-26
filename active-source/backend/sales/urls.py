@@ -12,7 +12,17 @@ from .supply_admission_views import SupplyAdmissionView
 
 from .new_order_source import ConfirmOrderSourceView, NewOrderSourceView, RegisterOrderSourceScopeView
 
+from .followup_views import (
+    CustomerBindingView, CustomerOrderProgressView, CustomerProgressPublicationView, FollowupDirectoryView, FollowupOrderView,
+)
+
 urlpatterns = [
+    path("production-followup/", FollowupDirectoryView.as_view(), name="enterprise-production-followup"),
+    path("production-followup/<str:order_no>/", FollowupOrderView.as_view(), name="enterprise-production-followup-detail"),
+    path("customer-bindings/", CustomerBindingView.as_view(), name="enterprise-customer-binding"),
+    path("customer-progress/orders/", CustomerOrderProgressView.as_view(), name="customer-progress-list"),
+    path("customer-progress/orders/<str:order_no>/", CustomerOrderProgressView.as_view(), name="customer-progress-order"),
+    path("customer-progress/publication/<str:order_no>/", CustomerProgressPublicationView.as_view(), name="customer-progress-publication"),
     path("orders/new-sources/<int:source_record_id>/formal-scope/", RegisterOrderSourceScopeView.as_view()),
     path("orders/new-sources/<int:source_record_id>/confirm/", ConfirmOrderSourceView.as_view()),
     path("orders/new-sources/", NewOrderSourceView.as_view()),

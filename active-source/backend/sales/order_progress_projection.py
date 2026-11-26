@@ -127,12 +127,14 @@ def _task_progress(task, quantity_fact, order_id):
 
 
 @terminal_closure_read
-def _work_order_progress(fact,item,order):
+def _work_order_progress(fact,item,order, *, selected_task_id=None):
     from planning.work_order_models import ProductionWorkOrder
     from planning.workshop_task_models import ProductionWorkshopTask
     wo=ProductionWorkOrder.objects.select_related('production_plan__planning_requirement','material','uom').get(
         pk=fact['workOrderId'],company_id=order.company_id)
     ids=[x['taskId'] for x in fact['tasks']]
+    if selected_task_id is not None:
+        ids = [selected_task_id]
     tasks=list(ProductionWorkshopTask.objects.filter(pk__in=ids,work_order=wo,company_id=order.company_id).select_related(
         'source_operation__operation','workshop','work_center','work_order__source_schedule').order_by('source_operation__sequence','pk'))
     if {t.pk for t in tasks}!=set(ids):raise ValueError('A08_TASK_SET_CHANGED')
@@ -150,7 +152,7 @@ def _work_order_progress(fact,item,order):
 
 
 @scoped_execution_read
-def order_progress_facts(order,completion_facts):
+def order_progress_facts(order,completion_facts, *, selected_task_id=None):
     """No calculation of percent, cross-task totals, or completion qualification."""
     if (completion_facts.get('salesOrderId')!=order.pk or completion_facts.get('companyId')!=order.company_id
         or completion_facts.get('salesOrderVersion')!=order.version):raise ValueError('A08_ORDER_PROOF_MISMATCH')
@@ -165,7 +167,10 @@ def order_progress_facts(order,completion_facts):
             'supplyCoverage':deepcopy(fact.get('supplyCoverage')),'blockingReasons':deepcopy(fact['blockingReasons']),
             'workOrders':[]}
         for wo_fact in fact['workOrders']:
-            try:line['workOrders'].append(_work_order_progress(wo_fact,item,order))
+            if selected_task_id is not None and not any(task['taskId'] == selected_task_id for task in wo_fact['tasks']):
+                continue
+            try:
+                line['workOrders'].append(_work_order_progress(wo_fact, item, order, selected_task_id=selected_task_id))
             except Exception as exc:
                 failure=_failure(exc,'WORK_ORDER',wo_fact['workOrderId']);failed=failed or isinstance(exc,DatabaseError)
                 line['workOrders'].append({'workOrderId':wo_fact['workOrderId'],'factStatus':failure['factStatus'],

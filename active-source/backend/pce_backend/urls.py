@@ -162,6 +162,7 @@ urlpatterns = [
     path("api/pde/", include("pde.urls")),
     path("api/planning/", include("planning.urls")),
     path("api/sales/", include("sales.urls")),
+    path("api/analytics/procurement-risks/", include("reconciliation.risk_urls")),
     path("api/purchase/order/list", purchase_order_v6_list, name="purchase-order-v6-list"),
     path("api/purchase/order/detail", purchase_order_v6_detail, name="purchase-order-v6-detail"),
     path(

@@ -418,3 +418,6 @@ class OrderSourceFormalScope(models.Model):
     items = models.JSONField()
     registered_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     registered_at = models.DateTimeField(auto_now_add=True)
+
+
+from .followup_models import CustomerAccountBinding, CustomerProgressPublication, ProductionFollowupAssignment  # noqa: F401

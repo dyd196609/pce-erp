@@ -398,6 +398,12 @@ const routes = [
     component: () => import('@/views/Login.vue'),
   },
   {
+    path: '/customer/order-progress',
+    name: 'CustomerOrderProgress',
+    component: () => import('@/meta/pages/CustomerOrderProgressPage.vue'),
+    meta: { requiresServerAuthentication: true },
+  },
+  {
     path: '/login',
     component: () => import('@/meta/pages/LoginPage.vue'),
   },

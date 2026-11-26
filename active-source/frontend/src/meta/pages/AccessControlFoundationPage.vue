@@ -545,7 +545,10 @@ function syncPermissionSelection(){selectedPermissionCodes.value=[...(facts.role
 async function savePermissions(){saving.value=true;try{const response=await accessControlApi.action('SET_ROLE_PERMISSIONS',{roleId:permissionRoleId.value,permissionCodes:selectedPermissionCodes.value,reason:permissionReason.value});if(!response.success)throw new Error(response.error?.message||'保存失败');ElMessage.success('角色权限已保存并形成审计');permissionVisible.value=false;await refresh()}catch(error){ElMessage.error(error.message||String(error))}finally{saving.value=false}}
 
 const authorityVisible=ref(false),authorityUserId=ref(null),authorityRows=ref([]),authorityReason=ref(''),nonAdminUsers=computed(()=>facts.users.filter(row=>!row.isSuperuser))
-function defaultAuthority(){return{roleCode:'buyer',scopeCode:'SELF',departmentId:null,legalEntityId:String(facts.companies[0]?.id||'')}}
+function defaultAuthority() {
+  const user = facts.users.find(row => row.id === authorityUserId.value)
+  return { roleCode: 'buyer', scopeCode: 'SELF', departmentId: null, legalEntityId: String(user?.companyId ?? '') }
+}
 function openAuthorityEditor(user){authorityUserId.value=user?.id||nonAdminUsers.value[0]?.id||null;authorityReason.value='';syncAuthorityRows();authorityVisible.value=true}
 function syncAuthorityRows(){const user=facts.users.find(row=>row.id===authorityUserId.value);authorityRows.value=(user?.authorities||[]).map(row=>({...row,departmentId:['SELF','ALL',''].includes(String(row.departmentId))?null:Number(row.departmentId)}));if(!authorityRows.value.length)authorityRows.value=[defaultAuthority()]}
 async function saveAuthorities(){saving.value=true;try{const response=await accessControlApi.action('SET_USER_AUTHORITIES',{userId:authorityUserId.value,authorities:authorityRows.value,reason:authorityReason.value});if(!response.success)throw new Error(response.error?.message||'保存失败');ElMessage.success('用户角色与数据范围已保存并形成审计');authorityVisible.value=false;await refresh()}catch(error){ElMessage.error(error.message||String(error))}finally{saving.value=false}}

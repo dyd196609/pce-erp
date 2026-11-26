@@ -1,5 +1,5 @@
 <template>
- <section class="office-home" data-office-version="PCE-OFFICE-HOME-20261115-B4-R1" :aria-label="roleLabel+'工作摘要'">
+ <section class="office-home" data-office-version="PCE-OFFICE-HOME-20261115-B4-R1" :data-office-mounted-ms="routeMountedMs" :data-order-read-timing="JSON.stringify(orderReadTiming)" :aria-label="roleLabel+'工作摘要'">
   <h3>{{roleLabel}} · 授权记录与原入口</h3>
   <p>记录数来自原服务本次返回的完整授权目录，分页和筛选不改变总记录数；记录数不表示待办或完成数。</p>
   <nav aria-label="岗位原模块"><router-link v-for="link in links" :key="link.url" :to="link.url">{{link.label}}</router-link></nav>
@@ -56,7 +56,7 @@
 import {ROLE_STATE_NOTICE,ROLE_STATE_TRACE} from '@/meta/runtime/authoritativeFieldPresentation.js'
 import {computed,ref,watch,onBeforeUnmount} from 'vue'
 import {useRoute,useRouter} from 'vue-router'
-import {OFFICE_ROLES,projectOfficeRecords} from '@/meta/runtime/enterpriseOfficeHome.js'
+import {OFFICE_ROLES,officeOrderReadTiming,projectOfficeRecords} from '@/meta/runtime/enterpriseOfficeHome.js'
 import request from '@/api/request.js'
 import {getTabAuthEpoch} from '@/meta/runtime/tabAuthenticationContext.js'
 import PceBusinessStatus from '@/meta/components/PceBusinessStatus.vue'
@@ -65,6 +65,7 @@ import OrderProgressEvidence from '@/meta/components/OrderProgressEvidence.vue'
 const props=defineProps({role:{type:String,required:true},facts:{type:Object,default:null}})
 const roleLabel=computed(()=>OFFICE_ROLES.find(x=>x.key===props.role)?.label||'岗位')
 const route=useRoute(),router=useRouter()
+const routeMountedMs=performance.now(),orderReadTiming=ref(null)
 const kinds=ref({}),localRecord=ref(null),completion=ref(null),completionOrder=ref(''),completionError=ref(''),completionLoading=ref(false)
 const progress=ref(null),progressError=ref('')
 const orderResource=computed(()=>props.facts?.results.find(resource=>resource.key==='orders'))
@@ -118,6 +119,7 @@ function clearCompletion(){
  completionLoading.value=false
  progress.value=null
  progressError.value=''
+ orderReadTiming.value=null
 }
 watch([()=>props.role,()=>props.facts,()=>selectedRecord.value?.id,()=>route.query.officeProgress],()=>{
  cycle++
@@ -135,6 +137,7 @@ async function loadCompletion(row){
  clearCompletion()
  completionLoading.value=true
  const read=(params)=>request({url:`/api/sales/orders/${encodeURIComponent(orderId)}/`,params,meta:{module:'SALES',readOnly:true,factLoad:true},timeout:120000}).catch(()=>null)
+ const started=performance.now()
  let response=await read({includeProgressFacts:1,includeCompletionFacts:1})
  if(id!==cycle||epoch!==getTabAuthEpoch())return
  if(!response?.success&&response?.error?.code==='A08_RECORD_READ_FAILED'){
@@ -172,6 +175,7 @@ async function loadCompletion(row){
   return
  }
  progress.value=current
+ orderReadTiming.value=officeOrderReadTiming(orderId,started)
 }
 onBeforeUnmount(()=>{cycle++})
 </script>

@@ -49,8 +49,8 @@
         </section>
 
         <section v-if="showCockpitDiagnostics" class="system-status">
-          <el-tag type="success">{{ t('Tenant') }} {{ runtimeState.tenant.id }}</el-tag>
-          <el-tag>{{ t('Role') }} {{ runtimeState.role }}</el-tag>
+          <el-tag type="success">演示租户 {{ runtimeState.tenant.id }}</el-tag>
+          <el-tag>演示角色 {{ runtimeState.role }}</el-tag>
           <el-tag>{{ runtimeState.plan }}</el-tag>
           <el-tag :type="health.errorCount === 0 ? 'success' : 'danger'">
             {{ health.errorCount === 0 ? t('Healthy') : t('Attention') }}
@@ -68,7 +68,7 @@
           <strong>{{ health.errorCount === 0 ? t('Healthy') : t('Attention') }}</strong>
         </article>
         <article>
-          <span>{{ t('Tenant') }}</span>
+          <span>演示租户</span>
           <strong>{{ runtimeState.tenant.id }}</strong>
         </article>
         <article>

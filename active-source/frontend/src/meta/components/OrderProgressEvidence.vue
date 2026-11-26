@@ -1,5 +1,5 @@
 <template>
-  <section class="order-progress" aria-label="本单生产进度" :data-progress-order="progress.orderNo">
+  <section class="order-progress" :data-task-read-timing="JSON.stringify(taskReadTiming)" aria-label="本单生产进度" :data-progress-order="progress.orderNo">
     <h4>订单 {{ progress.orderNo }} · 生产进度</h4>
     <p>整单完成条件：{{ eligibilityLabel }}。现场实际完工时间：{{ physicalTime(completion) }}。</p>
     <p v-if="!progress.lines.length">原服务本次未返回订单行进度。</p>
@@ -109,10 +109,16 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/api/request.js'
+import { officeOrderReadTiming } from '@/meta/runtime/enterpriseOfficeHome.js'
 import { getTabAuthEpoch } from '@/meta/runtime/tabAuthenticationContext.js'
 
-const props = defineProps({ progress: { type: Object, required: true }, completion: { type: Object, required: true } })
+const props = defineProps({
+  progress: { type: Object, required: true },
+  completion: { type: Object, required: true },
+  readFollowupTask: { type: Function, default: null },
+})
 const route = useRoute(), router = useRouter()
+const taskReadTiming = ref(null)
 const evidence = ref(null), evidenceReadAt = ref(null), loading = ref(false), error = ref('')
 const activeLine = computed(() => props.progress.lines.find(line => String(line.salesOrderItemId) === route.query.officeOrderLine))
 const activeTask = computed(() => activeLine.value?.workOrders.flatMap(work => work.tasks || []).find(task =>
@@ -143,10 +149,16 @@ async function readTask() {
   const cycle = ++readCycle, epoch = getTabAuthEpoch()
   evidence.value = null; evidenceReadAt.value = null; error.value = ''; loading.value = false
   const progress = props.progress, task = activeTask.value, line = activeLine.value
-  if (!task || route.path !== '/home') return
+  if (!task || (!props.readFollowupTask && route.path !== '/home')) return
   loading.value = true
-  const response = await request({ url: `/api/sales/orders/${encodeURIComponent(progress.salesOrderId)}/`,
-    params: { includeProgressFacts: 1, progressTaskId: task.taskId }, meta: { module: 'SALES', readOnly: true, factLoad: true }, timeout: 120000 }).catch(() => null)
+  taskReadTiming.value = null
+  const started = performance.now()
+  const read = props.readFollowupTask
+    ? props.readFollowupTask(task.taskId)
+    : request({ url: `/api/sales/orders/${encodeURIComponent(progress.salesOrderId)}/`,
+      params: { includeProgressFacts: 1, progressTaskId: task.taskId, selectedTaskOnly: 1 },
+      meta: { module: 'SALES', readOnly: true, factLoad: true }, timeout: 120000 })
+  const response = await read.catch(() => null)
   if (cycle !== readCycle) return
   loading.value = false
   if (epoch !== getTabAuthEpoch()) return
@@ -167,6 +179,7 @@ async function readTask() {
   }
   evidence.value = selected
   evidenceReadAt.value = result.loadedAt
+  taskReadTiming.value = officeOrderReadTiming(progress.salesOrderId, started, String(task.taskId))
 }
 watch([activeTask, () => props.progress, () => route.path], readTask, { immediate: true })
 onBeforeUnmount(() => { readCycle++ })

@@ -358,3 +358,6 @@ class BusinessDocumentNumberSequence(models.Model):
 
     class Meta:
         db_table = "business_document_number_sequences"
+
+
+from .risk_models import ProcurementEvidenceRisk  # noqa: F401

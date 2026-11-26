@@ -6,6 +6,7 @@
       <p>从授权订单读取原记录，查看计划、工单、工序和完成条件。</p>
       <RouterLink :to="{ path: '/home', query: { role: 'management' } }">查看授权订单及生产进度</RouterLink>
     </section>
+    <ProductionFollowup v-if="isBusinessTrace" />
     <section v-if="isValidationCenter">
       <h2>采购事实核对</h2>
       <p>下方可核对采购订单、收货、检验与库存流水；应付依据从原页面查看。</p>
@@ -13,10 +14,11 @@
         <RouterLink to="/wms/purchase-receives">查看收货单</RouterLink>
         <RouterLink to="/finance/payable-checks">查看应付核对</RouterLink>
       </nav>
-      <p>跨单据一致性检查、销售生产验证规则和通用风险闭环尚未接入本页。</p>
+      <p>销售生产完成条件从业务链追踪的订单依据读取。</p>
     </section>
+    <ProcurementEvidenceRisk v-if="isValidationCenter" />
     <section v-loading="loading">
-      <h2>PO → Receipt → Inspection</h2>
+      <h2>采购订单、收货与检验</h2>
       <el-alert v-if="qualityError" type="warning" :title="qualityError" :closable="false" />
       <el-table v-else :data="quality.inspections || []" stripe>
         <el-table-column prop="purchaseOrderNo" label="采购订单编号" min-width="160" />
@@ -26,7 +28,7 @@
       </el-table>
     </section>
     <section v-loading="loading">
-      <h2>Inspection → Inbound → InventoryTransaction</h2>
+      <h2>检验、入库与库存流水</h2>
       <el-alert v-if="inventoryError" type="warning" :title="inventoryError" :closable="false" />
       <el-table v-else :data="inventory.transactions || []" stripe>
         <el-table-column prop="sourceInboundNo" label="来源入库单编号" min-width="160" />
@@ -44,6 +46,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { formalExecutionApi } from '@/api/formalExecution'
+import ProductionFollowup from '@/meta/components/ProductionFollowup.vue'
+import ProcurementEvidenceRisk from '@/meta/components/ProcurementEvidenceRisk.vue' 
 
 const route = useRoute()
 const isBusinessTrace = computed(() => route.path === '/business-trace')

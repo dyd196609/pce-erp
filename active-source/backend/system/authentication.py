@@ -47,6 +47,13 @@ class JWTAuthentication(authentication.BaseAuthentication):
         if not credential_context_matches(user, payload.get('credential_context')):
             raise exceptions.AuthenticationFailed('账号安全凭据已变化，请重新登录。')
 
+        from sales.followup_models import CustomerAccountBinding
+
+        if CustomerAccountBinding.objects.filter(account=user).exists():
+            match = request.resolver_match
+            if not match or match.url_name not in {"customer-progress-list", "customer-progress-order", "api_logout"}:
+                raise exceptions.PermissionDenied("客户账号仅可访问本客户订单进度。")
+
         request.pce_auth_context = {
             'backend': f'{self.__class__.__module__}.{self.__class__.__name__}',
             'jwtSubject': payload.get('sub'),

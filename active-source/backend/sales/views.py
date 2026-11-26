@@ -20,6 +20,9 @@ from pde.crm_order_admission import (
 )
 from pde.crm_sales_order_identity import normalize_business_text, source_business_identity
 from pde.routing_read_context import routing_read_request
+from planning.operation_resource_read_scope import scoped_execution_read
+from time import perf_counter, time
+import logging
 from pde.models import (
     EngineeringDocumentVersion, OrderCrossFunctionalReview,
     ProductConfiguration, ProductDefinition, ProductManufacturingOutput,
@@ -473,6 +476,19 @@ class SalesBaseView(APIView):
     def fail(self, error): return envelope(error.data, {"code": error.code, "message": error.message}, error.http_status)
 
 
+def _office_order_row(row):
+    delivery = row.delivery_information if isinstance(row.delivery_information, dict) else {}
+    return {
+        'id': row.pk, 'orderNo': row.order_no, 'customerName': row.customer.name,
+        'departmentName': row.department.name, 'orderDate': iso_value(row.order_date),
+        'requiredDate': iso_value(row.required_delivery_date), 'statusLabel': row.get_status_display(),
+        'deliveryFacts': {
+            'committedDeliveryDate': str(delivery.get('committedDeliveryDate') or ''),
+            'plannedCompletionDate': str(delivery.get('plannedCompletionDate') or ''),
+        },
+    }
+
+
 class SalesFactsView(SalesBaseView):
     @routing_read_request
     def get(self, request):
@@ -501,6 +517,12 @@ class SalesFactsView(SalesBaseView):
         ordering = request.query_params.get("ordering")
         if ordering in {"order_no", "-order_no", "order_date", "-order_date", "required_delivery_date", "-required_delivery_date", "created_at", "-created_at"}:
             orders = orders.order_by(ordering)
+        if request.query_params.get("officeDirectory") == "1":
+            rows = [_office_order_row(order) for order in orders.prefetch_related(None)]
+            facts = successful_fact_load_facts(result_count=len(rows), api_url=request.path,
+                tenant_id=str(request.user.company_id), request=request)
+            return envelope({"orders": rows, "authorization": decision, "factLoadFacts": facts,
+                **{key: facts for key in ("apiFacts", "pageFacts", "diagnosticFacts", "strictFacts")}})
         action_codes = [
             "sales.order.create", "sales.order.update", "sales.order.submit", "sales.order.approve",
             "sales.order.engineering.start", "sales.order.engineering.complete",
@@ -628,6 +650,29 @@ class SalesOrderCreateView(SalesBaseView):
 
 
 class SalesOrderDetailView(SalesBaseView):
+    @scoped_execution_read
+    def _read_production_facts(self, order, *, include_progress, selected_task_id):
+        from .mes_completion_admission import order_mes_completion_facts
+        from .order_progress_projection import order_progress_facts
+
+        started = time()
+        start = perf_counter()
+        completion = order_mes_completion_facts(order)
+        completion_end = perf_counter()
+        progress = None
+        if include_progress and completion["factLoadStatus"] != "read_failed":
+            try:
+                progress = order_progress_facts(order, completion, selected_task_id=selected_task_id)
+            except DatabaseError:
+                progress = {"salesOrderId": order.pk, "lines": None, "factStatus": "READ_FAILED"}
+        if include_progress:
+            logging.getLogger("pce.routing_read").warning(
+                "sales_order_read_phases order_id=%s selected_task_id=%s started_unix=%.6f completion_ms=%.3f progress_ms=%.3f",
+                order.pk, selected_task_id, started, (completion_end-start)*1000, (perf_counter()-completion_end)*1000,
+            )
+        return completion, progress
+
+    @routing_read_request
     def get(self, request, order_id):
         decision, denied = self.authorize(request, "sales.order.view")
         if denied: return denied
@@ -644,33 +689,32 @@ class SalesOrderDetailView(SalesBaseView):
         completion_facts = None
         progress_facts = None
         include_progress = request.query_params.get("includeProgressFacts") == "1"
-        if "progressTaskId" in request.query_params and not include_progress:
+        task_query = request.query_params.get("progressTaskId")
+        selected_only = request.query_params.get("selectedTaskOnly") == "1"
+        if (task_query is not None and not include_progress) or (selected_only and task_query is None):
             return self.fail(SalesBusinessError("A08_TASK_QUERY_INVALID", "请从本订单进度选择准确工序任务。", 400))
+        task_id = None
+        if task_query is not None:
+            if not task_query.isascii() or not task_query.isdecimal() or len(task_query) > 18 or int(task_query) <= 0:
+                return self.fail(SalesBusinessError("A08_TASK_QUERY_INVALID", "请从本订单进度选择准确工序任务。", 400))
+            task_id = int(task_query)
         if request.query_params.get("includeCompletionFacts") == "1" or include_progress:
-            from .mes_completion_admission import order_mes_completion_facts
-            completion_facts = order_mes_completion_facts(row)
+            completion_facts, progress_facts = self._read_production_facts(
+                row, include_progress=include_progress, selected_task_id=task_id if selected_only else None)
             if completion_facts["factLoadStatus"] == "read_failed":
                 return envelope({"order":{"id":row.pk,"mesCompletionFacts":completion_facts},"factLoadFacts":completion_facts,"authorization":decision},
                     {"code":"M09_FACT_READ_FAILED","message":"完成事实读取失败，结果未知。"},503)
         if include_progress:
-            from .order_progress_projection import order_progress_facts
-            try:
-                progress_facts = order_progress_facts(row, completion_facts)
-            except DatabaseError:
-                progress_facts = {"salesOrderId": row.pk, "lines": None, "factStatus": "READ_FAILED"}
             if progress_facts["factStatus"] == "READ_FAILED":
                 from workflow_runtime.fact_loads import build_fact_load_facts
                 failed = build_fact_load_facts(fact_load_status="read_failed", api_url=request.path,
                     http_status=503, error_code="A08_RECORD_READ_FAILED", error_message="订单进度原始记录读取失败，已取得的局部事实另列。",
                     tenant_id=str(row.company_id), batch_id=f"SalesOrder:{row.pk}:v{row.version}")
-                return envelope({"order": {"id": row.pk, "mesCompletionFacts": completion_facts, "progressFacts": progress_facts},
+                return envelope({"order": {"id":row.pk, "mesCompletionFacts": completion_facts, "progressFacts": progress_facts},
                     "factLoadFacts": failed}, {"code": "A08_RECORD_READ_FAILED", "message": failed["errorMessage"]}, 503)
-            if "progressTaskId" in request.query_params:
-                raw = request.query_params.get("progressTaskId", "")
-                if not raw.isdecimal() or int(raw) <= 0:
-                    return self.fail(SalesBusinessError("A08_TASK_QUERY_INVALID", "请从本订单进度选择准确工序任务。", 400))
+            if task_id is not None:
                 selected = [task for line in progress_facts["lines"] for wo in line["workOrders"]
-                    for task in wo.get("tasks") or [] if task["taskId"] == int(raw)]
+                    for task in wo.get("tasks") or [] if task["taskId"] == task_id]
                 if len(selected) != 1:
                     return self.fail(SalesBusinessError("A08_TASK_NOT_FOUND", "当前订单已核实范围内没有该任务。", 404))
                 progress_facts["selectedTask"] = selected[0]

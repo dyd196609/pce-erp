@@ -61,6 +61,11 @@ def _jwt_for_user(user):
 
 
 def _user_payload(user):
+    from sales.followup_models import CustomerAccountBinding
+
+    if CustomerAccountBinding.objects.filter(account=user).exists():
+        return {"id": user.pk, "username": user.username, "real_name": user.real_name,
+                "company_id": user.company_id, "customer_portal": True}
     return {
         "id": user.id,
         "username": user.username,
@@ -237,7 +242,13 @@ def api_login(request):
                 status=401,
             )
 
-        login(request, user)
+        from sales.followup_models import CustomerAccountBinding
+
+        customer_portal = CustomerAccountBinding.objects.filter(account=user).exists()
+        if not customer_portal:
+            login(request, user)
+        else:
+            logout(request)
         logger.info(
             "authentication_succeeded request_id=%s account_id=%s company_id=%s "
             "database_fingerprint=%s",

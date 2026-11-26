@@ -38,7 +38,7 @@ export function homeRecordTypeLabel(row,{groupKey,recordMode=false,handovers=fal
 const source = (key,title,url,field) => ({key,title,url,field})
 export function officeSources(role){
   if(role==='planning') return [source('planning','订单需求与生产计划','/api/planning/facts/','demands'),source('workOrders','授权已下达工单','/api/planning/work-order-workshop-reception/','workshopReceptionFacts')]
-  if(role==='management') return [source('orders','授权订单','/api/sales/facts/','orders'),source('workOrders','授权已下达工单','/api/planning/work-order-workshop-reception/','workshopReceptionFacts')]
+  if(role==='management') return [{...source('orders','授权订单','/api/sales/facts/','orders'),params:{officeDirectory:1}},source('workOrders','授权已下达工单','/api/planning/work-order-workshop-reception/','workshopReceptionFacts')]
   if(role==='system') return [source('system','组织与权限基础','/api/access-control/foundation/','users')]
   return []
 }
@@ -71,9 +71,31 @@ export function projectOfficeRecords(result,kind){
   if(kind==='departments')return d.departments.map(x=>row(kind,x.id,x.code,x.name,x.statusLabel,`/organization?tab=departments&search=${encodeURIComponent(x.code)}`,{公司名称:x.companyName||'未提供',上级部门名称:x.parentName||'未提供',部门负责人姓名:x.leaderEmployeeName||'未提供'},{departmentName:text(x.name)}))
   return []
 }
+export function officeOrderReadTiming(orderId, started, taskId = null) {
+  const orderPath = `/api/sales/orders/${orderId}/`
+  const directoryPaths = new Set(['/api/sales/facts/', '/api/planning/work-order-workshop-reception/'])
+  const nav = performance.getEntriesByType('navigation')[0]
+  const resources = performance.getEntriesByType('resource').flatMap(entry => {
+    const url = new URL(entry.name)
+    if (url.origin !== window.location.origin) return []
+    let phase
+    if (url.pathname === orderPath && entry.startTime >= started &&
+        url.searchParams.get('includeProgressFacts') === '1' &&
+        url.searchParams.get('progressTaskId') === taskId) phase = 'detail'
+    else if (directoryPaths.has(url.pathname) && taskId === null) phase = 'directory'
+    else if (url.pathname.startsWith('/api/auth/') && taskId === null) phase = 'session'
+    else if (url.pathname === '/api/access-control/profile/' && taskId === null) phase = 'profile'
+    else return []
+    return [{ phase, path: url.pathname, startMs: entry.startTime, requestMs: entry.requestStart,
+      responseMs: entry.responseEnd, serverMs: entry.serverTiming.find(value => value.name === 'routing-read')?.duration }]
+  })
+  return { timeOrigin: performance.timeOrigin, started, captured: performance.now(),
+    navigationType: nav?.type, domInteractive: nav?.domInteractive, resources: resources.slice(-12) }
+}
+
 export async function loadOfficeFacts(role,request){
   const results=await Promise.all(officeSources(role).map(async spec=>{
-    try{return readResult(spec,await request({url:spec.url,method:'GET',timeout:120000,meta:{module:'SYSTEM',readOnly:true,factLoad:true}}))}
+    try{return readResult(spec,await request({url:spec.url,method:'GET',params:spec.params,timeout:120000,meta:{module:'SYSTEM',readOnly:true,factLoad:true}}))}
     catch(e){return readResult(spec,{success:false,status:e.response?.status,error:{code:'READ_FAILED',message:'原服务暂未读到，记录及数量未知。请刷新。'}})}
   }))
   return {role,results,readAt:new Date().toISOString(),businessWrites:0}

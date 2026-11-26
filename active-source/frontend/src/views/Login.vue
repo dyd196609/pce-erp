@@ -102,7 +102,7 @@ async function handleLogin() {
     ElMessage.success('登录成功')
     const requested = typeof route.query.redirect === 'string' ? route.query.redirect : ''
     const redirect = requested.startsWith('/') && !requested.startsWith('//') && !/[\\\r\n]/.test(requested) ? requested : '/'
-    await router.push(redirect)
+    await router.push(authentication.user?.customer_portal ? '/customer/order-progress' : redirect)
   } catch (error) {
     ElMessage.error(error?.response?.data?.error || error?.message || '登录失败')
   } finally {

@@ -1,6 +1,7 @@
 const records = Object.freeze([
   ['/account-shortcuts', '快捷登录账户', '身份与访问控制'],
   ['/system-login', '账户登录', '身份与访问控制'],
+  ['/customer/order-progress', '客户订单进度', '客户服务'],
   ['/analytics', '企业数据智能分析平台', '企业运营分析'],
   ['/business-trace', '企业业务追踪中心', '企业运营分析'],
   ['/process-center', '业务流程中心', '平台工作台'],
