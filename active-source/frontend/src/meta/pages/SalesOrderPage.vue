@@ -51,7 +51,7 @@
       <strong>未取得订单数据</strong>
       <p>当前结果数量未知；请先处理上方明确原因后刷新。此状态不能解释为真实订单为 0 条。</p>
     </section>
-    <el-drawer v-model="detailVisible" size="78%" :title="detailOrder ? `订单详情 / ${detailOrder.orderNo}` : '订单详情'">
+    <el-drawer v-model="detailVisible" class="sales-order-detail" size="var(--sales-order-detail-width, 78%)" :title="detailOrder ? `订单详情 / ${detailOrder.orderNo}` : '订单详情'">
       <template v-if="detailOrder">
         <section class="detail-facts"><span>客户名称：<strong>{{ detailOrder.customerName }}</strong></span><span>销售订单状态：<strong>{{ detailOrder.statusLabel }}</strong></span><span>金额：<strong>{{ detailOrder.currency }} {{ detailOrder.totalAmount }}</strong></span><span>客户要求交期：<strong>{{ dateText(detailOrder.deliveryFacts?.customerRequiredDate) }}</strong></span><span>企业承诺交期：<strong>{{ dateText(detailOrder.deliveryFacts?.committedDeliveryDate) }}</strong></span><span>计划完成时间：<strong>{{ predictionText(detailOrder.deliveryFacts?.plannedCompletionDate) }}</strong></span><span>实际交付时间：<strong>{{ dateText(detailOrder.deliveryFacts?.actualDeliveryDate) }}</strong></span></section>
         <el-tabs>
@@ -84,7 +84,45 @@
           <el-tab-pane label="07 Routing"><p class="not-integrated">NOT YET INTEGRATED（尚未接入详情投影）；正式事实仍由 PDE Routing 持有。</p></el-tab-pane>
           <el-tab-pane label="08 制造准备"><p>制造准备状态：<strong>{{ detailOrder.manufacturingReadinessStatus }}</strong>；正式制造输出来自 PDE ProductManufacturingOutput。</p><el-table :data="detailOrder.planningChain?.lines || []" border><el-table-column prop="salesOrderItemId" label="订单行ID" width="100"/><el-table-column label="供应计划类型" min-width="150"><template #default="{row}">{{ supplyPlanTypeText(row) }}</template></el-table-column><el-table-column prop="planNo" label="供应计划编号" min-width="205"><template #default="{row}">{{ supplyPlanNumberText(row) }}</template></el-table-column><el-table-column label="来源选择提示" min-width="260"><template #default="{row}">{{ sourceSelectionText(row) }}</template></el-table-column><el-table-column prop="demandNo" label="需求编号"><template #default="{ row }">{{ row.demandNo || '尚未生成' }}</template></el-table-column><el-table-column prop="requiredQty" label="需求数量"/><el-table-column prop="inventorySnapshotQty" label="库存计算快照（未分配）" width="170"><template #default="{ row }">{{ row.inventorySnapshotQty ?? '尚未计算' }}</template></el-table-column><el-table-column prop="effectivePlanQty" label="有效计划量"/><el-table-column prop="pendingNetPlanQty" label="净需求待计划"/><el-table-column label="订单未覆盖"><template #default="{ row }">{{ row.uncoveredDemandQty ?? '未确认' }}</template></el-table-column><el-table-column label="数量校验" width="145"><template #default="{ row }">{{ planningQuantityText(row) }}</template></el-table-column><el-table-column prop="supplyTypeLabel" label="供应方式"><template #default="{ row }">{{ row.supplyTypeLabel || '尚未判定' }}</template></el-table-column><el-table-column label="当前阻断" min-width="240"><template #default="{ row }">{{ planningBlocker(row) }}</template></el-table-column></el-table><el-button class="trace-link" type="primary" plain @click="openPlanning(detailOrder)">打开订单计划工作台</el-button></el-tab-pane>
           <el-tab-pane label="09 采购/生产"><p>计划类型与编号对应同一原供应计划；多来源待选择保留原提示，不表示无计划，类型说明不替代办理资格。</p><el-table :data="detailOrder.planningChain?.lines || []" border><el-table-column prop="salesOrderItemId" label="订单行ID" width="100"/><el-table-column label="供应计划类型" min-width="150"><template #default="{row}">{{ supplyPlanTypeText(row) }}</template></el-table-column><el-table-column prop="planNo" label="供应计划编号" min-width="205"><template #default="{row}">{{ supplyPlanNumberText(row) }}</template></el-table-column><el-table-column label="来源选择提示" min-width="260"><template #default="{row}">{{ sourceSelectionText(row) }}</template></el-table-column><el-table-column prop="mpsRunNo" label="MPS建议"><template #default="{ row }">{{ row.mpsRunNo || '尚未生成' }}</template></el-table-column><el-table-column prop="mpsQty" label="MPS数量"/><el-table-column prop="mrpRunNo" label="MRP建议"><template #default="{ row }">{{ row.mrpRunNo || '尚未生成' }}</template></el-table-column><el-table-column label="MRP物料建议" min-width="260"><template #default="{ row }">{{ row.mrpProposals?.map(item => `${item.materialCode}:${item.netRequirement}/${item.supplyType}`).join('；') || '尚未生成' }}</template></el-table-column></el-table><p class="not-integrated">正式生产任务与资源排程尚未接入；没有工序、资源、工时、日历和占用事实时不生成排产日期。</p></el-tab-pane>
-          <el-tab-pane label="10 交付"><p>当前交付状态：{{ detailOrder.deliveryStatus }}</p><el-alert v-if="detailOrder.deliveryFacts?.associationConflictCount" title="存在未匹配、重复或单位冲突的交付批次；冲突批次不计入已交付数量。" type="error" show-icon :closable="false"/><el-table :data="detailOrder.deliveryFacts?.lines || []" border><el-table-column prop="lineNo" label="订单行" width="90"/><el-table-column prop="orderedQty" label="订单数量"/><el-table-column prop="deliveredQty" label="已交付"/><el-table-column prop="remainingQty" label="待交付"/><el-table-column label="数量校验" width="125"><template #default="{ row }">{{ deliveryQuantityText(row) }}</template></el-table-column><el-table-column prop="uomCode" label="单位"/><el-table-column prop="customerRequiredDate" label="客户要求交期" width="135"/><el-table-column label="企业承诺交期" width="135"><template #default="{ row }">{{ dateText(row.committedDeliveryDate) }}</template></el-table-column></el-table><h4>交付批次</h4><el-table :data="detailOrder.deliveryFacts?.batches || []" border empty-text="未维护交付批次"><el-table-column prop="batchNo" label="批次"/><el-table-column prop="lineNo" label="订单行"/><el-table-column prop="quantity" label="数量"/><el-table-column prop="uomCode" label="单位"/><el-table-column label="归属校验" min-width="190"><template #default="{ row }">{{ row.associationIssues?.join('；') || '匹配有效' }}</template></el-table-column><el-table-column prop="customerRequiredDate" label="客户要求交期" width="135"/><el-table-column prop="committedDeliveryDate" label="企业承诺交期" width="135"><template #default="{ row }">{{ dateText(row.committedDeliveryDate) }}</template></el-table-column><el-table-column prop="plannedCompletionDate" label="计划完成时间" width="135"><template #default="{ row }">{{ predictionText(row.plannedCompletionDate) }}</template></el-table-column><el-table-column prop="actualDeliveryDate" label="实际交付时间" width="135"><template #default="{ row }">{{ dateText(row.actualDeliveryDate) }}</template></el-table-column><el-table-column prop="statusLabel" label="交付批次状态"/></el-table><h4 v-if="detailOrder.deliveryFacts?.unmatchedBatches?.length">未匹配交付批次</h4><el-table v-if="detailOrder.deliveryFacts?.unmatchedBatches?.length" :data="detailOrder.deliveryFacts.unmatchedBatches" border><el-table-column prop="batchNo" label="批次"/><el-table-column prop="salesOrderItemId" label="订单行ID"/><el-table-column prop="lineNo" label="行号"/><el-table-column prop="reason" label="未匹配原因" min-width="260"/></el-table></el-tab-pane>
+          <el-tab-pane label="10 交付">
+            <SalesDeliveryEvidence v-if="detailOrder.deliveryFacts?.evidence" :key="detailOrder.id"
+              :facts="detailOrder.deliveryFacts.evidence" :order="detailOrder" @registered="showDetail(detailOrder)" />
+            <details>
+              <summary>原交付批次台账</summary>
+              <el-alert v-if="detailOrder.deliveryFacts?.associationConflictCount"
+                title="存在未匹配、重复或单位冲突的交付批次，请核对原记录。" type="error" show-icon :closable="false" />
+              <el-table :data="detailOrder.deliveryFacts?.batches || []" border empty-text="未维护交付批次">
+                <el-table-column prop="batchNo" label="批次" min-width="140" />
+                <el-table-column prop="lineNo" label="订单行" width="90" />
+                <el-table-column prop="quantity" label="登记数量" width="105" />
+                <el-table-column prop="uomCode" label="单位" width="80" />
+                <el-table-column prop="verificationLabel" label="核验状态" min-width="160">
+                  <template #default="{ row }">{{ row.associationIssues?.join('；') || row.verificationLabel }}</template>
+                </el-table-column>
+                <el-table-column prop="sourceNo" label="核验来源单号" min-width="135" />
+                <el-table-column prop="deliveryAuditId" label="核验审计" width="100" />
+                <el-table-column prop="customerRequiredDate" label="客户要求交期" width="135" />
+                <el-table-column label="企业承诺交期" width="135">
+                  <template #default="{ row }">{{ dateText(row.committedDeliveryDate) }}</template>
+                </el-table-column>
+                <el-table-column label="计划完成时间" width="135">
+                  <template #default="{ row }">{{ predictionText(row.plannedCompletionDate) }}</template>
+                </el-table-column>
+                <el-table-column label="原登记交付日期" width="150">
+                  <template #default="{ row }">{{ dateText(row.actualDeliveryDate) }}</template>
+                </el-table-column>
+              </el-table>
+              <template v-if="detailOrder.deliveryFacts?.unmatchedBatches?.length">
+                <h4>未匹配交付批次</h4>
+                <el-table :data="detailOrder.deliveryFacts.unmatchedBatches" border>
+                  <el-table-column prop="batchNo" label="批次" />
+                  <el-table-column prop="salesOrderItemId" label="订单行ID" />
+                  <el-table-column prop="lineNo" label="行号" />
+                  <el-table-column prop="reason" label="未匹配原因" min-width="260" />
+                </el-table>
+              </template>
+            </details>
+          </el-tab-pane>
           <el-tab-pane label="11 财务/结算"><p>当前结算状态：{{ detailOrder.settlementStatus }}</p><p class="not-integrated">应收、成本与结算尚未接入。</p></el-tab-pane>
           <el-tab-pane label="12 Audit/Timeline"><el-timeline><el-timeline-item v-for="x in detailOrder.statusTransitionHistory" :key="x.version" :timestamp="x.timestamp">{{ x.source_state }} → {{ x.target_state }}（{{ x.action_code }}）</el-timeline-item></el-timeline></el-tab-pane>
         </el-tabs>
@@ -123,6 +161,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch, nextTick } 
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { salesApi } from '@/api/sales'
+import SalesDeliveryEvidence from '@/meta/components/SalesDeliveryEvidence.vue'
 import PceBusinessStatus from '@/meta/components/PceBusinessStatus.vue'
 import PceEnterpriseListTable from '@/meta/components/PceEnterpriseListTable.vue'
 import { createPceEnterpriseListContract, usePceEnterpriseListRuntime } from '@/meta/runtime/pceEnterpriseListContract.js'
@@ -209,7 +248,6 @@ const dateText=value=>value||'未维护'
 const predictionText=value=>value||'尚无法预测'
 const planningBlocker=row=>row.demandId?(row.requirementId?(row.planId?'无':'尚未形成供应计划'):'尚未计算计划需求'):'尚未生成订单需求'
 const planningQuantityText=row=>row.planningQuantityStatus==='OVER_PLANNED'?`超计划 ${row.overPlannedQty}`:(row.planningQuantityStatus==='NET_REQUIREMENT_FULLY_PLANNED'?'净需求已足额计划':(row.planningQuantityStatus==='NOT_CALCULATED'?'尚未计算':'净需求仍待计划'))
-const deliveryQuantityText=row=>row.deliveryQuantityStatus==='OVER_DELIVERED'?`超交付 ${row.overDeliveredQty}`:(row.deliveryQuantityStatus==='DELIVERED'?'已全部交付':'仍有待交付')
 const factCount=value=>loading.value?'读取中':factsAvailable.value?Number(value??0):'未取得'
 const money=value=>Number(value||0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2})
 function readFailureMessage(response){const facts=response?.factLoadFacts||response?.data?.factLoadFacts||{};const code=String(response?.error?.code||facts.errorCode||'FACT_READ_FAILED');const detail=String(response?.error?.message||facts.errorMessage||'服务端事实读取失败');if(code==='not_authenticated'||Number(facts.httpStatus||response?.meta?.status)===401)return '未取得数据：当前未登录或会话已失效。请从正式系统登录入口登录后重试。';if(Number(facts.httpStatus||response?.meta?.status)===403||code.toLowerCase().includes('denied'))return `未取得数据：当前合法身份没有销售订单只读权限。${detail}`;return `未取得数据：销售订单读取失败。${detail}`}
@@ -310,4 +348,7 @@ onBeforeUnmount(()=>{loadSequence+=1;window.removeEventListener('pce:authenticat
   align-content:start; scrollbar-gutter:stable;
 }
 :global(.pce-list-page-content:has(> .sales-order-workbench)) { overflow-x:clip; overflow-y:visible; }
+@media (max-width: 640px) {
+  :global(.sales-order-detail) { --sales-order-detail-width: 100%; }
+}
 </style>

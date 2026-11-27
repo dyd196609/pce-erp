@@ -9,6 +9,7 @@ from .engineering_source_formalization_views import EngineeringSourceFormalizati
 from .development_contract_sample_views import DevelopmentContractEntryView, DevelopmentContractQuoteCalculateView, DevelopmentContractSampleView
 from .order_review_views import CrmOrderReviewView
 from .supply_admission_views import SupplyAdmissionView
+from .delivery_evidence_views import SalesDeliveryEvidenceView
 
 from .new_order_source import ConfirmOrderSourceView, NewOrderSourceView, RegisterOrderSourceScopeView
 
@@ -39,6 +40,7 @@ urlpatterns = [
     path("orders/source-intake/engineering-sources/<int:source_record_id>/development-contract/calculate/", DevelopmentContractQuoteCalculateView.as_view()),
     path("orders/", SalesOrderCreateView.as_view()),
     path("orders/<int:order_id>/", SalesOrderDetailView.as_view()),
+    path("orders/<int:order_id>/delivery-evidence/", SalesDeliveryEvidenceView.as_view(), name="sales-delivery-evidence"),
     path("orders/<int:order_id>/actions/<slug:action>/", SalesOrderActionView.as_view()),
     path("orders/<int:order_id>/items/<int:item_id>/", SalesOrderItemDetailView.as_view()),
     path("orders/<int:order_id>/confirm/", SalesOrderConfirmView.as_view()),

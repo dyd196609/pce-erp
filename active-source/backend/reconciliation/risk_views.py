@@ -25,7 +25,6 @@ from .models import PayableCheckAuthorityRecord, PurchaseReconciliation, Purchas
 from .risk_models import ProcurementEvidenceRisk
 
 
-RISK_TYPE = "ProcurementEvidenceRisk"
 ACTIONS = {
     "receive": ("reconciliation.evidence_risk.receive", "受理并指定处理人"),
     "process": ("reconciliation.evidence_risk.process", "提交处置证据"),
@@ -162,8 +161,9 @@ def public_difference(difference):
 
 
 def row_facts(actor, risk, permissions):
-    entries = list(history(actor, RISK_TYPE, risk.pk))
-    transitions = BusinessStateTransition.objects.filter(object_type=RISK_TYPE, object_id=risk.pk).order_by("version")
+    risk_type = type(risk).__name__
+    entries = list(history(actor, risk_type, risk.pk))
+    transitions = BusinessStateTransition.objects.filter(object_type=risk_type, object_id=risk.pk).order_by("version")
     transition_ids = list(transitions.values_list("audit_reference", flat=True))
     consistent = len(transition_ids) == risk.version - 1 and transition_ids == [
         f"organization-operating-audit:{entry.pk}" for entry in entries[1:]]
@@ -182,6 +182,25 @@ def row_facts(actor, risk, permissions):
             "operator_id", "reason", "timestamp", "audit_reference")),
         "statusTransitionCount": len(transition_ids), "stateMachineConsistent": consistent,
         "actions": actions}
+
+
+def apply_risk_action(actor, risk, rights, action, data, source_no, source):
+    facts = row_facts(actor, risk, rights)
+    if action not in {item["type"] for item in facts["actions"]}:
+        raise PermissionDenied("当前动作不可用。关闭必须由未参与受理或处理的授权复核人办理。")
+    if data["expectedVersion"] != risk.version:
+        return None
+    if action == "process":
+        risk.disposition = data["evidence"]
+        risk.save(update_fields=["disposition"])
+    target = "processed" if action == "process" else "closed"
+    action_code = ACTIONS[action][0]
+    entry = audit(actor, action_code, risk, source_no, data["reason"], {"status": risk.get_status_display()},
+        {"status": dict(risk.Status.choices)[target], "source": source, "evidence": data["evidence"]})
+    transition_business_object(business_object=risk, object_type=type(risk).__name__, source_state=risk.status,
+        target_state=target, action_code=action_code, operator=actor, reason=data["reason"],
+        audit_reference=f"organization-operating-audit:{entry.pk}", allowed_transitions=TRANSITIONS)
+    return row_facts(actor, risk, rights)
 
 
 class ProcurementRiskDirectoryView(EnterpriseView):
@@ -250,20 +269,7 @@ class ProcurementRiskActionView(EnterpriseView):
         rights = case_authority(actor, risk.difference)
         if not any(rights.values()) or (not rights["close"] and not rights["receive"] and actor.pk != risk.handler_id):
             raise NotFound("当前范围没有对应风险记录。")
-        facts = row_facts(actor, risk, rights)
-        if action not in {item["type"] for item in facts["actions"]}:
-            raise PermissionDenied("当前动作不可用。关闭必须由未参与受理或处理的授权复核人办理。")
-        if data["expectedVersion"] != risk.version:
+        facts = apply_risk_action(actor, risk, rights, action, data, order_no, public_difference(risk.difference))
+        if facts is None:
             return conflict("风险记录已变化，请读取最新记录。")
-        if action == "process":
-            risk.disposition = data["evidence"]
-            risk.save(update_fields=["disposition"])
-        target = "processed" if action == "process" else "closed"
-        action_code = ACTIONS[action][0]
-        entry = audit(actor, action_code, risk, order_no, data["reason"], {"status": risk.get_status_display()},
-            {"status": dict(risk.Status.choices)[target], "source": public_difference(risk.difference),
-             "evidence": data["evidence"]})
-        transition_business_object(business_object=risk, object_type=RISK_TYPE, source_state=risk.status,
-            target_state=target, action_code=action_code, operator=actor, reason=data["reason"],
-            audit_reference=f"organization-operating-audit:{entry.pk}", allowed_transitions=TRANSITIONS)
-        return response(request, {"risk": row_facts(actor, risk, rights)})
+        return response(request, {"risk": facts})

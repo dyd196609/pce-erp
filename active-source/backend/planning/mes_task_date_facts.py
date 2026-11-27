@@ -1,4 +1,6 @@
 """Date projection after native MES validation; never part of proof snapshots."""
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from .mes_test_source_bridge import execution_timezone
 from .workshop_task_time import task_datetime_label
 
@@ -38,3 +40,60 @@ def task_date_facts(task, start, *, report_dates=None, completion=None):
             'recordedAtLabel': task_datetime_label(row['recordedAt'], zone),
         } for row in report_dates]
     return facts
+
+
+def _instant(value, *, stored=False):
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        instant = parse_datetime(value)
+    except ValueError:
+        return None
+    if instant is None:
+        return None
+    if timezone.is_naive(instant):
+        return timezone.make_aware(instant, timezone.get_default_timezone()) if stored else None
+    return instant
+
+
+def compare_task_start(dates, *, now=None):
+    """Compare the frozen planned start only to the verified actual start."""
+    expected = _instant(dates.get('plannedStartAt'))
+    actual = _instant(dates.get('actualStartAt'), stored=True)
+    result = {
+        'plannedAt': dates.get('plannedStartAt'), 'actualAt': dates.get('actualStartAtLabel'),
+        'planSourceLabel': '工序冻结排程', 'actualSourceLabel': '原正式开工记录',
+        'isLate': False,
+    }
+    if expected is None:
+        return dict(result, statusLabel='开工延期待核', reason='缺少带明确时区的冻结计划开工时间。')
+    if actual is None:
+        reference = now or timezone.now()
+        if timezone.is_naive(reference):
+            reference = timezone.make_aware(reference, timezone.get_default_timezone())
+        passed = expected < reference
+        message = '计划开工时间已过，缺少已核实的实际开工记录。' if passed else '缺少已核实的实际开工记录。'
+        return dict(result, statusLabel='开工延期待核', reason=message)
+    late = actual > expected
+    return dict(result, isLate=late, statusLabel='开工延期' if late else '按时开工',
+                reason='实际开工晚于冻结计划开工时间。' if late else '实际开工未晚于冻结计划开工时间。')
+
+
+def task_timing_facts(dates, *, now=None):
+    """An effective review or a warehouse receipt does not supply physical finish time."""
+    planned = _instant(dates.get('plannedCompletionAt'))
+    actual = _instant(dates.get('physicalCompletionAt'), stored=True)
+    missing = []
+    if planned is None:
+        missing.append('带明确时区的冻结计划完成时间')
+    if actual is None:
+        missing.append('现场实际完工时间')
+    result = {'plannedAt': dates.get('plannedCompletionAt'), 'actualAt': dates.get('physicalCompletionAt'),
+              'planSourceLabel': '工序冻结排程', 'actualSourceLabel': '现场实际完工记录', 'isLate': False}
+    if missing:
+        result.update(statusLabel='完工延期待核', reason='缺少' + '、'.join(missing) + '。')
+    else:
+        late = actual > planned
+        result.update(isLate=late, statusLabel='完工延期' if late else '按时完工',
+                      reason='现场实际完工晚于冻结计划完成时间。' if late else '现场实际完工未晚于冻结计划完成时间。')
+    return {'start': compare_task_start(dates, now=now), 'completion': result}

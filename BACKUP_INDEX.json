@@ -1,5 +1,5 @@
 {
-  "runtimeManifestSHA256": "637a298f2fd949b16c6dd0b765df1a1957ac08df8c27c949c8291b539597487e",
+  "runtimeManifestSHA256": "78ba1c936cd4d57ef111d9c6e013c2e1edd4647235feba7b33d47a37ed60115f",
   "baselineId": "PCE-UNIFIED-20261114-ISO3-L16-R3",
   "lastVerifiedReleaseCommit": "49a30f83842ea34f09c4c094925a375cd09a79f1",
   "primaryWorktreeHEAD": "6058ee03022ac1f4ef7a40905aef32f0dd2e294e",
@@ -1903,8 +1903,8 @@
       },
       {
         "path": "backend/pce_backend/urls.py",
-        "sha256": "774a7f0dd887372bfa9e4f1a7be4175c33141b14822537243e7208d1bb22a6f8",
-        "bytes": 6847,
+        "sha256": "0637cc0fc27056c4b6737bea45391e33b68085db300628afc2115d061c26f947",
+        "bytes": 6943,
         "untracked": false
       },
       {
@@ -4579,8 +4579,8 @@
       },
       {
         "path": "backend/planning/mes_task_date_facts.py",
-        "sha256": "c0410faae0567f864079f8cc833b8b86dc38d75e1a991d81ea9fcda01e2eb830",
-        "bytes": 2142,
+        "sha256": "17422dd73c7cd9d0fc503a300149f223953f24798bdec6377a18a96ebffb5566",
+        "bytes": 5119,
         "untracked": false
       },
       {
@@ -6492,6 +6492,12 @@
         "untracked": false
       },
       {
+        "path": "backend/reconciliation/migrations/0005_operational_evidence_risk.py",
+        "sha256": "73e2ef2e35239f779ba7f6753449a2bca7b139bea928b24b8fdd892228e1ec33",
+        "bytes": 1979,
+        "untracked": false
+      },
+      {
         "path": "backend/reconciliation/migrations/__init__.py",
         "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
         "bytes": 1,
@@ -6499,8 +6505,20 @@
       },
       {
         "path": "backend/reconciliation/models.py",
-        "sha256": "b0f1489e61c7953edc6ee9154682ea143842b69709437b4b8276664afac90264",
-        "bytes": 17409,
+        "sha256": "1dc0ef9275df795e2b15319da75532d4631857d1fc110791dcf2d60b8e18f658",
+        "bytes": 17434,
+        "untracked": false
+      },
+      {
+        "path": "backend/reconciliation/operational_risk_urls.py",
+        "sha256": "520381f9bf7db85dd3c65ce6d8b415d7b2c40dd37b88da93b733327695524f71",
+        "bytes": 375,
+        "untracked": false
+      },
+      {
+        "path": "backend/reconciliation/operational_risk_views.py",
+        "sha256": "3d7245f2c0795221f21c0d4804af8003f06066e403711c40ed8eb75d16062859",
+        "bytes": 13015,
         "untracked": false
       },
       {
@@ -6517,8 +6535,8 @@
       },
       {
         "path": "backend/reconciliation/risk_models.py",
-        "sha256": "907bf9f110b3a307fe497ff620e18477f94e5e18610b748465f56d3f70e203de",
-        "bytes": 873,
+        "sha256": "0576577d250962ffe501e0f1926d6719eca8e2fb843323693cba8195e2ff16c8",
+        "bytes": 2074,
         "untracked": false
       },
       {
@@ -6529,8 +6547,8 @@
       },
       {
         "path": "backend/reconciliation/risk_views.py",
-        "sha256": "fc9b6821b96ed824ee522f5ba139658605b42ffa67fef4f4aeb275ecc6910e4b",
-        "bytes": 15587,
+        "sha256": "c6f5db9eaa701f2947d313ede51f3ea77ca99a1e8ebe9c56df2b5ada1cc974f1",
+        "bytes": 15762,
         "untracked": false
       },
       {
@@ -6588,6 +6606,18 @@
         "untracked": false
       },
       {
+        "path": "backend/sales/delivery_evidence.py",
+        "sha256": "3831d7e6bb8937ddaa170760fb61b974ac09b69d8303e897ca5e793adc4148f4",
+        "bytes": 13191,
+        "untracked": false
+      },
+      {
+        "path": "backend/sales/delivery_evidence_views.py",
+        "sha256": "1faec459d0de6698cdfe3b38104ca46299dedff4eedb490a62b31b5e5926f4c6",
+        "bytes": 7771,
+        "untracked": false
+      },
+      {
         "path": "backend/sales/development_contract_sample.py",
         "sha256": "205b8742a301d02479e36a72f89756fda9c1d3f96d7471b02f625cc79c0bd1bf",
         "bytes": 26557,
@@ -6625,8 +6655,8 @@
       },
       {
         "path": "backend/sales/followup_views.py",
-        "sha256": "9ba32efa1bca157c44ab6ea60bbcf3972c470e7a1e393aed76af25778f2eb5db",
-        "bytes": 17712,
+        "sha256": "8c8bb78aedd3168e8fdb269e6cde13fd39169b1e84d6a5dde101c6b7093507e7",
+        "bytes": 20711,
         "untracked": false
       },
       {
@@ -6667,8 +6697,8 @@
       },
       {
         "path": "backend/sales/mes_completion_admission.py",
-        "sha256": "919954ba22a7cc6190455c2c918f91d150bb5d5ef046968da656b04c7f132058",
-        "bytes": 14044,
+        "sha256": "7e42eb6dbd9f01d55f08a499c8b01011a1008558d0b995c61e67758a7174eefd",
+        "bytes": 14203,
         "untracked": false
       },
       {
@@ -6757,8 +6787,8 @@
       },
       {
         "path": "backend/sales/order_progress_projection.py",
-        "sha256": "30df3e0768c37136a4daf27602d249a2e7dd3fd9450512a2d1f686cf4e70173e",
-        "bytes": 13166,
+        "sha256": "45bcf84a6eb8b62abcc75786a6bb7377ede23e535f16e0accf5a484c208daacd",
+        "bytes": 18129,
         "untracked": false
       },
       {
@@ -6859,14 +6889,14 @@
       },
       {
         "path": "backend/sales/urls.py",
-        "sha256": "be26dc287d7578b2f92d9f148e9f1e8e05a6b3664c97f4ed8ffb711f0014284a",
-        "bytes": 3788,
+        "sha256": "2759e8db689d187ed87e83de9cb1e2b430b73f3755c2618114aec22279fa452a",
+        "bytes": 3976,
         "untracked": false
       },
       {
         "path": "backend/sales/views.py",
-        "sha256": "b239e52f4e9357f78e4d8fd5ed7633829c577e8f864238dd907375c648a882ed",
-        "bytes": 54300,
+        "sha256": "2e93c4b1005385a87806faf3a0b0c61ae9983beeee0c5370b5f3d4e7240881ae",
+        "bytes": 51062,
         "untracked": false
       },
       {
@@ -14017,8 +14047,8 @@
       },
       {
         "path": "frontend/src/meta/components/CustomerBinding.vue",
-        "sha256": "9fcb6001585b413223a81916e0b0188d9d429d881db26b41e5dc748788dc8068",
-        "bytes": 2079,
+        "sha256": "a7dfc59ca91c14a26197767b247f56ef923eef06499791d6eb041f06be778429",
+        "bytes": 5032,
         "untracked": false
       },
       {
@@ -14190,9 +14220,15 @@
         "untracked": false
       },
       {
+        "path": "frontend/src/meta/components/OperationalEvidenceRisk.vue",
+        "sha256": "f0b72652dca6f7a5a3bf4837e21ce910aae635b2e0caf2df63b3aabd4918aaea",
+        "bytes": 7248,
+        "untracked": false
+      },
+      {
         "path": "frontend/src/meta/components/OrderProgressEvidence.vue",
-        "sha256": "353846d420cbe57376efde3ba29b30121af64a92db568cf9b334949d96846697",
-        "bytes": 15784,
+        "sha256": "f3e6ee3b50c83caa067df438b1a4888fdb72eee88739036419dff5a88763783f",
+        "bytes": 19586,
         "untracked": false
       },
       {
@@ -14341,8 +14377,8 @@
       },
       {
         "path": "frontend/src/meta/components/ProcurementEvidenceRisk.vue",
-        "sha256": "7b3e60fbb6a41647db228e97bb7491f6245f6c1fe288cba5727a12c821ff794e",
-        "bytes": 6285,
+        "sha256": "b6f8368f289a11ee4ac5e3cf56b013dd3d9d840668dadd2ccb25202c676bd8de",
+        "bytes": 6768,
         "untracked": false
       },
       {
@@ -14353,8 +14389,8 @@
       },
       {
         "path": "frontend/src/meta/components/ProductionFollowup.vue",
-        "sha256": "1835b397d74cd03c78a838f35c517f1a4442eb081be4158c77918e5974ad5cac",
-        "bytes": 6122,
+        "sha256": "a3c97e45bfb7acc0a5b47f9889a9f0c94dd259538b746dfc437417db81181bd4",
+        "bytes": 6424,
         "untracked": false
       },
       {
@@ -14445,6 +14481,12 @@
         "path": "frontend/src/meta/components/RoomDoorEdgeRequirementPreview.vue",
         "sha256": "978bfe48097c02c7bfda1785c2f9f3f06dc1d6904facfce874c7e380394d357d",
         "bytes": 2148,
+        "untracked": false
+      },
+      {
+        "path": "frontend/src/meta/components/SalesDeliveryEvidence.vue",
+        "sha256": "232f82e19b67e44cfdf32a4ce5e5b21289579d5293f7410dc1179a98972f3a64",
+        "bytes": 10564,
         "untracked": false
       },
       {
@@ -17935,8 +17977,8 @@
       },
       {
         "path": "frontend/src/meta/pages/FormalP2PTracePage.vue",
-        "sha256": "132703a7b042c8ac398dc0533594a6a6ab33cad51e6541ec2013c1d29b14b116",
-        "bytes": 4201,
+        "sha256": "4afc05f06ec1d9824bbfa8168026c2ffeb5230aa4449a5f846581fdd7c2386b7",
+        "bytes": 4541,
         "untracked": false
       },
       {
@@ -18283,8 +18325,8 @@
       },
       {
         "path": "frontend/src/meta/pages/SalesOrderPage.vue",
-        "sha256": "260654311758f0361a3cc2721aea6c323cd5b7a6f1bca6d56d90af53635f0e99",
-        "bytes": 48968,
+        "sha256": "54b090bedca5df8d815327ecc1a988d4b258a0aa3388d4d20768662c86499eb7",
+        "bytes": 49169,
         "untracked": false
       },
       {
@@ -22317,6 +22359,12 @@
         "path": "frontend/src/styles/appExperience.css",
         "sha256": "a8c29ddca2a1e9a2b7348079cdd4546c4e756c98a67ee3d6aac17dd9e36c2c11",
         "bytes": 11471,
+        "untracked": false
+      },
+      {
+        "path": "frontend/src/styles/evidenceControls.css",
+        "sha256": "8c2466b3b350892e50c0082b72181205eb0d812db0fdcc3b093bfacedd72ff12",
+        "bytes": 4082,
         "untracked": false
       },
       {

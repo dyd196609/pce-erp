@@ -1,16 +1,16 @@
 <template>
   <section class="followup-card" aria-label="生产跟单">
     <h2>生产跟单</h2>
-    <button type="button" :disabled="loading" @click="load">刷新生产跟单</button>
-    <form v-if="directory?.searchByOrderNo" @submit.prevent="findOrder">
-      <label>按销售订单号查找 <input v-model.trim="search" required maxlength="80"></label>
-      <button type="submit" :disabled="loading">查找订单</button>
+    <el-button size="large" native-type="button" :disabled="loading" @click="load">刷新生产跟单</el-button>
+    <form class="evidence-form" v-if="directory?.searchByOrderNo" @submit.prevent="findOrder">
+      <label class="evidence-field evidence-field--number">按销售订单号查找 <input v-model.trim="search" required maxlength="80"></label>
+      <el-button size="large" native-type="submit" type="primary" :disabled="loading">查找订单</el-button>
     </form>
     <p v-if="message" role="status">{{ message }}</p>
     <p v-if="directory && !directory.orders.length && !orderNo">当前没有本人负责的整单。</p>
     <ul v-if="directory?.orders.length">
-      <li v-for="row in directory.orders" :key="row.orderNo">
-        <button type="button" @click="openOrder(row.orderNo)">{{ row.orderNo }}</button>
+      <li class="evidence-order-row" v-for="row in directory.orders" :key="row.orderNo">
+        <el-button size="large" native-type="button" @click="openOrder(row.orderNo)">{{ row.orderNo }}</el-button>
         {{ row.approvalLabel }}
       </li>
     </ul>
@@ -18,17 +18,19 @@
       <h3>{{ detail.orderNo }}</h3>
       <p>订单审批：{{ detail.approvalLabel }}。生产跟单负责人：{{ detail.assignment.owner || '尚未分派' }}。</p>
       <p v-if="detail.assignment.effectiveAt">生效时间：{{ timestamp(detail.assignment.effectiveAt) }}</p>
-      <form v-if="detail.actions.length" @submit.prevent="assign">
-        <label>跟单负责人
+      <form class="evidence-form" aria-label="跟单分派与移交" v-if="detail.actions.length" @submit.prevent="assign">
+        <label class="evidence-field evidence-field--choice">跟单负责人
           <select v-model="ownerId" required>
             <option value="" disabled>请选择跟单负责人</option>
             <option v-for="owner in directory?.candidates || []" :key="owner.id" :value="owner.id">{{ owner.name }}</option>
           </select>
         </label>
-        <label>办理原因 <input v-model.trim="reason" required maxlength="300"></label>
-        <button type="submit" :disabled="busy">{{ detail.actions[0].label }}</button>
+        <label class="evidence-field evidence-field--wide">办理原因
+          <textarea v-model.trim="reason" required maxlength="300" rows="2"></textarea>
+        </label>
+        <el-button size="large" native-type="submit" type="primary" :disabled="busy">{{ detail.actions[0].label }}</el-button>
       </form>
-      <details v-if="detail.history?.length">
+      <details class="evidence-disclosure" v-if="detail.history?.length">
         <summary>查看分派与移交历史</summary>
         <ol>
           <li v-for="event in detail.history" :key="event.at">
@@ -37,7 +39,7 @@
           </li>
         </ol>
       </details>
-      <button type="button" :disabled="busy" @click="showProgress">读取本单生产进度</button>
+      <el-button size="large" native-type="button" :disabled="busy" @click="showProgress">读取本单生产进度</el-button>
       <OrderProgressEvidence v-if="progress" :progress="progress.progress" :completion="progress.completion"
         :read-followup-task="readTask" />
     </article>
@@ -139,7 +141,4 @@ watch([orderNo, () => route.query.followupProgress], load, { immediate: true })
 
 <style scoped>
 .followup-card { border: 1px solid #d6e0ee; border-radius: 12px; padding: 18px; background: #fff; }
-form { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin-block: 12px; }
-label { display: grid; gap: 6px; }
-input, select, button { min-height: 38px; }
 </style>

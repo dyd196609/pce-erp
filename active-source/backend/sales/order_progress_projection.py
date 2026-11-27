@@ -1,15 +1,17 @@
 """A08 read projection of an already-authorized order and native M09 proofs.
 
 No new completion, quantity, permission or workflow authority. This internal
-consumer receives M09 facts only from SalesOrderDetailView, after its original
-sales.order.view and order scope check; never from an HTTP request body.
+consumer reads M09 and independently verified historic starts, after the
+original order scope check at the calling entry.
 """
 from copy import deepcopy
 import logging
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import DatabaseError
 from django.utils import timezone
 from planning.operation_resource_read_scope import scoped_execution_read
 from pde.order_lifecycle_source_projection import terminal_closure_read
+from .delivery_evidence import delivery_evidence_facts
 
 CONTRACT = 'PCE-ORDER-INTERNAL-PROGRESS-V1'
 
@@ -23,13 +25,41 @@ def _failure(exc, scope, object_id):
         'scope': scope, 'objectId': object_id}
 
 
+
+
+def _verified_receipts(work_order, proofs):
+    """Project existing M09 conversion proofs in the already-authorized order scope."""
+    from planning.finished_goods_models import ProductionFinishedGoodsTransfer
+    from planning.finished_goods_service import _warehouse_result
+    output = []
+    for proof in proofs:
+        transfer = ProductionFinishedGoodsTransfer.objects.filter(pk=proof['transferId'],
+            company_id=work_order.company_id, work_order=work_order, status='received').first()
+        if transfer is None:
+            output.append({'transferId': proof['transferId'], 'statusLabel': '成品入库来源待核'})
+            continue
+        try:
+            inbound = _warehouse_result(transfer)
+        except ObjectDoesNotExist:
+            inbound = None
+        if inbound is None:
+            output.append({'transferId': transfer.pk, 'transferNo': transfer.no, 'statusLabel': '成品入库来源待核'})
+            continue
+        keys = ('transferId', 'transferNo', 'inboundId', 'inboundNo', 'statusLabel',
+                'quantity', 'uomLabel', 'warehouseName', 'locationName', 'inboundDate')
+        output.append({**{key: inbound[key] for key in keys},
+                       'custodyEventId': proof['custodyEventId'], 'stockTransactionNo': inbound['transaction']['no'],
+                       'receivedAt': transfer.data.get('receivedAt')})
+    return output
+
+
 def _task_progress(task, quantity_fact, order_id):
     from system.models import User
     from planning.operation_start_models import ProductionOperationStart
     from planning.operation_completion_v3_authority import validated_bundle, current_production_status
     from planning.operation_completion_service import _history
     from planning.operation_report_service import _reports
-    from planning.mes_task_date_facts import task_date_facts
+    from planning.mes_task_date_facts import task_date_facts, task_timing_facts
     from planning.operation_handover_models import OperationHandover
     from planning.operation_handover_facts import _header
     from workflow_runtime.models import BusinessStateTransition
@@ -110,6 +140,7 @@ def _task_progress(task, quantity_fact, order_id):
             allowed=('id','no','taskId','workOrderId','statusLabel','receiptStateLabel','version','uomId','uomLabel',
                 'senderEmployeeId','senderEmployeeName','receiverEmployeeId','receiverEmployeeName',
                 'sourceWorkshopId','targetWorkshopId','sourceOperationName','targetOperationName',
+                'targetWorkCenterName','targetWorkshopName','destinationKindLabel','businessNo',
                 'dispatchedAt','lastReceivedAt','historicalDispatches','historicalReceipts',
                 'sentQuantity','receivedQuantity','inTransitQuantity','shortQuantity','unmatchedQuantity',
                 'currentTargetHeldQuantity','receiptMetricBasisLabel','receiptStateExplanation','receiptCorrectionReferences')
@@ -120,6 +151,7 @@ def _task_progress(task, quantity_fact, order_id):
             handovers.append({'id':header.pk,'no':header.no,'factStatus':'SOURCE_UNKNOWN',
                 'blockingReason':_failure(exc,'HANDOVER',header.pk)})
     row['handovers']=handovers;row['dates']=dates
+    row['scheduleTiming'] = task_timing_facts(dates)
     row['progressUpdatedAt']=max(times).isoformat()
     row['progressUpdatedAtMeaning']='本投影已核实任务/开工/报工/审核/交接记录的最近登记更新时间；不是现场实际完工时间'
     row['factStatus']='SOURCE_UNKNOWN' if row['blockingReasons'] or any(x.get('factStatus')=='SOURCE_UNKNOWN' for x in handovers) else 'PROVIDED'
@@ -146,9 +178,58 @@ def _work_order_progress(fact,item,order, *, selected_task_id=None):
         'uomId':wo.uom_id,'uomLabel':wo.uom.name,'quantity':fact['quantity'],
         'statusLabel':fact['statusLabel'],'executionCompleted':fact['executionCompleted'],
         'mesClosed':fact['mesClosed'],'blockingReasons':deepcopy(fact['blockingReasons']),
+        'verifiedWarehouseReceipts':_verified_receipts(wo, fact.get('physicalClosureReceipts', [])),
         'plannedStartDate':fact['plannedStartDate'],'plannedRequiredDate':fact['plannedRequiredDate'],
         'physicalCompletedAt':None,'physicalCompletedAtStatus':'NOT_COLLECTED',
         'tasks':[_task_progress(t,quantities[t.pk],order.pk) for t in tasks]}
+
+
+@terminal_closure_read
+def _historical_started_work_orders(line, item, order, *, selected_task_id):
+    """Read original starts while whole-route applicability awaits evidence."""
+    from pde.order_routing_execution_service import ArrangementError
+    from planning.services import PlanningBusinessError
+    from planning.work_order_models import ProductionWorkOrder
+    from planning.workshop_task_models import ProductionWorkshopTask
+    from .mes_completion_admission import verify_work_order_source
+
+    related = ProductionWorkOrder.objects.filter(
+        company_id=order.company_id, usage_purpose='PRODUCTION_USE', status='released',
+        production_plan__planning_requirement__demand__sales_order_item=item,
+    ).select_related('production_plan__planning_requirement__demand', 'material', 'uom')
+    for work_order in related.order_by('pk'):
+        plan = work_order.production_plan
+        demand = plan.planning_requirement.demand
+        try:
+            frozen = verify_work_order_source(work_order, item, demand, plan)
+        except (PlanningBusinessError, ArrangementError, ValueError) as exc:
+            logging.getLogger(__name__).warning(
+                'A08 historical work order %s: %s', work_order.pk, type(exc).__name__)
+            continue
+
+        started = ProductionWorkshopTask.objects.filter(
+            work_order=work_order, company_id=order.company_id, operation_start__isnull=False)
+        if selected_task_id is not None:
+            started = started.filter(pk=selected_task_id)
+        task_quantities = [
+            {'taskId': task_id, 'quantityApplicable': mode == 'QUANTIFIED',
+             'quantityStatus': 'SOURCE_UNKNOWN', 'account': None}
+            for task_id, mode in started.values_list('pk', 'execution_mode')
+        ]
+        if not task_quantities:
+            continue
+        fact = {
+            'workOrderId': work_order.pk, 'version': work_order.version,
+            'statusLabel': work_order.get_status_display(), 'quantity': str(work_order.quantity),
+            'executionCompleted': None, 'mesClosed': None,
+            'blockingReasons': line['blockingReasons'],
+            'plannedStartDate': frozen.get('plannedStartDate'), 'plannedRequiredDate': frozen.get('requiredDate'),
+            'tasks': task_quantities,
+        }
+        progress = _work_order_progress(fact, item, order, selected_task_id=selected_task_id)
+        progress['tasks'] = [task for task in progress['tasks'] if task['start'] is not None]
+        if progress['tasks']:
+            yield progress
 
 
 @scoped_execution_read
@@ -175,9 +256,19 @@ def order_progress_facts(order,completion_facts, *, selected_task_id=None):
                 failure=_failure(exc,'WORK_ORDER',wo_fact['workOrderId']);failed=failed or isinstance(exc,DatabaseError)
                 line['workOrders'].append({'workOrderId':wo_fact['workOrderId'],'factStatus':failure['factStatus'],
                     'tasks':None,'blockingReasons':[failure]})
+        if (fact['manufacturingApplicable'] is True and fact['completionStatus']=='SOURCE_UNKNOWN'
+                and not fact['workOrders'] and any(
+                    reason['code']=='MES_FORMAL_ROUTE_DECISION_UNPROVEN' for reason in fact['blockingReasons'])):
+            try:
+                line['workOrders'].extend(_historical_started_work_orders(
+                    line, item, order, selected_task_id=selected_task_id))
+            except DatabaseError as exc:
+                failed = True
+                line['blockingReasons'].append(_failure(exc, 'ORDER_LINE', item.pk))
         lines.append(line)
     return {'contractVersion':CONTRACT,'companyId':order.company_id,'salesOrderId':order.pk,
         'orderNo':order.order_no,'salesOrderVersion':order.version,'statusLabel':order.get_status_display(),
+        'deliveryTiming':delivery_evidence_facts(order, items.values()),
         'completionEligibility':completion_facts['completionEligibility'],'completionAuthority':'original mesCompletionFacts (unchanged)',
         'lines':lines,'factStatus':'READ_FAILED' if failed else 'PROVIDED',
         'loadedAt':timezone.now().isoformat(),'progressPercent':None,'progressPercentStatus':'NOT_DEFINED',

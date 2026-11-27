@@ -1,6 +1,6 @@
 <template>
   <main class="trace-page">
-    <header><div><h1>正式 P2P / 库存质量链追踪</h1><p>服务端外键事实；不读取浏览器演示状态。</p></div><el-button :loading="loading" @click="load">刷新</el-button></header>
+    <header class="trace-heading"><div><h1>正式 P2P / 库存质量链追踪</h1><p>服务端外键事实；不读取浏览器演示状态。</p></div><el-button size="large" :loading="loading" @click="load">刷新</el-button></header>
     <section v-if="isBusinessTrace">
       <h2>销售订单与生产进度</h2>
       <p>从授权订单读取原记录，查看计划、工单、工序和完成条件。</p>
@@ -16,6 +16,7 @@
       </nav>
       <p>销售生产完成条件从业务链追踪的订单依据读取。</p>
     </section>
+    <OperationalEvidenceRisk v-if="isValidationCenter" />
     <ProcurementEvidenceRisk v-if="isValidationCenter" />
     <section v-loading="loading">
       <h2>采购订单、收货与检验</h2>
@@ -45,9 +46,11 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import '@/styles/evidenceControls.css'
 import { formalExecutionApi } from '@/api/formalExecution'
 import ProductionFollowup from '@/meta/components/ProductionFollowup.vue'
 import ProcurementEvidenceRisk from '@/meta/components/ProcurementEvidenceRisk.vue' 
+import OperationalEvidenceRisk from '@/meta/components/OperationalEvidenceRisk.vue'
 
 const route = useRoute()
 const isBusinessTrace = computed(() => route.path === '/business-trace')
@@ -85,9 +88,9 @@ onMounted(load)
 </script>
 
 <style scoped>
-.trace-page { padding: 24px; display: grid; gap: 18px; }
-header { display: flex; justify-content: space-between; align-items: center; }
+.trace-page { padding: clamp(12px, 2vw, 24px); display: grid; gap: clamp(12px, 2vw, 18px); min-width: 0; }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; min-width: 0; }
 header p { color: #64748b; }
 nav { display: flex; gap: 16px; flex-wrap: wrap; }
-section { border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; background: #fff; }
+section { border: 1px solid #e2e8f0; border-radius: 12px; padding: clamp(12px, 2vw, 18px); background: #fff; min-width: 0; }
 </style>

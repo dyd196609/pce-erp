@@ -1,9 +1,9 @@
 <template>
   <section class="risk-panel" aria-label="采购核对与风险闭环">
     <h2>按原采购单核对与回查风险</h2>
-    <form @submit.prevent="search">
-      <label>采购订单号 <input v-model.trim="searchNo" required maxlength="80"></label>
-      <button type="submit" :disabled="loading">查找</button>
+    <form class="evidence-form" @submit.prevent="search">
+      <label class="evidence-field evidence-field--number">采购订单号 <input v-model.trim="searchNo" required maxlength="80"></label>
+      <el-button size="large" native-type="submit" type="primary" :disabled="loading">查找</el-button>
     </form>
     <p v-if="loading" role="status">正在读取正式核对依据。</p>
     <p v-if="message" role="status">{{ message }}</p>
@@ -28,7 +28,7 @@
       <div v-for="item in data.differences" :key="item.id" class="risk-row">
         <p>{{ item.sourceNo }} · 责任岗位 {{ item.department }} · 比对值 {{ item.expected }}／{{ item.actual }}</p>
         <p v-if="item.risk">{{ item.risk.statusLabel }} · 处理人 {{ item.risk.handler }}</p>
-        <details v-if="item.risk">
+        <details class="evidence-disclosure" v-if="item.risk">
           <summary>查看受理、处理及复核历史</summary>
           <ol>
             <li v-for="row in item.risk.history" :key="row.at">
@@ -37,20 +37,26 @@
             </li>
           </ol>
         </details>
-        <button v-for="act in actions(item)" :key="act.code" type="button" @click="select(item, act)">{{ act.label }}</button>
-        <form v-if="selected?.item.id === item.id" @submit.prevent="submit">
-          <label v-if="selected.action.type === 'receive'">指定处理人
+        <div v-if="actions(item).length" class="evidence-toolbar">
+          <el-button size="large" v-for="act in actions(item)" :key="act.code" native-type="button" @click="select(item, act)">{{ act.label }}</el-button>
+        </div>
+        <form class="evidence-form evidence-subform" aria-label="采购风险办理" v-if="selected?.item.id === item.id" @submit.prevent="submit">
+          <label class="evidence-field evidence-field--choice" v-if="selected.action.type === 'receive'">指定处理人
             <select v-model="handlerId" required>
               <option value="" disabled>请选择</option>
               <option v-for="handler in item.handlers" :key="handler.id" :value="handler.id">{{ handler.name }}</option>
             </select>
           </label>
-          <label>办理说明 <input v-model.trim="reason" required maxlength="300"></label>
-          <label v-if="selected.action.type !== 'receive'">原单据及处置／复核证据
-            <textarea v-model.trim="evidence" required maxlength="1800"></textarea>
+          <label class="evidence-field evidence-field--wide">办理说明
+          <textarea v-model.trim="reason" required maxlength="300" rows="2"></textarea>
+        </label>
+          <label class="evidence-field evidence-field--full" v-if="selected.action.type !== 'receive'">原单据及处置／复核证据
+            <textarea v-model.trim="evidence" required maxlength="1800" rows="3"></textarea>
           </label>
-          <button type="submit" :disabled="saving">提交</button>
-          <button type="button" :disabled="saving" @click="selected = null">取消</button>
+          <div class="evidence-toolbar evidence-form-actions">
+            <el-button size="large" native-type="submit" type="primary" :disabled="saving">提交</el-button>
+            <el-button size="large" native-type="button" :disabled="saving" @click="selected = null">取消</el-button>
+          </div>
         </form>
       </div>
     </article>
@@ -124,7 +130,4 @@ watch(no, load, { immediate: true })
 <style scoped>
 .risk-panel { border: 1px solid #d6e0ee; border-radius: 12px; padding: 18px; background: #fff; }
 .risk-row { padding: 12px; border-top: 1px solid #d6e0ee; }
-form { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; padding-block: 10px; }
-label { display: grid; gap: 6px; }
-input, select, button { min-height: 38px; }
 </style>

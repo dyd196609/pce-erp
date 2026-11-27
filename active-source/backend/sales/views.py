@@ -32,6 +32,7 @@ from system.authorization import AuthorizationService
 from system.models import Department, OrganizationOperatingAuditRecord
 from workflow_runtime.fact_loads import successful_fact_load_facts
 
+from .delivery_evidence import REGISTER_ACTION, can_record_delivery, delivery_evidence_facts, order_delivery_info
 from .models import Customer, SalesOrder, SalesOrderItemEngineeringAttribute
 from .order_business_purpose_service import order_business_purpose_facts
 from .source_intake import build_whole_house_intake_preview, commit_source_intake
@@ -104,82 +105,22 @@ def decimal_value(value):
 
 
 def delivery_facts(row, items):
-    source = row.delivery_information if isinstance(row.delivery_information, dict) else {}
-    source_batches = source.get("batches") if isinstance(source.get("batches"), list) else []
-    batches = []
-    unmatched_batches = []
-    seen_batch_keys = set()
-    for index, batch in enumerate(source_batches, 1):
-        if not isinstance(batch, dict):
-            continue
-        item_id, line_no = batch.get("salesOrderItemId"), batch.get("lineNo")
-        item_by_id = next((value for value in items if value.pk == item_id), None)
-        item_by_line = next((value for value in items if value.line_no == line_no), None) if line_no is not None else None
-        batch_no = str(batch.get("batchNo") or f"BATCH-{index}")
-        batch_key = str(batch.get("id") or batch_no)
-        issues = []
-        if item_by_id and item_by_line and item_by_id.pk != item_by_line.pk:
-            issues.append("订单行稳定ID与行号指向不同明细")
-        item = item_by_id or item_by_line
-        if item is None or issues:
-            unmatched_batches.append({
-                "sourceIndex": index, "batchNo": batch_no,
-                "salesOrderItemId": item_id, "lineNo": line_no,
-                "reason": issues[0] if issues else "未找到同一订单内匹配的有效明细",
-            })
-            continue
-        if batch_key in seen_batch_keys:
-            issues.append("交付批次标识重复")
-        seen_batch_keys.add(batch_key)
-        batch_uom = str(batch.get("uomCode") or (item.uom.code if item.uom_id else ""))
-        if item.uom_id and batch_uom and batch_uom != item.uom.code:
-            issues.append("交付批次单位与订单行单位不一致")
-        quantity = decimal_value(batch.get("quantity"))
-        actual_date = str(batch.get("actualDeliveryDate") or "")
-        batches.append({
-            "id": batch.get("id") or f"delivery-{row.pk}-{index}",
-            "batchNo": batch_no,
-            "salesOrderItemId": item.pk, "lineNo": item.line_no,
-            "quantity": str(quantity), "uomCode": batch_uom,
-            "customerRequiredDate": str(batch.get("customerRequiredDate") or iso_value(item.required_date)),
-            "committedDeliveryDate": str(batch.get("committedDeliveryDate") or ""),
-            "plannedCompletionDate": str(batch.get("plannedCompletionDate") or ""),
-            "actualDeliveryDate": actual_date,
-            "status": str(batch.get("status") or ("delivered" if actual_date else "planned")),
-            "statusLabel": str(batch.get("statusLabel") or ("已交付" if actual_date else "待交付")),
-            "associationStatus": "CONFLICT" if issues else "MATCHED",
-            "associationIssues": issues,
-        })
-    line_facts = []
-    for item in items:
-        item_batches = [batch for batch in batches if batch["salesOrderItemId"] == item.pk]
-        delivered_qty = sum((
-            decimal_value(batch["quantity"])
-            for batch in item_batches
-            if batch["actualDeliveryDate"] and batch["associationStatus"] == "MATCHED"
-        ), Decimal("0"))
-        remaining_qty = max(item.quantity - delivered_qty, Decimal("0"))
-        over_delivered_qty = max(delivered_qty - item.quantity, Decimal("0"))
-        line_facts.append({
-            "salesOrderItemId": item.pk, "lineNo": item.line_no,
-            "orderedQty": str(item.quantity), "deliveredQty": str(delivered_qty),
-            "remainingQty": str(remaining_qty),
-            "overDeliveredQty": str(over_delivered_qty),
-            "deliveryQuantityStatus": "OVER_DELIVERED" if over_delivered_qty > 0 else ("DELIVERED" if remaining_qty == 0 else "PENDING"),
-            "uomCode": item.uom.code if item.uom_id else "",
-            "customerRequiredDate": iso_value(item.required_date),
-            "committedDeliveryDate": str(source.get("committedDeliveryDate") or ""),
-            "batches": item_batches,
-        })
+    source = order_delivery_info(row)
+    evidence = delivery_evidence_facts(row, items)
     return {
         "source": "SalesOrder.delivery_information",
-        "customerRequiredDate": iso_value(row.required_delivery_date),
-        "committedDeliveryDate": str(source.get("committedDeliveryDate") or ""),
+        "customerRequiredDate": evidence["customerRequiredDate"],
+        "committedDeliveryDate": evidence["promisedDate"] or "",
         "plannedCompletionDate": str(source.get("plannedCompletionDate") or ""),
-        "actualDeliveryDate": str(source.get("actualDeliveryDate") or ""),
-        "lines": line_facts, "batches": batches,
-        "unmatchedBatches": unmatched_batches,
-        "associationConflictCount": len(unmatched_batches) + sum(1 for batch in batches if batch["associationIssues"]),
+        "actualDeliveryDate": evidence["actualDeliveryDate"] or "",
+        "legacyHeaderActualDeliveryDate": str(source.get("actualDeliveryDate") or ""),
+        "lines": [{**line, "batches": [batch for batch in evidence["registeredBatches"]
+                                    if batch["salesOrderItemId"] == line["salesOrderItemId"]]}
+                  for line in evidence["lines"]],
+        "batches": evidence["registeredBatches"],
+        "unmatchedBatches": evidence["unmatchedBatches"],
+        "associationConflictCount": evidence["associationConflictCount"],
+        "evidence": evidence,
     }
 
 
@@ -752,6 +693,8 @@ class SalesOrderDetailView(SalesBaseView):
                 tenant_id=str(row.company_id),request=request)
             return envelope({'order':data,'factLoadFacts':loaded,'authorization':decision})
         data = order_row(row)
+        data["deliveryEvidenceAction"] = ({"code": REGISTER_ACTION, "label": "登记交付凭证",
+            "canRegisterContract": bool(row.contract_reference.strip())} if can_record_delivery(request.user, row) else None)
         if completion_facts is not None:
             data["mesCompletionFacts"] = completion_facts
         if progress_facts is not None:

@@ -22,15 +22,9 @@ def reason(code, message, *, scope, object_id=None):
     return {'code': code, 'message': message, 'scope': scope, 'objectId': object_id}
 
 
-@terminal_closure_read
-def _work_order_facts(work_order, item, demand, plan, *, lock=False):
+def verify_work_order_source(work_order, item, demand, plan):
     from planning.test_work_order_service import verify
-    from planning.finished_goods_authority import current_closure, task_graph
-    from planning.operation_output_authority import read_task_quantity_account
-    from planning.operation_start_models import ProductionOperationStart
-    from system.models import User
-    from planning.workshop_task_models import ProductionWorkshopTask
-    from planning.operation_handover_models import OperationQuantityAccount
+
     verify(work_order)
     frozen = work_order.source_snapshot
     if (work_order.usage_purpose != 'PRODUCTION_USE' or work_order.company_id != item.sales_order.company_id
@@ -40,6 +34,18 @@ def _work_order_facts(work_order, item, demand, plan, *, lock=False):
         or work_order.material_id != item.material_id or work_order.uom_id != item.uom_id
         or work_order.quantity != plan.planned_qty or work_order.quantity <= 0):
         raise ValueError('M09_WORK_ORDER_SOURCE_MISMATCH')
+    return frozen
+
+
+@terminal_closure_read
+def _work_order_facts(work_order, item, demand, plan, *, lock=False):
+    from planning.finished_goods_authority import current_closure, task_graph
+    from planning.operation_output_authority import read_task_quantity_account
+    from planning.operation_start_models import ProductionOperationStart
+    from system.models import User
+    from planning.workshop_task_models import ProductionWorkshopTask
+    from planning.operation_handover_models import OperationQuantityAccount
+    frozen = verify_work_order_source(work_order, item, demand, plan)
     if lock:
         list(ProductionWorkshopTask.objects.select_for_update().filter(work_order=work_order))
         list(OperationQuantityAccount.objects.select_for_update().filter(task__work_order=work_order))

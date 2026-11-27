@@ -360,4 +360,4 @@ class BusinessDocumentNumberSequence(models.Model):
         db_table = "business_document_number_sequences"
 
 
-from .risk_models import ProcurementEvidenceRisk  # noqa: F401
+from .risk_models import OperationalEvidenceRisk, ProcurementEvidenceRisk  # noqa: F401

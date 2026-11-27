@@ -1,0 +1,162 @@
+/* Shared evidence controls for trace, validation, and delivery registration. */
+:is(.trace-page, .delivery-form-controls) {
+  --evidence-control-height: var(--el-component-size-large, 40px);
+  --evidence-gap: 12px;
+  font-size: var(--el-font-size-base);
+}
+
+.trace-page > section {
+  overflow-wrap: anywhere;
+}
+
+.trace-page .evidence-toolbar,
+:is(.trace-page, .delivery-form-controls) .evidence-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--evidence-gap);
+}
+
+.trace-page .evidence-toolbar {
+  align-items: center;
+  margin-block: 8px;
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-form {
+  align-items: start;
+  margin-block: 12px;
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-subform {
+  padding: 12px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: var(--el-border-radius-base);
+  background: var(--el-fill-color-lighter);
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-field {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 14rem;
+  min-width: min(100%, 14rem);
+  color: var(--el-text-color-regular);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-field--choice {
+  flex-basis: 18rem;
+  min-width: min(100%, 18rem);
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-field--wide {
+  flex-basis: 24rem;
+  min-width: min(100%, 24rem);
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-field--number {
+  flex: 0 1 25rem;
+  min-width: min(100%, 15rem);
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-field--full,
+.trace-page .evidence-form-note {
+  flex: 1 0 100%;
+  min-width: 0;
+}
+
+.trace-page .evidence-form-note {
+  margin: 0;
+  color: var(--el-text-color-secondary);
+}
+
+.trace-page .evidence-form > .el-button,
+.trace-page .evidence-form-actions {
+  align-self: end;
+}
+
+.trace-page .evidence-form-actions {
+  margin: 0;
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-field > :is(input, select, textarea) {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  min-height: var(--evidence-control-height);
+  padding: 8px 12px;
+  border: 1px solid var(--el-border-color);
+  border-radius: var(--el-border-radius-base);
+  background: var(--el-fill-color-blank);
+  color: var(--el-text-color-regular);
+  font: inherit;
+  font-weight: 400;
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-field > :is(input, select, textarea):hover {
+  border-color: var(--el-border-color-hover);
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-field > :is(input, select, textarea):focus-visible {
+  border-color: var(--el-color-primary);
+  outline: 2px solid var(--el-color-primary-light-7);
+  outline-offset: 1px;
+}
+
+:is(.trace-page, .delivery-form-controls) .evidence-field > textarea {
+  resize: vertical;
+}
+
+:is(.trace-page, .delivery-form-controls) .el-button {
+  min-height: var(--evidence-control-height);
+  margin-inline-start: 0;
+  font-size: var(--el-font-size-base);
+}
+
+.trace-page .order-progress button {
+  padding: 8px 14px;
+  border: 1px solid var(--el-border-color);
+  border-radius: var(--el-border-radius-base);
+  background: var(--el-fill-color-blank);
+  color: var(--el-text-color-regular);
+  font: inherit;
+}
+.trace-page .order-progress button:hover:not(:disabled) {
+  color: var(--el-color-primary);
+  border-color: var(--el-color-primary-light-5);
+}
+.trace-page .evidence-pagination {
+  justify-content: flex-start;
+}
+
+.trace-page .evidence-disclosure > summary {
+  padding-block: 10px;
+  cursor: pointer;
+}
+
+.trace-page .evidence-order-row + .evidence-order-row {
+  margin-block-start: 6px;
+}
+
+@media (max-width: 640px) {
+  :is(.trace-page, .delivery-form-controls) {
+    --evidence-control-height: 44px;
+    --evidence-gap: 10px;
+  }
+
+  :is(.trace-page, .delivery-form-controls) .evidence-field {
+    flex: 1 0 100%;
+    min-width: 0;
+  }
+
+  :is(.trace-page, .delivery-form-controls) .evidence-field > :is(input, select, textarea) {
+    font-size: 16px;
+  }
+
+  :is(.trace-page, .delivery-form-controls) .el-button {
+    height: auto;
+    font-size: 16px;
+    max-width: 100%;
+    padding-inline: 12px;
+    white-space: normal;
+  }
+}

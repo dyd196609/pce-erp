@@ -1,6 +1,7 @@
+from collections.abc import Mapping
 from datetime import date
 
-from django.db import DatabaseError, transaction
+from django.db import DatabaseError, IntegrityError, transaction
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
@@ -15,6 +16,7 @@ from system.models import OrganizationOperatingAuditRecord, User, UserRoleScopeA
 from workflow_runtime.fact_loads import successful_fact_load_facts
 from workflow_runtime.models import BusinessStateTransition, UserOrganizationRoleAuthority
 
+from .delivery_evidence import delivery_batches, delivery_evidence_facts, order_delivery_info
 from .enterprise_authority import (
     CUSTOMER_BIND, CUSTOMER_PUBLISH, FOLLOWUP_ASSIGN, FOLLOWUP_VIEW,
     allowed, audit, audit_row, history, scoped_grants,
@@ -32,6 +34,13 @@ class AssignmentInput(serializers.Serializer):
 
 class BindingInput(serializers.Serializer):
     accountId = serializers.IntegerField(min_value=1)
+    customerId = serializers.IntegerField(min_value=1)
+    reason = serializers.CharField(max_length=300)
+
+
+class CustomerAccountProvisionInput(serializers.Serializer):
+    username = serializers.RegexField(r"\A[A-Za-z0-9_.@-]+\Z", max_length=50)
+    realName = serializers.CharField(max_length=50)
     customerId = serializers.IntegerField(min_value=1)
     reason = serializers.CharField(max_length=300)
 
@@ -226,12 +235,22 @@ def dedicated_account(account):
         and not UserOrganizationRoleAuthority.objects.filter(user=account, active=True).exists())
 
 
+def create_customer_binding(actor, account, customer, reason, *, new_account=False):
+    binding = CustomerAccountBinding.objects.create(account=account, customer=customer, effective_at=timezone.now())
+    after = {"accountId": account.pk, "customerId": customer.pk, "effectiveAt": binding.effective_at.isoformat()}
+    if new_account:
+        after.update({"accountCreated": True, "username": account.username, "credentialState": "PENDING_SECURE_INITIALIZATION"})
+    audit(actor, CUSTOMER_BIND, binding, customer.code, reason, {}, after)
+
+
 class CustomerBindingView(EnterpriseView):
     @transaction.atomic
     def post(self, request):
         actor = request.user
         if not allowed(actor, CUSTOMER_BIND):
             raise PermissionDenied("当前岗位没有客户身份核实与绑定权限。")
+        if isinstance(request.data, Mapping) and request.data.get("action") == "provision":
+            return self.provision(request)
         data = validated(BindingInput, request)
         account = User.objects.select_for_update().filter(pk=data["accountId"], company_id=actor.company_id).first()
         customer = Customer.objects.filter(pk=data["customerId"], company_id=actor.company_id, is_active=True).first()
@@ -239,10 +258,34 @@ class CustomerBindingView(EnterpriseView):
             raise ValidationError("请选择本企业有效客户和经过身份核实的独立客户账号。")
         if CustomerAccountBinding.objects.filter(account=account).exists():
             return conflict("此客户账号已有生效绑定。")
-        binding = CustomerAccountBinding.objects.create(account=account, customer=customer, effective_at=timezone.now())
-        audit(actor, CUSTOMER_BIND, binding, customer.code, data["reason"], {},
-              {"accountId": account.pk, "customerId": customer.pk, "effectiveAt": binding.effective_at.isoformat()})
+        create_customer_binding(actor, account, customer, data["reason"])
         return response(request, {"customerCode": customer.code, "bound": True})
+
+    def provision(self, request):
+        actor = request.user
+        if not actor.is_superuser:
+            raise PermissionDenied("请由企业账户管理员办理客户开户。")
+        data = validated(CustomerAccountProvisionInput, request)
+        customer = Customer.objects.select_for_update().filter(
+            pk=data["customerId"], company_id=actor.company_id, is_active=True,
+        ).first()
+        if customer is None:
+            raise ValidationError("请选择本企业的有效客户档案。")
+        username = data["username"].lower()
+        if User.objects.filter(username__iexact=username).exists():
+            return conflict("登录账号已被使用，请另选账号。")
+        try:
+            with transaction.atomic():
+                account = User.objects.create_user(username=username, password=None,
+                    real_name=data["realName"], company_id=actor.company_id,
+                    is_active=True, is_staff=False, is_superuser=False)
+        except IntegrityError:
+            if User.objects.filter(username__iexact=username).exists():
+                return conflict("登录账号已被使用，请另选账号。")
+            raise
+        create_customer_binding(actor, account, customer, data["reason"], new_account=True)
+        return response(request, {"customerCode": customer.code, "bound": True, "username": account.username,
+            "credentialStatusLabel": "待设置初始密码"})
 
     def get(self, request):
         actor = request.user
@@ -253,7 +296,7 @@ class CustomerBindingView(EnterpriseView):
                                        is_staff=False, is_superuser=False)
         available = [{"id": row.pk, "username": row.username, "name": row.real_name}
             for row in accounts if dedicated_account(row) and not CustomerAccountBinding.objects.filter(account=row).exists()]
-        return response(request, {"accounts": available,
+        return response(request, {"accounts": available, "canProvision": actor.is_superuser,
             "customers": list(customers.values("id", "code", "name"))}, len(available))
 
 
@@ -284,9 +327,17 @@ def public_order(order):
         definition = PUBLIC_MILESTONE_ACTIONS.get(publication.source.action_code)
         if definition and publication.source.target_state == definition[0] and valid_publication_source(publication.source):
             milestones.append({"label": definition[1], "publishedAt": publication.published_at.isoformat()})
+    shipped = signed = None
+    if delivery_batches(order_delivery_info(order)):
+        delivery = delivery_evidence_facts(order, order.items.select_related("material", "uom"))
+        if any(line["batches"] for line in delivery["lines"]):
+            full = delivery["allLinesFulfilledDate"] is not None
+            if delivery["batchDocumentType"] == "customer_receipt":
+                signed = "已签收" if full else "部分签收"
+            elif delivery["batchDocumentType"] == "specified_dispatch":
+                shipped = "已发货" if full else "部分发货"
     return {"orderNo": order.order_no, "milestones": milestones,
-            "committedDeliveryDate": committed_delivery(order),
-            "shipmentStatus": None, "receiptStatus": None}
+            "committedDeliveryDate": committed_delivery(order), "shipmentStatus": shipped, "receiptStatus": signed}
 
 
 class CustomerOrderProgressView(EnterpriseView):
